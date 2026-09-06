@@ -675,6 +675,9 @@
       - CrowbarRightArmInterdyne
       - InterdyneSandevistanInterdyne
       - InterdyneBerserkerInterdyne
+      - InterdyneInterface
+      - InterdyneSkilldeck
+      - InterdyneHackDoor
       - FridgeLPC
       - MeatwagonLPC
       - MatabeleLPC

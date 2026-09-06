@@ -18,6 +18,26 @@
         actions:
         - ActionDoorHack
 
+- type: entity
+  parent: BaseItem
+  id: SkillchipHackDoorInterdyne
+  name: Door sequencer quickhack datashard
+  description: Contains a fragment of code that abuses a bug in standard airlocks to force them open. Seems cobbled together from a variety of scrap electronics.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Objects/Misc/skillchips.rsi
+    layers:
+    - state: black_chip_1
+  - type: Skillchip
+    onImplantFunctions:
+    - !type:TraitAddActions
+      actions:
+      - ActionDoorHack
+    onRemoveFunctions:
+    - !type:TraitRemoveActions
+      actions:
+      - ActionDoorHack
+
 
 - type: entity
   id: ActionDoorHack

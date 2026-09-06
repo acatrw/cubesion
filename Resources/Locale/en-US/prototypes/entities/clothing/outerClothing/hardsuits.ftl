@@ -73,38 +73,37 @@ ent-ClothingOuterHardsuitCombatHoS = FPA-99s - "Dayicin Mk.II" tacsuit
 ent-ClothingOuterHardsuitLuxury = HpI-20c - "Minos" hardsuit
     .desc = A modified mining hardsuit from Hephaestus Industries, fashioned after the Logistics Officer's colors.
     The labels indicate that it provides slight protection against most forms of damage. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndie = CSA-51a - "Shanlin" tacsuit
-    .desc = A tactical combat hardsuit produced by the Cybersun-Armaments Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
+ent-ClothingOuterHardsuitSyndie = CDT-51a - "Shanlin" tacsuit
+    .desc = A tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
     This one has been painted blood red. It feels incredibly light.
-ent-ClothingOuterHardsuitShanlinUnpainted = CSA-51a - "Shanlin" tacsuit
-    .desc = A tactical combat hardsuit produced by the Cybersun-Armaments Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
+ent-ClothingOuterHardsuitShanlinUnpainted = CDT-51a - "Shanlin" tacsuit
+    .desc = A tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
     This one is unpainted bare metal. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieReverseEngineered = CSA-51a - "Shanlin" tacsuit
-    .desc = A tactical combat hardsuit produced by the Cybersun-Armaments Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
+ent-ClothingOuterHardsuitSyndieReverseEngineered = CDT-51A - "Shanlin" tacsuit
+    .desc = A tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
         This one has been painted blue. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieMedic = TFCF mk.IV "Zhongyao" tacsuit
+ent-ClothingOuterHardsuitSyndieMedic = CDT-51B "Zhongyao" tacsuit
     .desc = A tactical stealth combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
     Half of the suit is painted blood red, the rest bears sterile titanium plating. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieElite = CSA-54UA - "Shiwei" tacsuit
-    .desc = An "Up-Armored" tactical combat hardsuit produced by the Cybersun-Armaments Corporation.
+ent-ClothingOuterHardsuitSyndieElite = CDT-54UA - "Shiwei" tacsuit
+    .desc = An "Up-Armored" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation.
     The suit's tags indicate its rated for high exposure to radiation, heat and explosions, along with moderate physical trauma protection.
     It feels incredibly light.
-ent-ClothingOuterHardsuitShiweiUnpainted = CSA-54UA - "Shiwei" tacsuit
-    .desc = An "Up-Armored" tactical combat hardsuit produced by the Cybersun-Armaments Corporation.
+ent-ClothingOuterHardsuitShiweiUnpainted = CDT-54UA - "Shiwei" tacsuit
+    .desc = An "Up-Armored" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation.
     The suit's tags indicate its rated for high exposure to radiation, heat and explosions, along with moderate physical trauma protection.
     It is unpainted bare spaceship alloy. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieCommander = CSA-54c - "Tianming" tacsuit
-    .desc = A "Commander" tactical combat hardsuit produced by the Cybersun-Armaments Corporation. The suit's tags indicate that it protects greatly against all forms of damage.
+ent-ClothingOuterHardsuitSyndieCommander = CDT-54C - "Tianming" tacsuit
+    .desc = A "Commander" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation. The suit's tags indicate that it protects greatly against all forms of damage.
     This one has been painted blood red. It doesn't seem to have any weight.
-ent-ClothingOuterHardsuitJuggernaut = CSA-80UA - "Guan Yu" tacsuit
-    .desc = The pride and joy of the Cybersun-Armaments Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
+ent-ClothingOuterHardsuitJuggernaut = CDT-80UA - "Guan Yu" tacsuit
+    .desc = The pride and joy of the Cyberdawn-Technologies Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
     Matching its bulky appearance, it protects against all forms of damage. It feels VERY heavy.
-ent-ClothingOuterHardsuitJuggernautReverseEngineered = CSA-80UA - "Guan Yu" tacsuit
-    .desc = The pride and joy of the Cybersun-Armaments Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
+ent-ClothingOuterHardsuitJuggernautReverseEngineered = CDT-80UA - "Guan Yu" tacsuit
+    .desc = The pride and joy of the Cyberdawn-Technologies Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
         Matching its bulky appearance, it protects against all forms of damage. It feels VERY heavy.
-ent-ClothingOuterHardsuitCybersunStealth = CDT mk.I "Èguǐ" tacsuit
-    .desc = A rare prototype tacsuit produced by the Cyberdawn-Technologies Corporation that seeks to improve upon stolen designs of the SVBT-2XB "RAIKU" suit from their competitors at Shinohara.
-    Accomplishes this by using advanced meta-materials to strengthen the light armor plating sewn into the suit's core with only a minimal loss in agility.
+ent-ClothingOuterHardsuitCybersunStealth = CDT-91X "Èguǐ" tacsuit
+    .desc = A rare prototype tacsuit produced by the Cyberdawn-Technologies Corporation has the ability to create a local spatial disturbance allowing the user to become effectively invisible.
 ent-ClothingOuterHardsuitWizard = WZD-84 - "Mana" tacsuit
     .desc = A bizarre gem-encrusted hardsuit. Famously used by members of the Wizard Federation in their operations.
     Contrary to it's appearance, it can protect its wearer from space and considerable amounts of physical trauma, it feels somewhat light.

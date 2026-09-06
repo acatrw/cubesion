@@ -42,6 +42,20 @@
 
 - type: entity
   parent: BaseItem
+  id: SkilldeckLaozi
+  suffix: Advanced
+  name: CDT-95XC 'Laozi' integrated cyberdeck
+  description: Laozi Is a prototype cyberdeck using a basic AI within the cyberdeck. Allows the operator to handle more skill trips without collapse of the operator's psyche
+  components:
+  - type: Sprite
+    sprite: _Crescent/Objects/Misc/cybernetics.rsi
+    layers:
+    - state: lobotomychip
+  - type: Skilldeck
+    skillchipSlotAmount: 4
+
+- type: entity
+  parent: BaseItem
   id: SkilldeckShinohara
   suffix: Advanced
   name: SHI pF-300 'Kaisei' integrated cyberdeck

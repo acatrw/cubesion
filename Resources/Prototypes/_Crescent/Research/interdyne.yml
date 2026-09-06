@@ -47,20 +47,33 @@
   - ClothingHeadHelmetSyndicateBasicInterdyne
   - ClothingOuterArmorSyndicateArmorvestInterdyne
   - ClothingOuterHardsuitTraumasec
-  - M14IncendiaryHandgrenade
-  - M18SmokeHandgrenade
 
 - type: technology
-  id: InterdyneOptics
+  id: InterdyneOpticsBasic
   name: research-technology-interdyne-optics
   icon:
     sprite: _Crescent/Objects/Misc/cybernetics.rsi
     state: interdyneoptics
   discipline: Interdyne
   tier: 1
-  cost: 4000
+  cost: 2500
   recipeUnlocks:
   - InterdyneOpticsInterdyne
+
+- type: technology
+  id: CyberdeckTechnology
+  name: research-technology-interdyne-Cyberdeck
+  icon:
+    sprite: _Crescent/Objects/Misc/cybernetics.rsi
+    layers:
+    - state: higgsanchor
+  discipline: Interdyne
+  tier: 1
+  cost: 2500
+  recipeUnlocks:
+  - InterdyneInterface
+  - InterdyneSkilldeck
+  - InterdyneHackDoor
 
 #Tier 2
 - type: technology
@@ -71,20 +84,9 @@
     state: icon
   discipline: Interdyne
   tier: 2
-  cost: 7500
+  cost: 5000
   recipeUnlocks:
   - DefibrillatorSyndicate
-
-- type: technology
-  id: InterdyneOmnitool
-  name: research-technology-interdyne-omnitool
-  icon:
-    sprite: _Shitmed/Objects/Specific/Medical/Surgery/omnimed.rsi
-    state: evil
-  discipline: Interdyne
-  tier: 2
-  cost: 7500
-  recipeUnlocks:
   - OmnimedToolSyndieInterdyne
 
 - type: technology
@@ -95,7 +97,7 @@
     state: paineditor
   discipline: Interdyne
   tier: 2
-  cost: 8500
+  cost: 5000
   recipeUnlocks:
   - CyberneticsPainEditorInterdyne
 
@@ -107,7 +109,7 @@
     state: cherenzikovaccelerator
   discipline: Interdyne
   tier: 2
-  cost: 8500
+  cost: 5000
   recipeUnlocks:
   - CyberneticsAdrenalInterdyne
 
@@ -124,6 +126,30 @@
   cost: 12500
   recipeUnlocks:
   - CyberneticsBloodPumpInterdyne
+
+- type: technology
+  id: InterdyneSandevistan
+  name: research-technology-interdyne-Sandevistan
+  icon:
+    sprite: _Goobstation/Objects/Misc/sandevistan.rsi
+    state: icon
+  discipline: Interdyne
+  tier: 3
+  cost: 12500
+  recipeUnlocks:
+  - InterdyneSandevistanInterdyne
+
+- type: technology
+  id: InterdyneBerserker
+  name: research-technology-interdyne-Berserker
+  icon:
+    sprite: _Goobstation/Objects/Misc/berserker_heart.rsi
+    state: icon
+  discipline: Interdyne
+  tier: 3
+  cost: 12500
+  recipeUnlocks:
+  - InterdyneBerserkerInterdyne
 
 - type: technology
   id: InterdynePryarms
