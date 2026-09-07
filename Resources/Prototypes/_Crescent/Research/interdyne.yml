@@ -64,9 +64,8 @@
   id: CyberdeckTechnology
   name: research-technology-interdyne-Cyberdeck
   icon:
-    sprite: _Crescent/Objects/Misc/cybernetics.rsi
-    layers:
-    - state: higgsanchor
+    sprite: _Crescent/Objects/Misc/skillchips.rsi
+    state: black_chip_1
   discipline: Interdyne
   tier: 1
   cost: 2500
