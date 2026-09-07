@@ -122,8 +122,8 @@
   components:
   - type: LightBulb
     bulb: Bulb
-    color: "#FFD1A3" # 4000K color temp
-    lightEnergy: 1.0
+    color: "#FFB475" # 3100K color temp
+    lightEnergy: 0.7
     lightRadius: 6
     lightSoftness: 1.1
 
@@ -150,7 +150,7 @@
   components:
   - type: LightBulb
     bulb: Bulb
-    color: "#FFD1A3" # 4000K color temp
+    color: "#FFC99D" # 3800K color temp
     lightEnergy: 0.3 # old incandescents just arent as bright
     lightRadius: 6
     lightSoftness: 1.1
@@ -186,9 +186,9 @@
   description: A light fixture.
   components:
   - type: LightBulb
-    color: "#FFE4CE" # 5000K color temp
-    lightEnergy: 0.8
-    lightRadius: 10
+    color: "#FFC99D" # 3800K color temp
+    lightEnergy: 0.6
+    lightRadius: 8
     lightSoftness: 1
     PowerUse: 25
 
