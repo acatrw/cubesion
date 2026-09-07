@@ -85,6 +85,8 @@ research-technology-interdyne-paineditor = TT-46 Pain Editor
 research-technology-interdyne-adrenalaccelerator = TT-86 Adrenal Accelerator
 research-technology-interdyne-bloodpump = TT-92 Bloodpump
 research-technology-interdyne-pryarms = TT-42 Pryarms
+research-technology-interdyne-Sandevistan = Sandevistan
+research-technology-interdyne-Berserker = Berserker
 
 # CYBERDAWN
 research-technology-cyberdawn-clothing = Cyberdawn Clothing
@@ -107,6 +109,8 @@ research-technology-cyberdawn-CDTMedicalcyborgs = Medical cyborgs
 research-technology-cyberdawn-CDTSaboteurcyborgs = Saboteur cyborgs
 research-technology-cyberdawn-CDTAssaultcyborgs = Assault cyborgs
 research-technology-cyberdawn-CDTShipT1LPC = Basic stealth ship production
+research-technology-cyberdawn-energydagger = Energy Dagger
+research-technology-cyberdawn-CDTAdvancedFirearmcomponents = Advanced Firearm components
 
 
 # DSM
