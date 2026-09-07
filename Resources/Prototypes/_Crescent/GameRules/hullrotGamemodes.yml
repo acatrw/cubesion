@@ -70,8 +70,8 @@
     respawnTimeMinutes: 10
   - type: AdventureRule
     gameMapsByID:
-      PortBalreska:
-        gameMapID: PortBalreska
+      PortZarya:
+        gameMapID: PortZarya
         posX: -7000
         posY: 2000
         IFFColor: Orange
@@ -200,8 +200,8 @@
     respawnTimeMinutes: 10
   - type: AdventureRule
     gameMapsByID:
-      PortBalreska:
-        gameMapID: PortBalreska
+      PortZarya:
+        gameMapID: PortZarya
         posX: -7000
         posY: 2000
         IFFColor: Orange
