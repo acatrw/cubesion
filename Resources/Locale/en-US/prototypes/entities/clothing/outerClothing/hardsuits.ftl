@@ -79,27 +79,27 @@ ent-ClothingOuterHardsuitSyndie = CDT-51a - "Shanlin" tacsuit
 ent-ClothingOuterHardsuitShanlinUnpainted = CDT-51a - "Shanlin" tacsuit
     .desc = A tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
     This one is unpainted bare metal. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieReverseEngineered = CDT-51A - "Shanlin" tacsuit
+ent-ClothingOuterHardsuitSyndieReverseEngineered = CDT-51a - "Shanlin" tacsuit
     .desc = A tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
         This one has been painted blue. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieMedic = CDT-51B "Zhongyao" tacsuit
+ent-ClothingOuterHardsuitSyndieMedic = CDT-51m "Zhongyao" tacsuit
     .desc = A tactical stealth combat hardsuit produced by the Cyberdawn-Technologies Corporation, the suit's tags indicate it provides moderate protection against most forms of damage.
     Half of the suit is painted blood red, the rest bears sterile titanium plating. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieElite = CDT-54UA - "Shiwei" tacsuit
+ent-ClothingOuterHardsuitSyndieElite = CDT-54ua - "Shiwei" tacsuit
     .desc = An "Up-Armored" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation.
     The suit's tags indicate its rated for high exposure to radiation, heat and explosions, along with moderate physical trauma protection.
     It feels incredibly light.
-ent-ClothingOuterHardsuitShiweiUnpainted = CDT-54UA - "Shiwei" tacsuit
+ent-ClothingOuterHardsuitShiweiUnpainted = CDT-54ua - "Shiwei" tacsuit
     .desc = An "Up-Armored" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation.
     The suit's tags indicate its rated for high exposure to radiation, heat and explosions, along with moderate physical trauma protection.
     It is unpainted bare spaceship alloy. It feels incredibly light.
-ent-ClothingOuterHardsuitSyndieCommander = CDT-54C - "Tianming" tacsuit
+ent-ClothingOuterHardsuitSyndieCommander = CDT-54c - "Tianming" tacsuit
     .desc = A "Commander" tactical combat hardsuit produced by the Cyberdawn-Technologies Corporation. The suit's tags indicate that it protects greatly against all forms of damage.
     This one has been painted blood red. It doesn't seem to have any weight.
-ent-ClothingOuterHardsuitJuggernaut = CDT-80UA - "Guan Yu" tacsuit
+ent-ClothingOuterHardsuitJuggernaut = CDT-80ua - "Guan Yu" tacsuit
     .desc = The pride and joy of the Cyberdawn-Technologies Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
     Matching its bulky appearance, it protects against all forms of damage. It feels VERY heavy.
-ent-ClothingOuterHardsuitJuggernautReverseEngineered = CDT-80UA - "Guan Yu" tacsuit
+ent-ClothingOuterHardsuitJuggernautReverseEngineered = CDT-80ua - "Guan Yu" tacsuit
     .desc = The pride and joy of the Cyberdawn-Technologies Corporation, named after an ancient Sol' War God. Commonly known throughout the galaxy as a "Juggernaut".
         Matching its bulky appearance, it protects against all forms of damage. It feels VERY heavy.
 ent-ClothingOuterHardsuitCybersunStealth = CDT-91X "Èguǐ" tacsuit

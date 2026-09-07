@@ -1,0 +1,63 @@
+﻿- type: entity
+  id: ActionDoorHack
+  name: Door Hack
+  description: Breaks open whatever door you target.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: EntityTargetAction
+    useDelay: 10
+    whitelist:
+      components:
+      - Airlock
+    canTargetSelf: false
+    interactOnMiss: false
+    itemIconStyle: NoItem
+    checkCanInteract: true
+    icon:
+      sprite: Objects/Magic/magicactions.rsi
+      state: knock
+    event: !type:DoorHackActionEvent {}
+
+- type: entity
+  id: ActionSpawnSyndyCat
+  name: Summon SyndyCat
+  description: Tear a hole in reality to summon a SyndyCat.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: WorldTargetAction
+    useDelay: 60
+    range: 8
+    itemIconStyle: BigAction
+    icon:
+      sprite: Objects/Magic/magicactions.rsi
+      state: spell_default
+    event: !type:WorldSpawnSpellEvent
+      prototypes:
+      - id: BluespaceSyndyCat
+        amount: 1
+      offset: 0, 1
+
+- type: entity
+  parent: Acidifier
+  id: BluespaceSyndyCat
+  name: bluespace SyndyCat
+  description: Teleports SyndyCat to save your life!
+  components:
+  - type: Transform
+    anchored: True
+  - type: Sprite
+    sprite: /Prototypes/_Goobstation/Textures/Effects/bluespace_lifeline.rsi
+    noRot: true
+    layers:
+    - state: bluespace_lifeline
+      shader: unshaded
+  - type: SpawnOnDespawn
+    prototype: MobCatSyndy
+  - type: EmitSoundOnSpawn
+    sound:
+      path: /Audio/_Goobstation/Weapons/Guns/Stasisgun/stasisgun_reload.ogg
+  - type: PointLight
+    color: SkyBlue
+    radius: 3
+    energy: 1
+    netsync: false

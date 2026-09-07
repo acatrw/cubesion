@@ -12,6 +12,8 @@
 
 - type: npcFaction
   id: TFSC
+  friendly:
+  - Syndicate
   hostile:
     - NCWL
     # - TFSC

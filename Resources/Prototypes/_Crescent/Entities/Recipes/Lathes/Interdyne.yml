@@ -261,7 +261,7 @@
 - type: latheRecipe
   id: InterdyneInterface
   category: Medical
-  result: HullrotCyberneticBase
+  result: SkillshardSlot
   completetime: 1.5
   materials:
     BasicMechatronics: 1000

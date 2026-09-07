@@ -51,6 +51,7 @@
           - Freespeak
           - SolCommon
           - RobotTalk
+
   access:
   - Command
   - Maintenance

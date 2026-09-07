@@ -38,26 +38,25 @@
       actions:
       - ActionDoorHack
 
-
 - type: entity
-  id: ActionDoorHack
-  name: Door Hack
-  description: Breaks open whatever door you target.
-  categories: [ HideSpawnMenu ]
+  parent: BaseItem
+  id: SkillchipHackSyndyCatCD
+  name: SyndyCat quickhack datashard
+  description: This chip allows the user to connect to an ancient relay, allowing the deployment of a SyndyCat.
   components:
-  - type: EntityTargetAction
-    useDelay: 10
-    whitelist:
-      components:
-      - Airlock
-    canTargetSelf: false
-    interactOnMiss: false
-    itemIconStyle: NoItem
-    checkCanInteract: true
-    icon:
-      sprite: Objects/Magic/magicactions.rsi
-      state: knock
-    event: !type:DoorHackActionEvent {}
+  - type: Sprite
+    sprite: _Crescent/Objects/Misc/skillchips.rsi
+    layers:
+    - state: black_chip_3
+  - type: Skillchip
+    onImplantFunctions:
+    - !type:TraitAddActions
+      actions:
+      - ActionSpawnSyndyCat
+    onRemoveFunctions:
+    - !type:TraitRemoveActions
+      actions:
+      - ActionSpawnSyndyCat
 
 - type: entity
   parent: BaseItem

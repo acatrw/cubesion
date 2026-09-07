@@ -3391,15 +3391,17 @@
       path: /Audio/Effects/bite.ogg
     damage:
       types:
-        Slash: 6
-        Piercing: 6
-        Structural: 15
+        Slash: 15
+        Piercing: 15
+        Structural: 30
   - type: LanguageKnowledge
     speaks:
       - Cat
     understands:
     - Cat
     - TauCetiBasic
+    - Freespeak
+    - SolCommon
 
 - type: entity
   name: space cat

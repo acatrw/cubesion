@@ -737,6 +737,17 @@
     Plasma: 1000
 
 - type: latheRecipe
+  id: SkillchipHackSyndyCatCD
+  category: Implants
+  result: SkillchipHackSyndyCatCD
+  completetime: 1.5
+  materials:
+    AdvancedElectronics: 3000
+    Gold: 2000
+    Plastic: 500
+    Plasma: 3000
+
+- type: latheRecipe
   id: ReinforcementFlatpackSyndicateCyborgMedical
   category: Circuitry
   result: ReinforcementFlatpackSyndicateCyborgMedical

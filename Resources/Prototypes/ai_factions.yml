@@ -71,6 +71,8 @@
 
 - type: npcFaction
   id: Syndicate
+  friendly:
+    - TFSC # Eclipsion - syndicat
   hostile:
     - NanoTrasen
     - SimpleHostile
