@@ -251683,7 +251683,7 @@ entities:
           showEnts: False
           occludes: True
           ent: 320
-- proto: AmeJar
+- proto: AmeJarT3
   entities:
   - uid: 320
     components:
@@ -251693,6 +251693,8 @@ entities:
       angularDamping: 0
       linearDamping: 0
       canCollide: False
+- proto: AmeJar
+  entities:
   - uid: 321
     components:
     - type: Transform
@@ -276523,8 +276525,6 @@ entities:
       pos: 15.5,-8.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 4950
     components:
     - type: Transform
@@ -276591,8 +276591,6 @@ entities:
       pos: 14.5,-8.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 4963
     components:
     - type: Transform
@@ -288467,8 +288465,6 @@ entities:
       pos: 33.5,31.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 46
     - type: AtmosPipeColor
@@ -299243,7 +299239,7 @@ entities:
       parent: 1
     - type: TechShareReceiver
       consoleName: ЛРНП
-- proto: TelecomServerFilledNovaBalreska
+- proto: TelecomServerNCWL
   entities:
   - uid: 7888
     components:

@@ -24,8 +24,24 @@ public sealed partial class CaptureFlagComponent : Component
     [DataField, AutoNetworkedField]
     public string? OwnerTeam;
 
+    [DataField]
+    public string NeutralState = "neutral-white";
+
+    [DataField]
+    public string DsmState = "black-purple";
+
+    [DataField]
+    public string NcwlState = "brown-ncwl";
+
     [DataField, AutoNetworkedField]
     public string? ActiveTeam;
+
+    /// <summary>
+    /// Team which owns the current partial progress. Kept separately from <see cref="ActiveTeam"/> so progress can
+    /// decay while nobody is present without being inherited by the next faction that enters the radius.
+    /// </summary>
+    [ViewVariables]
+    public string? ProgressTeam;
 
     [DataField, AutoNetworkedField]
     public float ProgressSeconds = 0f;

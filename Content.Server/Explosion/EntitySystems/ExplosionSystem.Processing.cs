@@ -1,11 +1,16 @@
 using System.Numerics;
+using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Part;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
 using Content.Shared.Explosion.EntitySystems;
+using Content.Shared.Humanoid;
 using Content.Shared.Maps;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Projectiles;
 using Content.Shared.Tag;
@@ -23,6 +28,7 @@ namespace Content.Server.Explosion.EntitySystems;
 public sealed partial class ExplosionSystem : SharedExplosionSystem
 {
     [Dependency] private readonly FlammableSystem _flammableSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
 
     /// <summary>
     ///     Used to limit explosion processing time. See <see cref="MaxProcessingTime"/>.
@@ -438,12 +444,62 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     {
         if (originalDamage != null)
         {
+            var explosion = _prototypeManager.Index<ExplosionPrototype>(id);
             GetEntitiesToDamage(uid, originalDamage, id);
             foreach (var (entity, damage) in _toDamage)
             {
                 // TODO EXPLOSIONS turn explosions into entities, and pass the the entity in as the damage origin.
-                _damageableSystem.TryChangeDamage(entity, damage, ignoreResistances: true, partMultiplier: 0.3f); // Shitmed: Temp change, nerf explosion delimbing
+                if (!explosion.RandomizeLimbDamage)
+                {
+                    var spreadLimbs = GetSeverableLimbs(entity);
+                    _damageableSystem.TryChangeDamage(
+                        entity,
+                        damage,
+                        ignoreResistances: true,
+                        partMultiplier: explosion.LimbDamageMultiplier);
+                    TryPlayLimbLossScream(entity, explosion, spreadLimbs);
+                    continue;
+                }
 
+                // Keep normal explosion damage for structures and other entities without a body.
+                if (!HasComp<BodyComponent>(entity))
+                {
+                    _damageableSystem.TryChangeDamage(entity, damage, ignoreResistances: true);
+                    continue;
+                }
+
+                var limbTargets = GetRandomExplosionLimbs(
+                    entity,
+                    explosion.MinLimbDamageTargets,
+                    explosion.MaxLimbDamageTargets);
+                var bodyDamage = damage * MathF.Max(0f, explosion.BodyDamageMultiplier);
+                var bodyDamageTotal = GetApplicableDamageTotal(entity, bodyDamage);
+                if (explosion.MaxBodyDamage is { } maxBodyDamage
+                    && bodyDamageTotal > maxBodyDamage
+                    && bodyDamageTotal > 0f)
+                {
+                    bodyDamage *= MathF.Max(0f, maxBodyDamage) / bodyDamageTotal;
+                }
+
+                _damageableSystem.TryChangeDamage(
+                    entity,
+                    bodyDamage,
+                    ignoreResistances: true,
+                    doPartDamage: false);
+
+                var limbDamageMultiplier = explosion.LimbDamageMultiplier;
+                if (IsWearingHardsuit(entity))
+                    limbDamageMultiplier *= explosion.HardsuitLimbDamageMultiplier;
+
+                foreach (var limb in limbTargets)
+                {
+                    _damageableSystem.TryChangeDamage(
+                        limb.Id,
+                        damage * limbDamageMultiplier,
+                        ignoreResistances: true);
+                }
+
+                TryPlayLimbLossScream(entity, explosion, limbTargets);
             }
         }
 
@@ -477,6 +533,142 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     }
 
     /// <summary>
+    ///     Picks attached arms, hands, legs, or feet from separate limb branches for concentrated blast trauma.
+    ///     A hand and its parent arm (or a foot and its parent leg) cannot both consume target slots.
+    /// </summary>
+    private List<(EntityUid Id, BodyPartComponent Component)> GetRandomExplosionLimbs(
+        EntityUid entity,
+        int minimumTargets,
+        int maximumTargets)
+    {
+        var selected = new List<(EntityUid Id, BodyPartComponent Component)>();
+        var limbs = GetSeverableLimbs(entity);
+
+        _robustRandom.Shuffle(limbs);
+        minimumTargets = Math.Max(0, minimumTargets);
+        maximumTargets = Math.Max(minimumTargets, maximumTargets);
+        maximumTargets = Math.Min(maximumTargets, limbs.Count);
+        minimumTargets = Math.Min(minimumTargets, maximumTargets);
+        if (maximumTargets == 0)
+            return selected;
+
+        var targetCount = _robustRandom.Next(minimumTargets, maximumTargets + 1);
+
+        foreach (var candidate in limbs)
+        {
+            var overlapsSelectedBranch = selected.Any(existing =>
+                _bodySystem.PartHasChild(candidate.Id, existing.Id, candidate.Component, existing.Component)
+                || _bodySystem.PartHasChild(existing.Id, candidate.Id, existing.Component, candidate.Component));
+            if (overlapsSelectedBranch)
+                continue;
+
+            selected.Add(candidate);
+            if (selected.Count >= targetCount)
+                break;
+        }
+
+        return selected;
+    }
+
+    /// <summary>
+    ///     Every attached arm, hand, leg or foot that a blast is allowed to take off. Empty for anything without a
+    ///     body, which is most of what an explosion touches.
+    /// </summary>
+    private List<(EntityUid Id, BodyPartComponent Component)> GetSeverableLimbs(EntityUid entity)
+    {
+        var limbs = new List<(EntityUid Id, BodyPartComponent Component)>();
+        if (!TryComp<BodyComponent>(entity, out var body))
+            return limbs;
+
+        foreach (var part in _bodySystem.GetBodyChildren(entity, body))
+        {
+            if (!part.Component.CanSever || part.Component.PartType is not (
+                    BodyPartType.Arm or
+                    BodyPartType.Hand or
+                    BodyPartType.Leg or
+                    BodyPartType.Foot))
+            {
+                continue;
+            }
+
+            limbs.Add(part);
+        }
+
+        return limbs;
+    }
+
+    /// <summary>
+    ///     Screams if the blast just took an arm or a leg off, and only some of the time - see
+    ///     <see cref="ExplosionPrototype.LimbLossSoundChance"/>. Rolled once per victim, not once per limb.
+    /// </summary>
+    /// <param name="limbs">
+    ///     Limbs that were still attached before the damage went in. Anything now detached or outright gibbed counts
+    ///     as a loss.
+    /// </param>
+    private void TryPlayLimbLossScream(
+        EntityUid entity,
+        ExplosionPrototype explosion,
+        List<(EntityUid Id, BodyPartComponent Component)> limbs)
+    {
+        if (explosion.LimbLossSound is null
+            || explosion.LimbLossSoundChance <= 0f
+            || limbs.Count == 0
+            || TerminatingOrDeleted(entity))
+        {
+            return;
+        }
+
+        // Animals, borgs and whatever is left after a corpse gibs have nothing to scream with.
+        if (!HasComp<HumanoidAppearanceComponent>(entity) || _mobStateSystem.IsDead(entity))
+            return;
+
+        var lostLimb = false;
+        foreach (var limb in limbs)
+        {
+            // DropPart clears Body when a part comes off; a part destroyed outright is deleted instead.
+            if (limb.Component.Body is not null && !TerminatingOrDeleted(limb.Id))
+                continue;
+
+            lostLimb = true;
+            break;
+        }
+
+        if (!lostLimb || !_robustRandom.Prob(explosion.LimbLossSoundChance))
+            return;
+
+        _audio.PlayPvs(explosion.LimbLossSound, entity);
+    }
+
+    /// <summary>
+    ///     Pressure protection is inherited by the hardsuit bases and is more reliable than the incomplete Hardsuit
+    ///     tag. It also gives sealed suits the same sensible protection against blast-driven limb separation.
+    /// </summary>
+    private bool IsWearingHardsuit(EntityUid entity)
+    {
+        return _inventorySystem.TryGetSlotEntity(entity, OuterClothingSlot, out var outerClothing)
+               && HasComp<PressureProtectionComponent>(outerClothing);
+    }
+
+    /// <summary>
+    ///     Gets the damage total supported by an entity's damage container. Structural damage, for example, should
+    ///     not consume a humanoid's body-damage cap.
+    /// </summary>
+    private float GetApplicableDamageTotal(EntityUid entity, DamageSpecifier damage)
+    {
+        if (!TryComp<DamageableComponent>(entity, out var damageable))
+            return 0f;
+
+        var total = 0f;
+        foreach (var (damageType, value) in damage.DamageDict)
+        {
+            if (damageable.Damage.DamageDict.ContainsKey(damageType))
+                total += value.Float();
+        }
+
+        return total;
+    }
+
+    /// <summary>
     ///     Tries to damage floor tiles. Not to be confused with the function that damages entities intersecting the
     ///     grid tile.
     /// </summary>
@@ -496,7 +688,8 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             canCreateVacuum = true; // is already a vacuum.
 
         int tileBreakages = 0;
-        while (maxTileBreak > tileBreakages && _robustRandom.Prob(type.TileBreakChance(effectiveIntensity)))
+        while (maxTileBreak > tileBreakages &&
+               _robustRandom.Prob(type.TileBreakChance(effectiveIntensity * tileDef.ExplosionBreakMultiplier)))
         {
             tileBreakages++;
             effectiveIntensity -= type.TileBreakRerollReduction;
@@ -512,6 +705,11 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
                 break;
 
             tileDef = newDef;
+
+            // Floor coverings should reveal their protected subfloor instead of allowing the same explosion to
+            // immediately roll through every layer beneath them. An already exposed subfloor is still breakable.
+            if (tileDef.StopsExplosionBreakChain)
+                break;
         }
 
         if (tileDef.TileId == tileRef.Tile.TypeId)
@@ -643,6 +841,7 @@ sealed class Explosion
     private readonly bool _canCreateVacuum;
 
     private readonly IEntityManager _entMan;
+    private readonly SharedMapSystem _mapMan;
     private readonly ExplosionSystem _system;
 
     public readonly EntityUid VisualEnt;
@@ -662,7 +861,7 @@ sealed class Explosion
         int maxTileBreak,
         bool canCreateVacuum,
         IEntityManager entMan,
-        IMapManager mapMan,
+        SharedMapSystem mapMan,
         EntityUid visualEnt)
     {
         VisualEnt = visualEnt;
@@ -676,6 +875,7 @@ sealed class Explosion
         _maxTileBreak = maxTileBreak;
         _canCreateVacuum = canCreateVacuum;
         _entMan = entMan;
+        _mapMan = mapMan;
 
         _xformQuery = entMan.GetEntityQuery<TransformComponent>();
         _physicsQuery = entMan.GetEntityQuery<PhysicsComponent>();
@@ -685,7 +885,7 @@ sealed class Explosion
 
         if (spaceData != null)
         {
-            var mapUid = mapMan.GetMapEntityId(epicenter.MapId);
+            var mapUid = mapMan.GetMap(epicenter.MapId);
 
             _explosionData.Add(new()
             {
@@ -810,7 +1010,7 @@ sealed class Explosion
 
             // Is the current tile on a grid (instead of in space)?
             if (_currentGrid != null &&
-                _currentGrid.TryGetTileRef(_currentEnumerator.Current, out var tileRef) &&
+                _mapMan.TryGetTileRef(_currentGrid.Owner, _currentGrid, _currentEnumerator.Current, out var tileRef) &&
                 !tileRef.Tile.IsEmpty)
             {
                 if (!_tileUpdateDict.TryGetValue(_currentGrid, out var tileUpdateList))
@@ -871,7 +1071,7 @@ sealed class Explosion
         {
             if (list.Count > 0 && _entMan.EntityExists(grid.Owner))
             {
-                grid.SetTiles(list);
+                _mapMan.SetTiles(grid.Owner, grid, list);
             }
         }
         _tileUpdateDict.Clear();

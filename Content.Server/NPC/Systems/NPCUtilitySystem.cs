@@ -1,4 +1,7 @@
+using Content.Server._Crescent.Diplomacy; // Eclipsion
+using Content.Server._Crescent.Factions; // Eclipsion
 using Content.Server._Mono.NPC.HTN;
+using Content.Server.Atmos.Components; // Eclipsion
 using Content.Server.Chemistry.Containers.EntitySystems;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.NPC.Queries;
@@ -14,7 +17,13 @@ using Content.Shared.Examine;
 using Content.Shared.Fluids.Components;
 using Content.Shared.Hands.Components;
 using Content.Shared.Inventory;
+using Content.Shared._Crescent.Diplomacy; // Eclipsion
+using Content.Shared._Crescent.HullrotFaction; // Eclipsion
+using Content.Shared.Mech.Components; // Eclipsion
+using Content.Shared.Mobs; // Eclipsion
+using Content.Shared.Mobs.Components; // Eclipsion
 using Content.Shared.Mobs.Systems;
+using Content.Shared.NPC.Components; // Eclipsion
 using Content.Shared.NPC.Systems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
@@ -39,6 +48,9 @@ public sealed class NPCUtilitySystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
+    [Dependency] private readonly DiplomacySystem _diplomacy = default!; // Eclipsion
+    [Dependency] private readonly FactionIdCardSystem _factionIds = default!; // Eclipsion
+    [Dependency] private readonly RatDiplomacySystem _factionDiplomacy = default!; // Eclipsion
     [Dependency] private readonly DrinkSystem _drink = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly FoodSystem _food = default!;
@@ -53,6 +65,9 @@ public sealed class NPCUtilitySystem : EntitySystem
     [Dependency] private readonly ExamineSystemShared _examine = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly TurretTargetSettingsSystem _turretTargetSettings = default!;
+
+    // Eclipsion - inventory slot an anti-boarder gun inspects for a sealed suit.
+    private const string OuterClothingSlot = "outerClothing";
 
     private EntityQuery<PuddleComponent> _puddleQuery;
     private EntityQuery<TransformComponent> _xformQuery;
@@ -392,6 +407,111 @@ public sealed class NPCUtilitySystem : EntitySystem
         return Math.Clamp(adjusted, 0f, 1f);
     }
 
+    /// <summary>
+    /// Eclipsion - adds a target to an anti-boarder gun's candidate set if it is not one of ours and is
+    /// dressed to come aboard.
+    /// </summary>
+    private void TryAddBoarder(EntityUid owner, EntityUid target, HashSet<EntityUid> entities)
+    {
+        // The old PD query required both alive and not critical. NearbyBoarders also yields corpses, so keep
+        // that rule here instead of using TargetIsAliveCon: faction mechs intentionally have no MobState and
+        // would otherwise be rejected along with dead mobs.
+        if (TryComp<MobStateComponent>(target, out var mobState) && mobState.CurrentState != MobState.Alive)
+            return;
+
+        // Ordinary mechs are just transports as far as an anti-boarder gun is concerned: identify the
+        // boarder driving one instead of wasting fire on the chassis. Faction mechs are purpose-built combat
+        // assets, however, and remain targets in their own right.
+        var inOrdinaryMech = false;
+        if (TryComp<MechPilotComponent>(target, out var mechPilot))
+        {
+            if (HasComp<NpcFactionMemberComponent>(mechPilot.Mech))
+                return;
+
+            inOrdinaryMech = true;
+        }
+
+        if (target == owner)
+            return;
+
+        // Anti-boarder guns trust the faction credential in the wearer's ID slot. An allied card grants safe
+        // passage, while a card belonging to a faction at war identifies its wearer as a boarder even without
+        // a pressure suit. Cards held in a hand are not accepted.
+        var hasHostileCredential = false;
+        if (_factionIds.TryGetWornFaction(target, out var idFaction) &&
+            TryComp<NpcFactionMemberComponent>(owner, out var ownerFactions))
+        {
+            foreach (var ownerFaction in ownerFactions.Factions)
+            {
+                var relation = _factionDiplomacy.GetRelation(ownerFaction, idFaction);
+                if (relation == FactionRelation.Alliance)
+                    return;
+
+                hasHostileCredential |= relation == FactionRelation.War;
+            }
+        }
+
+        // Hardsuitless people normally get the benefit of the doubt as crew. A hostile credential overrides
+        // that assumption, and being inside an ordinary mech still counts as boarding protection by itself.
+        if (!inOrdinaryMech && !hasHostileCredential && !IsSealedBoarder(target))
+            return;
+
+        // Restore the old accessibility guard without hiding ordinary-mech pilots. Those pilots are inside
+        // a mech container by design and are the intended target; every other inaccessible container keeps
+        // the old behaviour (non-storage containers are rejected, welded closed storage is rejected).
+        if (!inOrdinaryMech && !IsTargetAccessible(target))
+            return;
+
+        // HullrotFaction is the authoritative player allegiance. Check it directly as well as the mirrored
+        // NPC faction so a crew member cannot become a target while their job/recruitment faction is waiting
+        // to synchronize (or if that mirror was removed by another system).
+        if (TryComp<HullrotFactionComponent>(target, out var hullrotFaction)
+            && !string.IsNullOrWhiteSpace(hullrotFaction.Faction)
+            && _npcFaction.IsMember(owner, hullrotFaction.Faction.Trim()))
+        {
+            return;
+        }
+
+        // Anything we have no positive relationship with counts, which is the entire point: an unaligned
+        // boarder belongs to no faction that could ever appear in a hostile set.
+        if (_npcFaction.IsEntityFriendly(owner, target))
+            return;
+
+        entities.Add(target);
+    }
+
+    private bool IsTargetAccessible(EntityUid target)
+    {
+        if (!_container.TryGetContainingContainer(target, out var container))
+            return true;
+
+        if (!TryComp<EntityStorageComponent>(container.Owner, out var storage))
+            return false;
+
+        return storage.Open || !_weldable.IsWelded(container.Owner);
+    }
+
+    /// <summary>
+    /// Eclipsion - whether this entity is sealed against vacuum, which is what an anti-boarder gun reads as
+    /// "dressed to come aboard" rather than "works here".
+    /// </summary>
+    /// <remarks>
+    /// Pressure protection is used rather than the Hardsuit tag because that tag reaches barely a third of
+    /// the sealed suits in the game and almost none of the fork's own, so a gun keyed to it would wave
+    /// through most of the sector's boarding gear.
+    /// </remarks>
+    private bool IsSealedBoarder(EntityUid uid)
+    {
+        // Only something that could have dressed for the airlock and did not gets the crew's benefit of the
+        // doubt. A mech, a borg, a boarding drone or hostile fauna has no outer slot to check and is nobody's
+        // shirtsleeve deckhand, and all of them were valid targets before there was a suit requirement.
+        if (!_inventory.HasSlot(uid, OuterClothingSlot))
+            return true;
+
+        return _inventory.TryGetSlotEntity(uid, OuterClothingSlot, out var suit)
+               && HasComp<PressureProtectionComponent>(suit);
+    }
+
     private void Add(NPCBlackboard blackboard, HashSet<EntityUid> entities, UtilityQuery query)
     {
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
@@ -474,11 +594,57 @@ public sealed class NPCUtilitySystem : EntitySystem
                 }
                 break;
             }
-            // Mono - TODO: consider factions
+            // Eclipsion - an explicitly ordered target, with no faction or vision filter of its own.
+            // OrderedTargets sits on top of NearbyHostiles, so a commandable pet could only ever be
+            // pointed at something it already wanted to attack; this is the order on its own terms.
+            case OrderedTargetQuery:
+            {
+                if (blackboard.TryGetValue<EntityUid>(NPCBlackboard.CurrentOrderedTarget, out var ordered, EntityManager)
+                    && !TerminatingOrDeleted(ordered))
+                {
+                    entities.Add(ordered);
+                }
+
+                break;
+            }
+            // Eclipsion Start - anti-boarder targeting. NPC factions still identify the gun's owner, while a
+            // worn faction ID is checked against the live player-diplomacy matrix in TryAddBoarder.
+            case NearbyBoardersQuery:
+            {
+                var mapPos = _transform.GetMapCoordinates(owner, xform: _xformQuery.GetComponent(owner));
+
+                foreach (var (ent, _) in _lookup.GetEntitiesInRange<MobStateComponent>(mapPos, vision))
+                {
+                    TryAddBoarder(owner, ent, entities);
+                }
+
+                // Mechs carry no MobState, so they need a sweep of their own. Faction mechs remain targets in
+                // their own right; for ordinary models such as the Ripley, target the pilot instead. Empty
+                // ordinary mechs are not boarders and are ignored.
+                foreach (var (ent, mech) in _lookup.GetEntitiesInRange<MechComponent>(mapPos, vision))
+                {
+                    if (HasComp<NpcFactionMemberComponent>(ent))
+                        TryAddBoarder(owner, ent, entities);
+                    else if (mech.PilotSlot.ContainedEntity is { } pilot)
+                        TryAddBoarder(owner, pilot, entities);
+                }
+
+                break;
+            }
+            // Eclipsion End
             case NearbyHostileShuttlesQuery shuttlesQuery:
             {
                 var xform = Transform(owner);
                 var ownGrid = xform.GridUid;
+
+                // Eclipsion - diplomacy filter. Auto keeps the old faction-blind behaviour for an NPC flying an
+                // unaligned hull (the derelict rammer/attacker cores that ship on maps are exactly that), and
+                // only starts checking relations once the hull actually belongs to a faction.
+                var ownFaction = ownGrid != null ? _diplomacy.GetGridFaction(ownGrid.Value) : null;
+                var targeting = shuttlesQuery.Targeting;
+                if (targeting == ShipNpcTargeting.Auto)
+                    targeting = ownFaction != null ? ShipNpcTargeting.War : ShipNpcTargeting.All;
+
                 foreach (var (target, targetComp) in _lookup.GetEntitiesInRange<ShipNpcTargetComponent>(_transform.GetMapCoordinates(xform), shuttlesQuery.Range))
                 {
                     var targetXform = Transform(target);
@@ -490,6 +656,20 @@ public sealed class NPCUtilitySystem : EntitySystem
                         targetGrid != null && _whitelistSystem.IsBlacklistPass(shuttlesQuery.Blacklist, targetGrid.Value))
                     {
                         continue;
+                    }
+
+                    // Eclipsion - a hull with no faction of its own, or a target with none, has no relation we
+                    // could measure, so it is never a valid target outside All. That covers derelicts,
+                    // asteroids and unaligned civilian traffic.
+                    if (targeting != ShipNpcTargeting.All)
+                    {
+                        if (ownFaction == null ||
+                            targetGrid == null ||
+                            _diplomacy.GetGridFaction(targetGrid.Value) is not { } targetFaction ||
+                            !_diplomacy.IsHostile(ownFaction, targetFaction, targeting == ShipNpcTargeting.War))
+                        {
+                            continue;
+                        }
                     }
 
                     entities.Add(target);

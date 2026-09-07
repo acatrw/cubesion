@@ -28,6 +28,61 @@
     state: skullbanner
 
 - type: entity
+  parent: BannerBase
+  id: MedievalPoleBannerBlackPurple
+  name: black and purple pole banner
+  description: A dark medieval field banner hanging from a long iron pole.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/medieval_pole_banners.rsi
+    state: black-purple
+    noRot: true
+
+- type: entity
+  parent: BannerBase
+  id: MedievalPoleBannerGreenGold
+  name: green and gold pole banner
+  description: A forest-green medieval field banner edged with antique gold.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/medieval_pole_banners.rsi
+    state: green-gold
+    noRot: true
+
+- type: entity
+  parent: BannerBase
+  id: MedievalPoleBannerBurgundyGold
+  name: burgundy and gold pole banner
+  description: A rich burgundy medieval field banner edged with antique gold.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/medieval_pole_banners.rsi
+    state: burgundy-gold
+    noRot: true
+
+- type: entity
+  parent: BannerBase
+  id: MedievalPoleBannerCharcoalRusset
+  name: charcoal and russet pole banner
+  description: A somber charcoal medieval field banner with weathered russet trim.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/medieval_pole_banners.rsi
+    state: charcoal-russet
+    noRot: true
+
+- type: entity
+  parent: BannerBase
+  id: MedievalPoleBannerBrownNCWL
+  name: NCWL brown pole banner
+  description: A weathered brown field banner carrying restrained Communard-red trim.
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/medieval_pole_banners.rsi
+    state: brown-ncwl
+    noRot: true
+
+- type: entity
   parent: BaseSign
   id: BaseFlagNCWL
   abstract: true
@@ -109,7 +164,7 @@
   parent: BaseSign
   id: RotLayerThin
   name: welt tendrils
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -122,7 +177,7 @@
   parent: BaseSign
   id: RotLayerThick
   name: welt tendrils
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -148,7 +203,7 @@
   parent: BaseSign
   id: ImperialFlag
   name: imperial banner
-  description: "A strip of fabric with the insignia of House Vogsburg on it."
+  description: "A strip of fabric bearing Count Olywier's charter insignia."
   components:
   - type: WallMount
     arc: 360
@@ -161,7 +216,7 @@
   parent: BaseSign
   id: RotUnderside
   name: rot underside
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: Sprite
     drawdepth: Overdoors
@@ -173,7 +228,7 @@
   id: RotWeltDirectional
   name: rot welt
   suffix: Directional
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -187,7 +242,7 @@
   id: RotWelt0
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -201,7 +256,7 @@
   id: RotWelt1
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -215,7 +270,7 @@
   id: RotWelt2
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -229,7 +284,7 @@
   id: RotWelt3
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -243,7 +298,7 @@
   id: RotWelt4
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -257,7 +312,7 @@
   id: RotWelt5
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -271,7 +326,7 @@
   id: RotWelt6
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -285,7 +340,7 @@
   id: RotWelt7
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360
@@ -299,7 +354,7 @@
   id: RotWelt8
   name: rot welt growths
   suffix: Detail
-  description: "A tendril of Rotwelt. They tend to grow on corpses where Fog is abundant."
+  description: "A tendril of Rotwelt. It tends to grow on corpses exposed to severe temporal desynchronization."
   components:
   - type: WallMount
     arc: 360

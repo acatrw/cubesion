@@ -36,13 +36,25 @@ public sealed partial class ShipShieldsSystem : EntitySystem
 
     private ISawmill _sawmill = default!;
 
+    // Crescent: deflections are queued by OnCollide and resolved from Update.
+    // OnCollide runs inside SharedPhysicsSystem.CollideContacts, and resolving a deflection deletes the projectile
+    // (which purges its contacts on the spot) and can detonate it. Doing that while the engine is still walking its
+    // pooled Contact[] hands a live contact back to the pool mid-iteration.
+    private readonly List<(EntityUid Emitter, EntityUid Deflected)> _pendingDeflections = new();
+    private readonly List<(EntityUid Emitter, EntityUid Deflected)> _processingDeflections = new();
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
+        UpdateDeflections();
+
         var query = EntityQueryEnumerator<ShipShieldEmitterComponent, ApcPowerReceiverComponent>();
         while (query.MoveNext(out var uid, out var emitter, out var power))
         {
+            if (emitter.ForcedDisabled)
+                continue;
+
             //.2 | 2025 here to untangle this mess
 
             // emitter only runs its code every EmitterUpdateRate. emitter.Accumulator just adds up to 1.5 each time and...
@@ -95,7 +107,10 @@ public sealed partial class ShipShieldsSystem : EntitySystem
             //this checks if the shield the ship is attached to actually exists. if it's completely gone, don't bother calculating shields for this "grid"
             var parent = Transform(uid).GridUid;
             if (parent == null)
-                return;
+            {
+                RemoveEmitterShield(uid, emitter);
+                continue;
+            }
 
             // filter is needed to play the power down / power up noise for ONLY those on the ship grid
             var filter = _station.GetInOwningStation(uid);
@@ -104,17 +119,21 @@ public sealed partial class ShipShieldsSystem : EntitySystem
             if (emitter.Damage > emitter.DamageLimit)
                 emitter.OverloadAccumulator = emitter.DamageOverloadTimePunishment;
 
-            // if our shield is gone, AND the OverloadAccumulator is done counting down (with some padding), then...
-            if (emitter.Shield is null && emitter.OverloadAccumulator < 1.5 && power.Powered) //put the shield back up!
+            // if our shield is gone, AND the OverloadAccumulator is done counting down (with one tick of
+            // padding - a literal 1.5 here was left over from when EmitterUpdateRate was 1.5, and let the
+            // shield back up a tick and a half before the punishment had actually been served), then...
+            if (emitter.Shield is null && emitter.OverloadAccumulator < EmitterUpdateRate && power.Powered) //put the shield back up!
             {
                 emitter.Recharging = false; //stop boosting hp recharge now that it's up
                 var shield = ShieldEntity(parent.Value, source: uid);
-                if (shield != EntityUid.Invalid)
+                if (shield != EntityUid.Invalid
+                    && TryComp<ShipShieldComponent>(shield, out var shieldComp)
+                    && shieldComp.Source == uid)
                 {
                     emitter.Shield = shield;
                     emitter.Shielded = parent.Value;
+                    _audio.PlayGlobal(emitter.PowerUpSound, filter, true, emitter.PowerUpSound.Params);
                 }
-                _audio.PlayGlobal(emitter.PowerUpSound, filter, true, emitter.PowerUpSound.Params);
             }
             // if our emitter is Overloaded, AND the shield is active, shut down the shield.
             else if (emitter.OverloadAccumulator > 0 && emitter.Shield is not null)
@@ -141,14 +160,32 @@ public sealed partial class ShipShieldsSystem : EntitySystem
 
         }
 
-        // better ways to do it but this will catch every edge case (probably)
+        // Remove orphaned shield state. In particular, an emitter can be deleted after its transform has already
+        // detached from the grid, so cleanup must validate the stored source instead of just checking for null.
         var cleanupQuery = EntityQueryEnumerator<ShipShieldedComponent>();
-        while (cleanupQuery.MoveNext(out var uid, out var shieldedComp)) // five. hundred. entity queries.
+        while (cleanupQuery.MoveNext(out var uid, out var shieldedComp))
         {
-            if (!shieldedComp.Source.HasValue)
+            if (shieldedComp.Source is not { } source
+                || TerminatingOrDeleted(source)
+                || !TryComp<ShipShieldEmitterComponent>(source, out var emitter))
             {
-                Del(uid);
+                UnshieldEntity(uid, shieldedComp);
+                continue;
             }
+
+            var shieldValid = !TerminatingOrDeleted(shieldedComp.Shield)
+                && TryComp<ShipShieldComponent>(shieldedComp.Shield, out var shield)
+                && shield.Source == shieldedComp.Source
+                && shield.Shielded == uid;
+
+            if (shieldValid)
+                continue;
+
+            emitter.Shield = null;
+            emitter.Shielded = null;
+            Dirty(source, emitter);
+
+            UnshieldEntity(uid, shieldedComp);
         }
     }
     public override void Initialize()
@@ -163,27 +200,31 @@ public sealed partial class ShipShieldsSystem : EntitySystem
 
     private void OnCollide(EntityUid uid, ShipShieldComponent component, StartCollideEvent args)
     {
-        //_sawmill.Debug("collision detected, collided entity: " + args.OtherEntity.ToString());
-        if (Transform(args.OtherEntity).Anchored)
-            return;
+        TryQueueDeflection((uid, component), args.OtherEntity);
+    }
 
-        if (!TryComp<PhysicsComponent>(Transform(uid).GridUid, out var ourPhysics) || !TryComp<PhysicsComponent>(args.OtherEntity, out var theirPhysics))
-            return;
-
-        // only handle ship weapons for now. engine update introduced physics regressions. Let's polish everything else and circle back yeah?
-        if (!HasComp<ShipWeaponProjectileComponent>(args.OtherEntity))
-            return;
-
-        if (HasComp<IgnoresHullrotShieldsComponent>(args.OtherEntity))
-            return;
-
-        if (!TryComp<ProjectileComponent>(args.OtherEntity, out var projectile))
-            return;
-        if (projectile.Weapon is not null)
+    /// <summary>
+    /// Routes a ship projectile into the shield damage pipeline. This is also called by phase prevention because
+    /// the engine's raycast deliberately excludes the shield's soft collision sensor.
+    /// </summary>
+    public bool TryQueueDeflection(Entity<ShipShieldComponent> shield, EntityUid deflected)
+    {
+        if (Transform(deflected).Anchored
+            || !HasComp<ShipWeaponProjectileComponent>(deflected)
+            || HasComp<IgnoresHullrotShieldsComponent>(deflected)
+            || !TryComp<ProjectileComponent>(deflected, out var projectile))
         {
-            // dont collide with projectiles coming from the same , grid  SPCR 2025
-            if (component.Shielded == Transform(projectile.Weapon.Value).GridUid)
-                return;
+            return false;
+        }
+
+        if (projectile.DamagedEntity)
+            return true;
+
+        if (projectile.Weapon is { } weapon
+            && !TerminatingOrDeleted(weapon)
+            && shield.Comp.Shielded == Transform(weapon).GridUid)
+        {
+            return false;
         }
 
         // .2 | 2025. this code used to make some projectiles ignore shields if their velocity was low enough.
@@ -215,12 +256,40 @@ public sealed partial class ShipShieldsSystem : EntitySystem
         // instead of reflecting the projectile, just delete it. this works better for gameplay and intuiting what is going on in a fight.
         //_gun.ShootProjectile(args.OtherEntity, deflectionVector, _physicsSystem.GetMapLinearVelocity(uid), uid, null, velocity.Length());
 
-        if (component.Source != null)
+        if (shield.Comp.Source is not { } source || TerminatingOrDeleted(source))
+            return false;
+
+        // Stop the round dead right now - it must not go on to damage the hull this tick - but leave deleting and
+        // detonating it to UpdateDeflections, once the physics step is over.
+        projectile.DamagedEntity = true;
+
+        _pendingDeflections.Add((source, deflected));
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves deflections queued by <see cref="OnCollide"/>, outside the physics step.
+    /// </summary>
+    private void UpdateDeflections()
+    {
+        if (_pendingDeflections.Count == 0)
+            return;
+
+        // Handling a deflection can detonate the round, which may deflect further rounds off the same shield.
+        _processingDeflections.Clear();
+        _processingDeflections.AddRange(_pendingDeflections);
+        _pendingDeflections.Clear();
+
+        foreach (var (emitter, deflected) in _processingDeflections)
         {
-            //_sawmill.Debug("shield deflected projectile");
-            var ev = new ShieldDeflectedEvent(args.OtherEntity);
-            RaiseLocalEvent(component.Source.Value, ref ev);
+            if (TerminatingOrDeleted(emitter) || TerminatingOrDeleted(deflected) || EntityManager.IsQueuedForDeletion(deflected))
+                continue;
+
+            var ev = new ShieldDeflectedEvent(deflected);
+            RaiseLocalEvent(emitter, ref ev);
         }
+
+        _processingDeflections.Clear();
     }
 
     /// <summary>
@@ -334,6 +403,13 @@ public sealed partial class ShipShieldsSystem : EntitySystem
         _fixtureSystem.TryCreateFixture(uid, chain, name,
             hard: false,
             collisionLayer: (int) CollisionGroup.FullTileLayer,
+            body: physics);
+
+        // IntersectRay ignores soft fixtures. This hard fixture uses a query-only collision layer, so phase
+        // prevention can see the shield without making the bubble physically solid to ships or entities.
+        _fixtureSystem.TryCreateFixture(uid, chain, "phaseShield",
+            hard: true,
+            collisionLayer: (int) CollisionGroup.PhasePrevention,
             body: physics);
 
         return chain;

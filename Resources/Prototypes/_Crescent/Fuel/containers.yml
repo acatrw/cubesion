@@ -1,0 +1,162 @@
+# AmeJar is the refillable antimatter container.
+# JugBoriaticFuel is the tier 1 canister.
+
+- type: entity
+  parent: JugBoriaticFuel
+  id: JugBoriaticFuelEmpty
+  suffix: Empty
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 200
+  - type: StaticPrice
+    price: 60
+
+- type: entity
+  parent: JugBoriaticFuelEmpty
+  id: FuelCanisterBoriaticT2
+  name: reinforced boriatic fuel canister
+  description: A reinforced pressure canister of boriatic fuel. Holds 500 units.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 500
+  - type: StaticPrice
+    price: 140
+  # Blast strength scales with capacity and current fill.
+  - type: Explosive
+    explosionType: Default
+    totalIntensity: 110
+    intensitySlope: 4
+    maxIntensity: 18
+
+- type: entity
+  parent: JugBoriaticFuelEmpty
+  id: FuelCanisterBoriaticT3
+  name: bulk boriatic fuel canister
+  description: A compound-wound bulk canister of boriatic fuel. Holds 1000 units.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 1000
+  - type: StaticPrice
+    price: 280
+  - type: Explosive
+    explosionType: Default
+    totalIntensity: 220
+    intensitySlope: 5
+    maxIntensity: 30
+
+- type: entity
+  parent: FuelCanisterBoriaticT2
+  id: FuelCanisterBoriaticT2Full
+  suffix: Full
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 500
+        reagents:
+        - ReagentId: BoriaticFuel
+          Quantity: 500
+
+- type: entity
+  parent: FuelCanisterBoriaticT3
+  id: FuelCanisterBoriaticT3Full
+  suffix: Full
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      beaker:
+        maxVol: 1000
+        reagents:
+        - ReagentId: BoriaticFuel
+          Quantity: 1000
+
+- type: entity
+  parent: WeldingFuelTank
+  id: BoriaticFuelTank
+  name: boriatic fuel tank
+  description: A wheeled 2000 unit tank dedicated to boriatic fuel. Fill canisters and engines from it.
+  suffix: Empty
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/fuelcan.rsi
+    color: "#e0a33c"
+    layers:
+      - state: fueltank-2
+      - state: fueltank-2-1
+        map: ["enum.SolutionContainerLayers.Fill"]
+        visible: false
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 2000
+  - type: RefillableSolution
+    solution: tank
+  - type: StaticPrice
+    price: 300
+  # Override the parent yield for a 2000-unit tank.
+  - type: Explosive
+    explosionType: Default
+    totalIntensity: 400
+    intensitySlope: 6
+    maxIntensity: 60
+
+- type: entity
+  parent: BoriaticFuelTank
+  id: BoriaticFuelTankFull
+  suffix: Full
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 2000
+        reagents:
+        - ReagentId: BoriaticFuel
+          Quantity: 2000
+
+- type: entity
+  parent: WeldingFuelTank
+  id: AmeFuelTank
+  name: AME fuel tank
+  description: A wheeled, magnetically shielded 2000 unit tank dedicated to AME fuel. Fill jars from it.
+  suffix: Empty
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/fuelcan.rsi
+    color: "#8d6fe0"
+    layers:
+      - state: fueltank-2
+      - state: fueltank-2-1
+        map: ["enum.SolutionContainerLayers.Fill"]
+        visible: false
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 2000
+  - type: RefillableSolution
+    solution: tank
+  - type: Explosive
+    explosionType: Default
+    totalIntensity: 900
+    intensitySlope: 8
+    maxIntensity: 90
+  - type: StaticPrice
+    price: 900
+
+- type: entity
+  parent: AmeFuelTank
+  id: AmeFuelTankFull
+  suffix: Full
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 2000
+        reagents:
+        - ReagentId: AmeFuel
+          Quantity: 2000

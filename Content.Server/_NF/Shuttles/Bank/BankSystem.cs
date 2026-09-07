@@ -20,6 +20,12 @@ public sealed partial class BankSystem : EntitySystem
 
     private ISawmill _log = default!;
 
+    /// <summary>
+    ///     Users we have already complained about, so the once-per-state-send handler below doesn't spam the log.
+    /// </summary>
+    private readonly HashSet<NetUserId> _brokenPrefsWarned = new();
+    private readonly HashSet<NetUserId> _crossCharacterWriteWarned = new();
+
     public override void Initialize()
     {
         base.Initialize();
@@ -60,8 +66,28 @@ public sealed partial class BankSystem : EntitySystem
             return;
         }
 
-        var prefs = _prefsManager.GetPreferences((NetUserId) user);
-        var character = prefs.SelectedCharacter;
+        args.State = new BankAccountComponentState
+        {
+            Balance = bank.Balance,
+        };
+
+        // This runs inside component state serialization, on every state send. Anything that throws here (a
+        // prefs row whose selected slot has no profile behind it makes SelectedCharacter throw) would take out
+        // the player's state send rather than surfacing as a normal error, so resolve it defensively and log.
+        PlayerPreferences prefs;
+        ICharacterProfile character;
+        try
+        {
+            prefs = _prefsManager.GetPreferences((NetUserId) user);
+            character = prefs.SelectedCharacter;
+        }
+        catch (Exception e)
+        {
+            if (_brokenPrefsWarned.Add((NetUserId) user))
+                _log.Error($"Could not resolve the selected character for {user} while saving their bank balance: {e}");
+            return;
+        }
+
         var index = prefs.IndexOfCharacter(character);
 
         if (character is not HumanoidCharacterProfile profile)
@@ -69,14 +95,24 @@ public sealed partial class BankSystem : EntitySystem
             return;
         }
 
+        // State gets serialized several times a second, so don't hit the DB unless something actually moved.
+        if (bank.Balance == profile.BankBalance)
+            return;
+
+        // The balance is written to whichever slot is selected *right now*, not to the character this mob
+        // actually is. If the player switched slots in the lobby while still attached to a mob, this quietly
+        // stamps one character's money onto another one's saved profile.
+        if (profile.Name != MetaData(mobUid).EntityName && _crossCharacterWriteWarned.Add((NetUserId) user))
+        {
+            _log.Error(
+                $"Saving bank balance {bank.Balance} for {user} onto selected slot {index} ('{profile.Name}'), " +
+                $"but their attached mob is '{MetaData(mobUid).EntityName}'. These are different characters.");
+        }
+
         var balanceDiff = (long)bank.Balance - profile.BankBalance;
 
         var newProfile = profile.WithBank((long)bank.Balance);
 
-        args.State = new BankAccountComponentState
-        {
-            Balance = bank.Balance,
-        };
         _prefsManager.SetProfileNoChecks((NetUserId) user, index,(ICharacterProfile)newProfile);
         _log.Info($"Character {profile.Name} saved");
         if (balanceDiff > 250000)
@@ -123,7 +159,7 @@ public sealed partial class BankSystem : EntitySystem
     /// <param name="mobUid">The UID that the bank account is connected to, typically the player controlled mob</param>
     /// <param name="amount">The integer amount of which to increase the bank account</param>
     /// <returns>true if the transaction was successful, false if it was not</returns>
-    public bool TryBankDeposit(EntityUid mobUid, int amount)
+    public bool TryBankDeposit(EntityUid mobUid, long amount)
     {
         if (amount <= 0)
         {
@@ -134,6 +170,12 @@ public sealed partial class BankSystem : EntitySystem
         if (!TryComp<BankAccountComponent>(mobUid, out var bank))
         {
             _log.Info($"{mobUid} has no bank account");
+            return false;
+        }
+
+        if (bank.Balance > long.MaxValue - amount)
+        {
+            _log.Warning($"Deposit of {amount} would overflow the bank account for {mobUid}");
             return false;
         }
 

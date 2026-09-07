@@ -7,6 +7,8 @@ namespace Content.Client._Crescent.Poker;
 public sealed class PokerTableBoundUserInterface : BoundUserInterface
 {
     private PokerTableWindow? _window;
+    private PokerPrivateHandMessage? _privateHand;
+    private PokerTableBoundUserInterfaceState? _lastState;
 
     public PokerTableBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -17,6 +19,7 @@ public sealed class PokerTableBoundUserInterface : BoundUserInterface
         base.Open();
         _window = new PokerTableWindow();
 
+        _window.OnClose += Close;
         _window.OnJoin += () => SendMessage(new PokerJoinMessage());
         _window.OnLeave += () => SendMessage(new PokerLeaveMessage());
         _window.OnFold += () => SendMessage(new PokerFoldMessage());
@@ -35,6 +38,8 @@ public sealed class PokerTableBoundUserInterface : BoundUserInterface
         if (state is not PokerTableBoundUserInterfaceState uiState)
             return;
 
+        _lastState = uiState;
+
         // Resolve per-player fields locally — server sends one shared state
         var playerManager = IoCManager.Resolve<IPlayerManager>();
         var entManager = IoCManager.Resolve<IEntityManager>();
@@ -48,6 +53,9 @@ public sealed class PokerTableBoundUserInterface : BoundUserInterface
             ? uiState.Players.Find(p => p.PlayerEntity == myNetEntity.Value)
             : null;
 
+        if (myPlayer != null && _privateHand?.RoundNumber == uiState.RoundNumber)
+            myPlayer.HoleCards = new List<PokerCard>(_privateHand.Cards);
+
         uiState.MySeatIndex = myPlayer?.SeatIndex ?? -1;
         uiState.MyStack = myPlayer?.Stack ?? 0;
         uiState.MyBet = myPlayer?.CurrentBet ?? 0;
@@ -56,6 +64,17 @@ public sealed class PokerTableBoundUserInterface : BoundUserInterface
             && uiState.CurrentTurnEntity.Value == myNetEntity.Value;
 
         _window?.UpdateState(uiState);
+    }
+
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+    {
+        base.ReceiveMessage(message);
+        if (message is not PokerPrivateHandMessage hand)
+            return;
+
+        _privateHand = hand;
+        if (_lastState != null)
+            UpdateState(_lastState);
     }
 
     protected override void Dispose(bool disposing)

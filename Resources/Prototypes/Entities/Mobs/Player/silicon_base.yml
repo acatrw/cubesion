@@ -6,6 +6,9 @@
   components:
     - type: ContentEye
     - type: CameraRecoil
+    - type: Telescope
+      divisor: 0.1
+      lerpAmount: 0.1
     - type: Reactive
       groups:
         Flammable: [Touch]
@@ -27,8 +30,8 @@
       damageModifierSet: IPC
     - type: InteractionOutline
     - type: MovementSpeedModifier
-      baseWalkSpeed: 4
-      baseSprintSpeed: 3
+      baseWalkSpeed: 4.4 # heavy chassis, a touch under human's 4.5 / 7
+      baseSprintSpeed: 6.8
     - type: ZombieImmune
     - type: CanEnterCryostorage
     - type: DoAfter

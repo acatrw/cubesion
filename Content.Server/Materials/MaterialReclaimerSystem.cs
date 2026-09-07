@@ -26,6 +26,7 @@ using Content.Shared.Database;
 using Content.Shared.Destructible;
 using Content.Shared.Emag.Components;
 using Content.Shared.Power;
+using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.Materials;
@@ -55,7 +56,7 @@ public sealed class MaterialReclaimerSystem : SharedMaterialReclaimerSystem
         SubscribeLocalEvent<MaterialReclaimerComponent, UpgradeExamineEvent>(OnUpgradeExamine);
         SubscribeLocalEvent<MaterialReclaimerComponent, PowerChangedEvent>(OnPowerChanged);
         SubscribeLocalEvent<MaterialReclaimerComponent, InteractUsingEvent>(OnInteractUsing,
-            before: new []{typeof(WiresSystem), typeof(SolutionTransferSystem)});
+            before: new[] { typeof(WiresSystem), typeof(SolutionTransferSystem) });
         SubscribeLocalEvent<MaterialReclaimerComponent, SuicideByEnvironmentEvent>(OnSuicideByEnvironment);
         SubscribeLocalEvent<ActiveMaterialReclaimerComponent, PowerChangedEvent>(OnActivePowerChanged);
     }
@@ -71,7 +72,7 @@ public sealed class MaterialReclaimerSystem : SharedMaterialReclaimerSystem
 
     private void OnRefreshParts(Entity<MaterialReclaimerComponent> entity, ref RefreshPartsEvent args)
     {
-        var rating = args.PartRatings[entity.Comp.MachinePartProcessRate] - 1;
+        var rating = args.GetRating(entity.Comp.MachinePartProcessRate) - 1;
         entity.Comp.MaterialProcessRate = entity.Comp.BaseMaterialProcessRate * MathF.Pow(entity.Comp.PartRatingProcessRateMultiplier, rating);
         Dirty(entity);
     }
@@ -205,9 +206,11 @@ public sealed class MaterialReclaimerSystem : SharedMaterialReclaimerSystem
         if (!Resolve(item, ref composition, false))
             return;
 
+        var stackCount = CompOrNull<StackComponent>(item)?.Count ?? 1;
+
         foreach (var (material, amount) in composition.MaterialComposition)
         {
-            var outputAmount = (int) (amount * efficiency);
+            var outputAmount = (int) (amount * stackCount * efficiency);
             _materialStorage.TryChangeMaterialAmount(reclaimer, material, outputAmount, storage);
         }
 

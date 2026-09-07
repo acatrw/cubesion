@@ -11,6 +11,9 @@ namespace Content.Client.Stealth;
 public sealed class StealthSystem : SharedStealthSystem
 {
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+
+    private const string ShaderId = "Stealth";
 
     private ShaderInstance _shader = default!;
 
@@ -40,9 +43,19 @@ public sealed class StealthSystem : SharedStealthSystem
             return;
 
         sprite.Color = Color.White;
-        sprite.PostShader = enabled ? _shader : null;
-        sprite.GetScreenTexture = enabled;
-        sprite.RaiseShaderEvent = enabled;
+
+        if (enabled)
+        {
+            _sprite.SetPostShader(sprite, new SpriteComponent.PostShaderArgs(ShaderId, _shader)
+            {
+                GetScreenTexture = true,
+                RaiseShaderEvent = true,
+            });
+        }
+        else
+        {
+            _sprite.RemovePostShader(sprite, ShaderId);
+        }
 
         if (!enabled)
         {
@@ -92,6 +105,11 @@ public sealed class StealthSystem : SharedStealthSystem
         _shader.SetParameter("visibility", visibility);
 
         visibility = MathF.Max(0, visibility);
-        args.Sprite.Color = new Color(visibility, visibility, 1, 1);
+
+        // Eclipsion - psionic concealment leaves the body its own colours; only the distortion says
+        // someone is there. Without this a half-hidden psion reads as having turned blue.
+        args.Sprite.Color = component.ColorTint
+            ? new Color(visibility, visibility, 1, 1)
+            : Color.White;
     }
 }

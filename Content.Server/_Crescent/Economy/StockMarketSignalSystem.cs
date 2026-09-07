@@ -1,6 +1,7 @@
 using Content.Server.Cargo.Systems;
 using Content.Server.GameTicking.Events;
 using Content.Server._Crescent.Taxation;
+using Content.Server._Crescent.Territory;
 using Content.Shared._Crescent.HullrotFaction;
 using Content.Shared._Crescent.RoundEnd;
 using Content.Shared.Mobs;
@@ -24,6 +25,7 @@ public sealed class StockMarketSignalSystem : EntitySystem
 {
     [Dependency] private readonly StockCompanySystem _stocks = default!;
     [Dependency] private readonly FactionTreasurySystem _treasury = default!;
+    [Dependency] private readonly OfflineFactionProtectionSystem _protection = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     private const string MerchantsId = "stock-company-fmn";
@@ -77,8 +79,8 @@ public sealed class StockMarketSignalSystem : EntitySystem
 
     /// <summary>
     /// Factions seen fielded at any point this round. This only ever grows: a faction whose station is
-    /// blown up has emphatically not left the market, it has just had a very bad day, and its stock
-    /// must stay tradeable so the crash means something.
+    /// blown up has emphatically not left the market, it has just had a very bad day. Whether its stock
+    /// is currently tradeable is decided separately by offline protection.
     /// </summary>
     private readonly HashSet<string> _fielded = new(StringComparer.OrdinalIgnoreCase);
 
@@ -93,6 +95,7 @@ public sealed class StockMarketSignalSystem : EntitySystem
         SubscribeLocalEvent<FactionStationFellEvent>(OnStationFell);
         SubscribeLocalEvent<FactionWarDecidedEvent>(OnWarDecided);
         SubscribeLocalEvent<FactionMissionCompletedEvent>(OnMissionCompleted);
+        SubscribeLocalEvent<PersistentTerritoryStockRewardEvent>(OnTerritoryStockReward);
         // Deliberately NOT on RoundRestartCleanupEvent. StockCompanySystem applies its between-round
         // recovery on that same event and needs the finishing round's listing flags to still be intact;
         // system ordering within one event is not guaranteed, so delisting waits for the new round.
@@ -135,8 +138,8 @@ public sealed class StockMarketSignalSystem : EntitySystem
     }
 
     /// <summary>
-    /// Looks for signs that a faction is actually playing this round — a headquarters on the map, or
-    /// anyone wearing its tag — and lists its company for trading the moment it finds one.
+    /// Finds factions represented by the mode, then lists only the ones whose player activity makes
+    /// their persistent economy vulnerable this round.
     /// </summary>
     private void ScanRoster()
     {
@@ -148,15 +151,19 @@ public sealed class StockMarketSignalSystem : EntitySystem
         var mobs = EntityQueryEnumerator<HullrotFactionComponent>();
         while (mobs.MoveNext(out _, out var member))
             MarkFielded(member.Faction);
+
+        _protection.RefreshActivity();
+        foreach (var (faction, companyId) in FactionCompanies)
+        {
+            var active = _fielded.Contains(faction) && !_protection.IsProtected(faction);
+            _stocks.SetActive(companyId, active);
+        }
     }
 
     private void MarkFielded(string faction)
     {
-        if (string.IsNullOrEmpty(faction) || !_fielded.Add(faction))
-            return;
-
-        if (FactionCompanies.TryGetValue(faction, out var companyId))
-            _stocks.SetActive(companyId, true);
+        if (!string.IsNullOrEmpty(faction))
+            _fielded.Add(faction);
     }
 
     /// <summary>
@@ -291,5 +298,20 @@ public sealed class StockMarketSignalSystem : EntitySystem
             MissionImpact,
             MissionDuration,
             Loc.GetString("stock-news-contract", ("faction", args.Faction)));
+    }
+
+    private void OnTerritoryStockReward(ref PersistentTerritoryStockRewardEvent args)
+    {
+        if (_protection.IsProtected(args.Faction) ||
+            !FactionCompanies.TryGetValue(args.Faction, out var companyId))
+        {
+            return;
+        }
+
+        _stocks.AddPressure(
+            companyId,
+            args.Magnitude,
+            args.DurationTicks,
+            Loc.GetString("stock-news-territory-income", ("region", args.RegionName)));
     }
 }

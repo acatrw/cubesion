@@ -127,18 +127,19 @@
     sprite: _Crescent/Objects/Weapons/Guns/twinshot.rsi
   - type: GunRequiresWield
   - type: Gun
+    damageModifier: 0.75
     selectedMode: Burst
     shotsPerBurst: 2
     availableModes:
     - Burst
     burstFireRate: 24
-    burstCooldown: 1
+    burstCooldown: 1.25
     fireOnDropChance: 0.5
     soundGunshot:
       path: /Audio/_Crescent/Weapons/Guns/shotgun_2/shotgun_gunshot_2.ogg
   - type: Wieldable
   - type: BallisticAmmoProvider
-    capacity: 8 #Better make those 4 shots count.
+    capacity: 6 # Three double-shot bursts before reloading.
 
 - type: entity
   name: PTA MOD-23 Karabin 4g
@@ -302,7 +303,7 @@
   name: IRM DA-13 Reno 12g
   parent: [BaseWeaponShotgun, BaseGunWieldable, StreeCredRedeemable]
   id: WeaponShotgunReno
-  description: An Imperial semi-automatic shotgun designed by Olywir Armaments. Unlike other Olywirian designs, this weapon is not prohibitively expensive to produce.
+  description: An Imperial semi-automatic shotgun designed by Olywier Charter Armaments. Unlike many charter designs, this weapon is not prohibitively expensive to produce.
   components:
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Guns/reno.rsi
@@ -428,7 +429,7 @@
   # Don't parent to BaseWeaponShotgun because it differs significantly
   parent: [BaseItem, BaseGunWieldable]
   id: WeaponShotgunTFSCSaiga12
-  name: TFSC Saiga-12k Hammer 12g
+  name: TFCF Saiga-12k Hammer 12g
   description: A magazine-fed shotgun in use by terrorist forces. Uses 12 gauge shotgun shells.
   components:
   - type: Sprite

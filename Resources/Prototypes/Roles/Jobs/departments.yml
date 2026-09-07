@@ -16,15 +16,12 @@
   description: department-Civilian-description
   color: "#9FED58"
   weight: 5
-  # Spacer and GliessianDockhand live in the Independents department, see _Crescent/Roles/Jobs/departments.yml
-  roles:
+  # CMM and Spacer roles live in the Independents department, see _Crescent/Roles/Jobs/departments.yml
+  #roles:
   #- OrdnancemanCMM
   #- MachinistCMM
   #- PhysicianCMM
-  - MinutemanCMM
   #- WatchmasterCMM
-  - DeputyMarshalCMM
-  - MarshalCMM
   editorHidden: true
 
 - type: department
@@ -132,6 +129,7 @@
   weight: 85
   roles:
   - FreeholderDSM
+  - OathboundDSM
   - LevymanDSM
   - KnightDSM
   - RitterDSM
@@ -161,7 +159,7 @@
   - HunterSRM
   - MontagneSRM
   - OverseerSRM
-  editorHidden: false # i just like to see them for the numbers , SPCR 2025
+  editorHidden: true # unused faction, hidden from job selection
 
 - type: department
   id: SHI
@@ -171,7 +169,7 @@
   roles:
   - ExecutiveSHI
   - BoardSHI
-  #- HighsecSHI
+  - HighsecSHI
   - CorpsecSHI
   - EmployeeSHI
   - MedtechSHI
@@ -209,6 +207,8 @@
   - BeltrunnerTAP
   - DraugrTAP
   - ServileTAP
+  # Live: FreeplayTAPGLIESSTFCF spawns TribalHideout with seven of these slots, so the department has to be
+  # visible in the character editor or nobody can round-start into the Pact.
   editorHidden: false
 
 - type: department

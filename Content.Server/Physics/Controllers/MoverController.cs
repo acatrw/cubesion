@@ -278,7 +278,8 @@ public sealed class MoverController : SharedMoverController
     /// </summary>
     public Vector2 GetDirectionThrust(Vector2 dir, ShuttleComponent shuttle, PhysicsComponent body)
     {
-        if (dir.Length() == 0f)
+        var lengthSquared = dir.LengthSquared();
+        if (lengthSquared <= 0f || !float.IsFinite(lengthSquared))
             return Vector2.Zero;
 
         dir.Normalize();
@@ -288,11 +289,19 @@ public sealed class MoverController : SharedMoverController
         var horizThrust = shuttle.LinearThrust[horizIndex];
         var vertThrust = shuttle.LinearThrust[vertIndex];
 
-        var horizScale = MathF.Abs(horizThrust / dir.X);
-        var vertScale = MathF.Abs(vertThrust / dir.Y);
-        dir *= MathF.Min(horizScale, vertScale);
+        // A cardinal input has a zero component, and dividing thrust by it gives NaN.
+        var horizScale = dir.X == 0f
+            ? float.PositiveInfinity
+            : MathF.Abs(horizThrust / dir.X);
+        var vertScale = dir.Y == 0f
+            ? float.PositiveInfinity
+            : MathF.Abs(vertThrust / dir.Y);
+        var scale = MathF.Min(horizScale, vertScale);
 
-        return dir;
+        if (!float.IsFinite(scale))
+            return Vector2.Zero;
+
+        return dir * scale;
     }
 
     /// <summary>
@@ -580,8 +589,8 @@ public sealed class MoverController : SharedMoverController
 
     #endregion
 
-    // .NET 8 seem to miscompile usage of Vector2.Dot above. This manual outline fixes it pending an upstream fix.
-    // See PR #24008
+    // Keep this call out of the caller's JIT path to avoid a Vector2.Dot miscompilation.
+    // See PR #24008.
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static float Vector2Dot(Vector2 value1, Vector2 value2)
     {

@@ -7,10 +7,12 @@ using Content.Shared._Crescent.Payment;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Database;
+using Content.Shared.Mind;
 using Content.Shared.Popups;
 using Robust.Server.GameObjects;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Crescent.Payment;
 
@@ -28,9 +30,17 @@ public sealed class PaymentConsoleSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StationTradeMarketSystem _market = default!;
     [Dependency] private readonly FactionPayrollSystem _payroll = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly ISharedPlayerManager _player = default!;
 
     private const int MaxBonus = 1_000_000;
     private const int MaxReasonLength = 128;
+
+    /// <summary>How often an open console re-reads the roster and the treasury balance.</summary>
+    private const float RefreshInterval = 3f;
+
+    private float _sinceRefresh;
 
     public override void Initialize()
     {
@@ -48,6 +58,29 @@ public sealed class PaymentConsoleSystem : EntitySystem
             return;
 
         UpdateUi(ent);
+    }
+
+    /// <summary>
+    /// Keeps an open console current. It only ever redrew in response to its own buttons, so a member
+    /// who joined the faction, disconnected or died after it was opened never appeared or changed, and
+    /// the treasury figure sat frozen while payroll and purchases moved it.
+    /// </summary>
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        _sinceRefresh += frameTime;
+        if (_sinceRefresh < RefreshInterval)
+            return;
+
+        _sinceRefresh = 0f;
+
+        var query = EntityQueryEnumerator<PaymentConsoleComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (_ui.IsUiOpen(uid, PaymentConsoleUiKey.Key))
+                UpdateUi((uid, comp));
+        }
     }
 
     /// <summary>
@@ -102,6 +135,14 @@ public sealed class PaymentConsoleSystem : EntitySystem
         if (reason.Length > MaxReasonLength)
             reason = reason[..MaxReasonLength];
 
+        var now = _timing.CurTime;
+        if (ent.Comp.LastBonus is { } last && now - last < ent.Comp.BonusCooldown)
+        {
+            var secondsLeft = Math.Max(1, (int) Math.Ceiling((ent.Comp.BonusCooldown - (now - last)).TotalSeconds));
+            _popup.PopupEntity(Loc.GetString("payment-console-bonus-cooldown", ("seconds", secondsLeft)), ent, args.Actor);
+            return;
+        }
+
         var station = _market.TryGetFactionTreasuryStation(ent.Comp.Faction);
         if (station == null)
         {
@@ -122,19 +163,33 @@ public sealed class PaymentConsoleSystem : EntitySystem
             return;
         }
 
-        var paid = _market.TryWithdrawTreasury(station.Value, args.Amount);
+        // Identify the operator so the bonus is billed to their own per-round share of the vault.
+        if (!TryComp<ActorComponent>(args.Actor, out var operatorActor))
+            return;
+
+        // Capped, not raw: the operator's bonuses and their own hand withdrawals at the vault draw on
+        // one budget, so signing bonuses is no longer a way around the treasury console's limit.
+        var paid = _market.TryWithdrawTreasuryCapped(
+            station.Value, operatorActor.PlayerSession.UserId, args.Amount, ent.Comp.MaxPayoutFraction);
+
         if (paid <= 0)
         {
-            _popup.PopupEntity(Loc.GetString("payment-console-treasury-empty"), ent, args.Actor);
+            _popup.PopupEntity(
+                Loc.GetString("payment-console-bonus-limit",
+                    ("percent", (int) MathF.Round(ent.Comp.MaxPayoutFraction * 100f))),
+                ent, args.Actor);
             return;
         }
 
         if (!_bank.TryBankDeposit(mob, paid))
         {
-            _market.AddTreasury(station.Value, paid);
+            // Refund rather than plain re-add, so the failed attempt does not eat the operator's budget.
+            _market.RefundTreasuryCapped(station.Value, operatorActor.PlayerSession.UserId, paid);
             _popup.PopupEntity(Loc.GetString("payment-console-member-unpayable"), ent, args.Actor);
             return;
         }
+
+        ent.Comp.LastBonus = now;
 
         _adminLogger.Add(LogType.ATMUsage, LogImpact.High,
             $"{ToPrettyString(args.Actor):player} paid a {paid} bonus from {ent.Comp.Faction} treasury to {ToPrettyString(mob):player}. Reason: {reason}");
@@ -169,34 +224,49 @@ public sealed class PaymentConsoleSystem : EntitySystem
         var faction = ent.Comp.Faction;
         var station = _market.TryGetFactionTreasuryStation(faction);
 
-        var members = new List<PaymentMemberEntry>();
-        var seen = new HashSet<NetUserId>();
+        // Keyed rather than appended so one player can only hold one row: the client reuses rows by
+        // this key, and a duplicate would leave a row nobody can edit.
+        var byUser = new Dictionary<NetUserId, PaymentMemberEntry>();
 
-        var query = EntityQueryEnumerator<HullrotFactionComponent, ActorComponent>();
-        while (query.MoveNext(out var uid, out var factionComp, out var actor))
+        // Members are resolved through the mob's mind, not through ActorComponent. That component comes
+        // off the body the instant its player ghosts, disconnects or is attached to anything else, which
+        // made the member drop out of the roster for a refresh and took the row - and whatever salary was
+        // being typed into it - with them. Their body is still in the faction either way, so it stays
+        // listed and is simply marked unpayable, which is what the Payable flag was there for.
+        var query = EntityQueryEnumerator<HullrotFactionComponent>();
+        while (query.MoveNext(out var uid, out var factionComp))
         {
             if (factionComp.Faction != faction)
                 continue;
 
-            var session = actor.PlayerSession;
-            seen.Add(session.UserId);
+            if (!_mind.TryGetMind(uid, out _, out var mind) || mind.UserId is not { } user)
+                continue;
 
-            members.Add(new PaymentMemberEntry
+            var payable = _player.TryGetSessionById(user, out var session) && _payroll.IsPayable(session, uid);
+
+            // A body its player has left behind can still answer for their mind. The one they are
+            // actually playing wins, so the row tracks the live character.
+            if (byUser.TryGetValue(user, out var existing) && (existing.Payable || !payable))
+                continue;
+
+            byUser[user] = new PaymentMemberEntry
             {
-                User = session.UserId,
+                User = user,
                 Name = Name(uid),
                 Job = GetJobTitle(uid),
-                SalaryPerHour = _payroll.GetEntry(faction, session.UserId)?.SalaryPerHour ?? 0,
-                Payable = _payroll.IsPayable(session, uid),
+                SalaryPerHour = _payroll.GetEntry(faction, user)?.SalaryPerHour ?? 0,
+                Payable = payable,
                 Stale = false,
-            });
+            };
         }
+
+        var members = new List<PaymentMemberEntry>(byUser.Values);
 
         // Payroll entries with nobody in the faction to match. They're inert, but command needs to see
         // them to prune them.
         foreach (var (user, entry) in _payroll.GetRoster(faction))
         {
-            if (seen.Contains(user))
+            if (byUser.ContainsKey(user))
                 continue;
 
             members.Add(new PaymentMemberEntry

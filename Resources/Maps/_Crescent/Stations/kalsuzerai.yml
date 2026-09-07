@@ -23768,78 +23768,6 @@ entities:
       pos: 7.5,-27.5
       parent: 1
     - type: TargetingConsole
-      cannonGroups:
-        all:
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        boltgun:
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        minirocket:
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        machinegun:
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        - invalid
-        flak:
-        - invalid
-        - invalid
-        - invalid
 - proto: ComputerWallmountBankATM
   entities:
   - uid: 3331
@@ -25775,22 +25703,6 @@ entities:
     - type: Physics
       canCollide: False
     - type: InsideEntityStorage
-- proto: EncryptionKeyEmpire
-  entities:
-  - uid: 3626
-    components:
-    - type: Transform
-      parent: 3625
-    - type: Physics
-      canCollide: False
-- proto: EncryptionKeyTraffic
-  entities:
-  - uid: 3627
-    components:
-    - type: Transform
-      parent: 3625
-    - type: Physics
-      canCollide: False
 - proto: ExosuitFabricator
   entities:
   - uid: 3628
@@ -32898,113 +32810,6 @@ entities:
     - type: Transform
       pos: -15.470162,-19.495874
       parent: 1
-- proto: HandheldGPSBasic
-  entities:
-  - uid: 139
-    components:
-    - type: Transform
-      parent: 134
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 146
-    components:
-    - type: Transform
-      parent: 141
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 152
-    components:
-    - type: Transform
-      parent: 147
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 158
-    components:
-    - type: Transform
-      parent: 153
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 164
-    components:
-    - type: Transform
-      parent: 159
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 170
-    components:
-    - type: Transform
-      parent: 165
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 176
-    components:
-    - type: Transform
-      parent: 171
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 186
-    components:
-    - type: Transform
-      parent: 181
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 192
-    components:
-    - type: Transform
-      parent: 187
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 198
-    components:
-    - type: Transform
-      parent: 193
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 204
-    components:
-    - type: Transform
-      parent: 199
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 210
-    components:
-    - type: Transform
-      parent: 205
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 216
-    components:
-    - type: Transform
-      parent: 211
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 222
-    components:
-    - type: Transform
-      parent: 217
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 228
-    components:
-    - type: Transform
-      parent: 223
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
 - proto: HandheldHealthAnalyzer
   entities:
   - uid: 4840
@@ -33575,9 +33380,7 @@ entities:
           - 3257
           - 3255
           - 3259
-          - invalid
           - 3256
-          - invalid
         paper_label: !type:ContainerSlot
           showEnts: False
           occludes: True
@@ -40625,7 +40428,6 @@ entities:
           ents:
           - 140
           - 135
-          - 139
           - 136
           - 137
           - 138
@@ -40662,7 +40464,6 @@ entities:
           - 144
           - 145
           - 142
-          - 146
   - uid: 147
     components:
     - type: Transform
@@ -40696,7 +40497,6 @@ entities:
           - 150
           - 149
           - 148
-          - 152
   - uid: 153
     components:
     - type: Transform
@@ -40729,7 +40529,6 @@ entities:
           - 154
           - 157
           - 155
-          - 158
           - 156
   - uid: 159
     components:
@@ -40764,7 +40563,6 @@ entities:
           - 163
           - 161
           - 162
-          - 164
   - uid: 165
     components:
     - type: Transform
@@ -40796,7 +40594,6 @@ entities:
           ents:
           - 166
           - 167
-          - 170
           - 168
           - 169
   - uid: 171
@@ -40828,7 +40625,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 176
           - 174
           - 172
           - 175
@@ -40898,7 +40694,6 @@ entities:
           - 182
           - 183
           - 185
-          - 186
   - uid: 187
     components:
     - type: Transform
@@ -40928,7 +40723,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 192
           - 190
           - 188
           - 189
@@ -40962,7 +40756,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 198
           - 194
           - 196
           - 197
@@ -40996,7 +40789,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 204
           - 200
           - 202
           - 201
@@ -41032,7 +40824,6 @@ entities:
           ents:
           - 209
           - 208
-          - 210
           - 207
           - 206
   - uid: 211
@@ -41065,7 +40856,6 @@ entities:
           occludes: True
           ents:
           - 214
-          - 216
           - 212
           - 215
           - 213
@@ -41098,7 +40888,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 222
           - 221
           - 220
           - 218
@@ -41135,7 +40924,6 @@ entities:
           - 224
           - 227
           - 225
-          - 228
           - 226
   - uid: 5930
     components:
@@ -41799,29 +41587,13 @@ entities:
       rot: 3.141592653589793 rad
       pos: 17.5,-27.5
       parent: 1
-- proto: TelecomServer
+- proto: TelecomServerDSM
   entities:
   - uid: 3625
     components:
     - type: Transform
       pos: 8.5,9.5
       parent: 1
-    - type: ContainerContainer
-      containers:
-        key_slots: !type:Container
-          showEnts: False
-          occludes: True
-          ents:
-          - 3626
-          - 3627
-        machine_board: !type:Container
-          showEnts: False
-          occludes: True
-          ents: []
-        machine_parts: !type:Container
-          showEnts: False
-          occludes: True
-          ents: []
 - proto: ToiletDirtyWater
   entities:
   - uid: 6049

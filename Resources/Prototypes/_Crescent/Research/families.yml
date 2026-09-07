@@ -15,7 +15,6 @@
   - SmallMissileHardpointFlatpack
   - MediumMissileHardpointFlatpack
   - FixedHardpointFlatpack
-  - BaseWeaponTurretBolterFlatpack
 
 - type: technology
   id: FamiliesShips
@@ -43,7 +42,6 @@
   tier: 2
   cost: 10000
   recipeUnlocks:
-  - BallisticCycler1Craft
   - TubeLoader1Craft
   - AdvancedMechatronics1Craft
   - AdvancedElectronics1Craft
@@ -76,6 +74,8 @@
     - WeaponTurretSmallMachinegunFlatpack
     - WeaponTurretMediumMachinegunFlatpack
     - BaseWeaponTurretShortbowFlatpack
+    - M14IncendiaryHandgrenade
+    - M18SmokeHandgrenade
 
 # TAP - Primary Artillery - Tier 2
 - type: technology

@@ -43,6 +43,5 @@
             KnightDSM: [ 4, 4 ]
             LevymanDSM: [ -1, -1 ]
             ForemanDSM: [ 4, 4 ]
-            ScribeDSM: [ 6, 6 ]
-            SurgeonDSM: [ 6, 6 ]
             FreeholderDSM: [ -1, -1 ]
+            OathboundDSM: [ -1, -1 ]

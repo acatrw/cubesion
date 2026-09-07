@@ -1,9 +1,7 @@
 using Robust.Shared.Random;
-using Content.Server.Abilities.Psionics;
 using Content.Shared.GameTicking.Components;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.StationEvents.Components;
-using Content.Server.Psionics;
 using Content.Shared.Abilities.Psionics;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Psionics.Glimmer;
@@ -13,7 +11,6 @@ namespace Content.Server.StationEvents.Events;
 
 internal sealed class NoosphericStormRule : StationEventSystem<NoosphericStormRuleComponent>
 {
-    [Dependency] private readonly PsionicAbilitiesSystem _psionicAbilitiesSystem = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly GlimmerSystem _glimmerSystem = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
@@ -25,16 +22,16 @@ internal sealed class NoosphericStormRule : StationEventSystem<NoosphericStormRu
         List<EntityUid> validList = new();
 
         var query = EntityManager.EntityQueryEnumerator<PsionicComponent>();
-        while (query.MoveNext(out var Psionic, out var PsionicComponent))
+        while (query.MoveNext(out var psionic, out var psionicComponent))
         {
-            if (_mobStateSystem.IsDead(Psionic)
-                || HasComp<PsionicInsulationComponent>(Psionic))
+            if (_mobStateSystem.IsDead(psionic)
+                || HasComp<PsionicInsulationComponent>(psionic))
                 continue;
 
-            validList.Add(Psionic);
+            validList.Add(psionic);
         }
 
-        // Give some targets psionic abilities.
+        // The storm may restore a future catalyst roll, but it never grants levels by itself.
         RobustRandom.Shuffle(validList);
 
         var toAwaken = RobustRandom.Next(1, component.MaxAwaken);
@@ -44,7 +41,11 @@ internal sealed class NoosphericStormRule : StationEventSystem<NoosphericStormRu
             if (toAwaken-- == 0)
                 break;
 
-            _psionicAbilitiesSystem.AddPsionics(target);
+            if (TryComp<PsionicComponent>(target, out var psionic))
+            {
+                psionic.CanReroll = true;
+                Dirty(target, psionic);
+            }
         }
 
         // Increase glimmer.

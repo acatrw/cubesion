@@ -8,7 +8,9 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
 using Robust.Shared.Physics.Components;
-using Content.Shared._Crescent.ShipShields; // Rat
+using Content.Client._Crescent.ShipShields; // Rat
+using Content.Client._KS14.UI; // KS14
+using Robust.Client.UserInterface; // KS14
 
 namespace Content.Client.Shuttles.UI;
 
@@ -34,6 +36,31 @@ public sealed partial class NavScreen : BoxContainer
 
         NfInitialize(); // Frontier Initialization for the NavScreen
         HullrotInitialize();
+
+        KsApplyInstrumentLook(); // KS14
+    }
+
+    /// <summary>
+    ///     KS14: dresses this screen in the instrument look - VT323 face, green CRT palette,
+    ///         flat bordered buttons. Cosmetic only: it retitles the two panels and walks the
+    ///         side column applying style classes, touching no control's behaviour, name or
+    ///         layout. Runtime colour overrides (status readouts that tint themselves) are
+    ///         left alone, so anything that already paints itself keeps winning.
+    /// </summary>
+    private void KsApplyInstrumentLook()
+    {
+        var palette = KsInstrumentPalette.Nav;
+
+        DisplayPanel.Title = Loc.GetString("shuttle-console-display-label");
+        SettingsPanel.Title = Loc.GetString("shuttle-console-nav-settings");
+
+        foreach (var panel in new[] { DisplayPanel, SettingsPanel })
+        {
+            panel.Accent = palette.Accent;
+            panel.Background = palette.Background;
+        }
+
+        KsInstrumentDressing.Apply(RightDisplayNav, palette);
     }
 
     public void SetShuttle(EntityUid? shuttle)
@@ -97,31 +124,23 @@ public sealed partial class NavScreen : BoxContainer
         GridAngularVelocity.Text = $"{-gridBody.AngularVelocity + 10f * float.Epsilon:0.0}";
 
         // Rat-start
-        var shieldQuery = _entManager.EntityQueryEnumerator<ShipShieldEmitterComponent, TransformComponent>();
-        bool foundShield = false;
-        while (shieldQuery.MoveNext(out _, out var emitter, out var emitterXform))
+        var shield = ShipShieldReadout.Find(_entManager, _shuttleEntity.Value);
+        if (shield == null)
         {
-            if (emitterXform.GridUid == _shuttleEntity.Value)
-            {
-                foundShield = true;
-                if (emitter.OverloadAccumulator > 0 || emitter.Damage >= emitter.DamageLimit)
-                {
-                    ShieldStatus.Text = emitter.OverloadAccumulator > 0
-                        ? Loc.GetString("shuttle-console-shield-recharging", ("time", (int)emitter.OverloadAccumulator))
-                        : Loc.GetString("shuttle-console-shield-recharging", ("time", (int)emitter.DamageOverloadTimePunishment));
-                }
-                else
-                {
-                    var remaining = emitter.DamageLimit - emitter.Damage;
-                    ShieldStatus.Text = Loc.GetString("shuttle-console-shield-active",
-                        ("remaining", (int)remaining),
-                        ("limit", (int)emitter.DamageLimit));
-                }
-                break;
-            }
-        }
-        if (!foundShield)
             ShieldStatus.Text = Loc.GetString("shuttle-console-shield-absent");
+        }
+        else if (ShipShieldReadout.IsDown(shield))
+        {
+            ShieldStatus.Text = Loc.GetString("shuttle-console-shield-recharging",
+                ("time", (int) ShipShieldReadout.DownSeconds(shield)));
+        }
+        else
+        {
+            // Percent rather than raw damage: hulls run wildly different damage limits, so the
+            // absolute number said nothing about how much fight the shield had left in it.
+            ShieldStatus.Text = Loc.GetString("shuttle-console-shield-active",
+                ("percent", ShipShieldReadout.Percent(shield)));
+        }
         // Rat-end
 
 		ShipName.Text = $"{_entManager.GetComponent<MetaDataComponent>(_shuttleEntity.Value).EntityName}";

@@ -1,6 +1,6 @@
-# Coalition Technology tree — an EXTRA, combined discipline.
+# TFCF Technology tree — an EXTRA, combined discipline using legacy Coalition prototype IDs.
 # This duplicates the Interdyne (IPM) and Cyberdawn (CD) catalogues into one shared TFSC tree so a station can
-# research everything off a single "coalition technology research server". It does NOT replace the original
+# research everything from a single shared Federation research server. It does NOT replace the original
 # Interdyne/Cyberdawn trees (interdyne.yml / cyberdawn.yml) — those stay intact so existing maps keep working.
 #
 # Technology ids here are prefixed "Coalition" so they never collide with the originals (a duplicate id would
@@ -204,6 +204,8 @@
   - WeaponRifleKrinkovCyberdawn
   - WeaponPistolViperWoodCyberdawn
   - WeaponPistolAnsemCyberdawn
+  - M14IncendiaryHandgrenade
+  - M18SmokeHandgrenade
 
 - type: technology
   id: CoalitionCyberdawnT1Infiltration
@@ -315,7 +317,6 @@
   tier: 2
   cost: 10000
   recipeUnlocks:
-  - BallisticCycler1Craft
   - TubeLoader1Craft
   - LaserLocus1Craft
   - HardlightGenerator1Craft
@@ -475,3 +476,15 @@
   - ScramImplanter
   - SyndicateBombCyberdawn
   - StealthBoxCyberdawn
+
+- type: technology
+  id: CoalitionCDTAssaultCyborgs
+  name: research-technology-cyberdawn-CDTAssaultcyborgs
+  icon:
+    sprite: Mobs/Silicon/chassis.rsi
+    state: synd_sec
+  discipline: Coalition
+  tier: 3
+  cost: 15000
+  recipeUnlocks:
+  - ReinforcementFlatpackSyndicateCyborgAssault

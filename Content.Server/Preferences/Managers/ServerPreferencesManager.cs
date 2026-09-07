@@ -59,24 +59,42 @@ namespace Content.Server.Preferences.Managers
                 return;
             }
 
-            if (index < 0 || index >= MaxCharacterSlots)
+            await prefsData.WriteLock.WaitAsync();
+            try
             {
-                return;
+                if (index < 0 || index >= MaxCharacterSlots)
+                {
+                    return;
+                }
+
+                var curPrefs = prefsData.Prefs!;
+
+                if (!curPrefs.Characters.ContainsKey(index))
+                {
+                    return;
+                }
+
+                prefsData.Prefs = new PlayerPreferences(curPrefs.Characters, index, curPrefs.AdminOOCColor);
+
+                if (ShouldStorePrefs(message.MsgChannel.AuthType))
+                {
+                    try
+                    {
+                        await _db.SaveSelectedCharacterIndexAsync(message.MsgChannel.UserId, message.SelectedCharacterIndex);
+                    }
+                    catch (Exception e)
+                    {
+                        prefsData.Prefs = curPrefs;
+                        SendPreferences(curPrefs, message.MsgChannel);
+                        _sawmill.Error(
+                            $"Failed to persist selected character slot {index} for {userId}. The server is using slot " +
+                            $"{curPrefs.SelectedCharacterIndex} again after rolling the failed change back: {e}");
+                    }
+                }
             }
-
-            var curPrefs = prefsData.Prefs!;
-
-            if (!curPrefs.Characters.ContainsKey(index))
+            finally
             {
-                // Non-existent slot.
-                return;
-            }
-
-            prefsData.Prefs = new PlayerPreferences(curPrefs.Characters, index, curPrefs.AdminOOCColor);
-
-            if (ShouldStorePrefs(message.MsgChannel.AuthType))
-            {
-                await _db.SaveSelectedCharacterIndexAsync(message.MsgChannel.UserId, message.SelectedCharacterIndex);
+                prefsData.WriteLock.Release();
             }
         }
 
@@ -86,9 +104,19 @@ namespace Content.Server.Preferences.Managers
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (message.Profile == null)
+            {
                 _sawmill.Error($"User {userId} sent a {nameof(MsgUpdateCharacter)} with a null profile in slot {message.Slot}.");
-            else
+                return;
+            }
+
+            try
+            {
                 await SetProfile(userId, message.Slot, message.Profile);
+            }
+            catch (Exception e)
+            {
+                _sawmill.Error($"Failed to apply character update from {userId} for slot {message.Slot}: {e}");
+            }
         }
 
         public async Task SetProfileNoChecks(NetUserId userId, int slot, ICharacterProfile profile)
@@ -98,15 +126,50 @@ namespace Content.Server.Preferences.Managers
                 _sawmill.Error($"Tried to modify user {userId} preferences before they loaded.");
                 return;
             }
-            var curPrefs = prefsData.Prefs!;
-            var session = _playerManager.GetSessionById(userId);
-            var profiles = new Dictionary<int, ICharacterProfile>(curPrefs.Characters)
+
+            await prefsData.WriteLock.WaitAsync();
+            try
             {
-                [slot] = profile
-            };
-            prefsData.Prefs = new PlayerPreferences(profiles, slot, curPrefs.AdminOOCColor);
-            if (ShouldStorePrefs(session.Channel.AuthType))
-                await _db.SaveCharacterSlotAsync(userId, profile, slot);
+                var curPrefs = prefsData.Prefs!;
+                var session = _playerManager.GetSessionById(userId);
+
+                if (slot < 0 || slot >= MaxCharacterSlots)
+                {
+                    _sawmill.Error(
+                        $"SetProfileNoChecks called for {session.Name} ({userId}) with out-of-range slot {slot} " +
+                        $"(max {MaxCharacterSlots}); ignoring the write.");
+                    return;
+                }
+
+                var profiles = new Dictionary<int, ICharacterProfile>(curPrefs.Characters)
+                {
+                    [slot] = profile
+                };
+                // Saving a slot is not the same as picking it - the client never moves its own selection here.
+                prefsData.Prefs = new PlayerPreferences(
+                    profiles,
+                    curPrefs.SelectedCharacterIndex,
+                    curPrefs.AdminOOCColor);
+
+                if (!ShouldStorePrefs(session.Channel.AuthType))
+                    return;
+
+                try
+                {
+                    await _db.SaveCharacterSlotAsync(userId, profile, slot);
+                }
+                catch (Exception e)
+                {
+                    prefsData.Prefs = curPrefs;
+                    _sawmill.Error(
+                        $"Failed to persist slot {slot} for {session.Name} ({userId}) via SetProfileNoChecks. " +
+                        $"The in-memory update was rolled back: {e}");
+                }
+            }
+            finally
+            {
+                prefsData.WriteLock.Release();
+            }
         }
 
         public async Task SetProfile(NetUserId userId, int slot, ICharacterProfile profile)
@@ -117,59 +180,77 @@ namespace Content.Server.Preferences.Managers
                 return;
             }
 
-            if (slot < 0 || slot >= MaxCharacterSlots)
-                return;
-
-            var curPrefs = prefsData.Prefs!;
-            var session = _playerManager.GetSessionById(userId);
-
-            profile.EnsureValid(session, _dependencies);
-
-            // hullrot edit
-            if (profile is HumanoidCharacterProfile)
+            await prefsData.WriteLock.WaitAsync();
+            try
             {
-                if (!curPrefs.Characters.ContainsKey(slot))
+                if (slot < 0 || slot >= MaxCharacterSlots)
+                    return;
+
+                var curPrefs = prefsData.Prefs!;
+                var session = _playerManager.GetSessionById(userId);
+
+                profile.EnsureValid(session, _dependencies);
+
+                if (profile is HumanoidCharacterProfile)
                 {
-                    profile = ((HumanoidCharacterProfile) profile).WithBank(HumanoidCharacterProfile.DefaultBalance);
+                    if (!curPrefs.Characters.ContainsKey(slot))
+                    {
+                        profile = ((HumanoidCharacterProfile) profile).WithBank(HumanoidCharacterProfile.DefaultBalance);
+                    }
+                    else if (curPrefs.Characters[slot] is HumanoidCharacterProfile humanoidEditingTarget)
+                    {
+                        if (humanoidEditingTarget.Faction != "" && ((HumanoidCharacterProfile) profile).Faction != humanoidEditingTarget.Faction)
+                        {
+                            _sawmill.Info(
+                                $"{session.Name} has tried to modify a locked character's faction. They are using a modified client!");
+                            profile = ((HumanoidCharacterProfile) profile).WithFaction(humanoidEditingTarget.Faction);
+                        }
+
+                        if (humanoidEditingTarget.BankBalance != ((HumanoidCharacterProfile) profile).BankBalance)
+                        {
+                            if (((HumanoidCharacterProfile) profile).BankBalance > humanoidEditingTarget.BankBalance)
+                                _sawmill.Info($"{session.Name} has tried to give their character money. They are using a modified client!");
+                            profile = ((HumanoidCharacterProfile) profile).WithBank(humanoidEditingTarget.BankBalance);
+                        }
+
+                        profile = ((HumanoidCharacterProfile) profile).WithCharacterFlags(humanoidEditingTarget.CharacterFlags);
+                    }
                 }
-                else if (curPrefs.Characters[slot] is HumanoidCharacterProfile humanoidEditingTarget)
+
+                var profiles = new Dictionary<int, ICharacterProfile>(curPrefs.Characters)
                 {
-                    // you cheat like a king! gg! - SPCR
-                    if (humanoidEditingTarget.Faction != "" && ((HumanoidCharacterProfile) profile).Faction != humanoidEditingTarget.Faction)
-                    {
-                        _sawmill.Info(
-                            $"{session.Name} has tried to modify a locked character's faction. They are using a modified client!");
-                        profile = ((HumanoidCharacterProfile) profile).WithFaction(humanoidEditingTarget.Faction);
-                    }
+                    [slot] = profile
+                };
 
-                    // ha ha ha ha
-                    if (humanoidEditingTarget.BankBalance != ((HumanoidCharacterProfile) profile).BankBalance)
-                    {
-                        if (((HumanoidCharacterProfile) profile).BankBalance > humanoidEditingTarget.BankBalance)
-                            _sawmill.Info($"{session.Name} has tried to give their character money. They are using a modified client!");
-                        profile = ((HumanoidCharacterProfile) profile).WithBank(humanoidEditingTarget.BankBalance);
-                    }
+                prefsData.Prefs = new PlayerPreferences(
+                    profiles,
+                    curPrefs.SelectedCharacterIndex,
+                    curPrefs.AdminOOCColor);
 
-                    // prevent client from changing flags on a slot. fuck you
-                    profile = ((HumanoidCharacterProfile) profile).WithCharacterFlags(humanoidEditingTarget.CharacterFlags);
+                var msg = new MsgUpdatePreferences();
+                msg.Preferences = prefsData.Prefs;
+                _netManager.ServerSendMessage(msg, session.Channel);
+
+                if (!ShouldStorePrefs(session.Channel.AuthType))
+                    return;
+
+                try
+                {
+                    await _db.SaveCharacterSlotAsync(userId, profile, slot);
+                }
+                catch (Exception e)
+                {
+                    prefsData.Prefs = curPrefs;
+                    SendPreferences(curPrefs, session.Channel);
+                    _sawmill.Error(
+                        $"Failed to persist slot {slot} for {session.Name} ({userId}). The optimistic server/client " +
+                        $"update was rolled back to the stored preferences: {e}");
                 }
             }
-
-            // hullrot edit end
-            var profiles = new Dictionary<int, ICharacterProfile>(curPrefs.Characters)
+            finally
             {
-                [slot] = profile
-            };
-
-            prefsData.Prefs = new PlayerPreferences(profiles, slot, curPrefs.AdminOOCColor);
-
-            // Fire a prefs update message
-            var msg = new MsgUpdatePreferences();
-            msg.Preferences = prefsData.Prefs;
-            _netManager.ServerSendMessage(msg, session.Channel);
-
-            if (ShouldStorePrefs(session.Channel.AuthType))
-                await _db.SaveCharacterSlotAsync(userId, profile, slot);
+                prefsData.WriteLock.Release();
+            }
         }
 
         private async void HandleDeleteCharacterMessage(MsgDeleteCharacter message)
@@ -183,46 +264,61 @@ namespace Content.Server.Preferences.Managers
                 return;
             }
 
-            if (slot < 0 || slot >= MaxCharacterSlots)
+            await prefsData.WriteLock.WaitAsync();
+            try
             {
-                return;
-            }
-
-            var curPrefs = prefsData.Prefs!;
-
-            // If they try to delete the slot they have selected then we switch to another one.
-            // Of course, that's only if they HAVE another slot.
-            int? nextSlot = null;
-            if (curPrefs.SelectedCharacterIndex == slot)
-            {
-                // That ! on the end is because Rider doesn't like .NET 5.
-                var (ns, profile) = curPrefs.Characters.FirstOrDefault(p => p.Key != message.Slot);
-                if (profile == null)
+                if (slot < 0 || slot >= MaxCharacterSlots)
                 {
-                    // Only slot left, can't delete.
                     return;
                 }
 
-                nextSlot = ns;
+                var curPrefs = prefsData.Prefs!;
+
+                int? nextSlot = null;
+                if (curPrefs.SelectedCharacterIndex == slot)
+                {
+                    var (ns, profile) = curPrefs.Characters.FirstOrDefault(p => p.Key != message.Slot);
+                    if (profile == null)
+                    {
+                        return;
+                    }
+
+                    nextSlot = ns;
+                }
+
+                var arr = new Dictionary<int, ICharacterProfile>(curPrefs.Characters);
+                arr.Remove(slot);
+
+                prefsData.Prefs = new PlayerPreferences(arr, nextSlot ?? curPrefs.SelectedCharacterIndex, curPrefs.AdminOOCColor);
+
+                if (!ShouldStorePrefs(message.MsgChannel.AuthType))
+                {
+                    return;
+                }
+
+                try
+                {
+                    if (nextSlot != null)
+                    {
+                        await _db.DeleteSlotAndSetSelectedIndex(userId, slot, nextSlot.Value);
+                    }
+                    else
+                    {
+                        await _db.SaveCharacterSlotAsync(userId, null, slot);
+                    }
+                }
+                catch (Exception e)
+                {
+                    prefsData.Prefs = curPrefs;
+                    SendPreferences(curPrefs, message.MsgChannel);
+                    _sawmill.Error(
+                        $"Failed to delete character slot {slot} for {userId} (new selected slot {nextSlot}). " +
+                        $"The optimistic deletion was rolled back: {e}");
+                }
             }
-
-            var arr = new Dictionary<int, ICharacterProfile>(curPrefs.Characters);
-            arr.Remove(slot);
-
-            prefsData.Prefs = new PlayerPreferences(arr, nextSlot ?? curPrefs.SelectedCharacterIndex, curPrefs.AdminOOCColor);
-
-            if (!ShouldStorePrefs(message.MsgChannel.AuthType))
+            finally
             {
-                return;
-            }
-
-            if (nextSlot != null)
-            {
-                await _db.DeleteSlotAndSetSelectedIndex(userId, slot, nextSlot.Value);
-            }
-            else
-            {
-                await _db.SaveCharacterSlotAsync(userId, null, slot);
+                prefsData.WriteLock.Release();
             }
         }
 
@@ -350,7 +446,7 @@ namespace Content.Server.Preferences.Managers
         private async Task<PlayerPreferences> GetOrCreatePreferencesAsync(NetUserId userId, CancellationToken cancel)
         {
             var prefs = await _db.GetPlayerPreferencesAsync(userId, cancel);
-            if (prefs is null)
+            if (prefs is null || prefs.Characters.Count == 0)
             {
                 return await _db.InitPrefsAsync(userId, HumanoidCharacterProfile.Random(), cancel);
             }
@@ -363,8 +459,26 @@ namespace Content.Server.Preferences.Managers
         {
             // Clean up preferences in case of changes to the game,
             // such as removed jobs still being selected.
-            return new PlayerPreferences(prefs.Characters.Select(p => new KeyValuePair<int, ICharacterProfile>(p.Key,
-                    p.Value.Validated(session, collection))), prefs.SelectedCharacterIndex, prefs.AdminOOCColor);
+            var characters = prefs.Characters
+                .Select(p => new KeyValuePair<int, ICharacterProfile>(p.Key, p.Value.Validated(session, collection)))
+                .ToList();
+
+            // The selected slot is loaded straight out of the DB and was never checked against the profile rows
+            // that actually exist. A dangling index makes PlayerPreferences.SelectedCharacter throw
+            // KeyNotFoundException for every consumer (lobby preview, character setup, BankSystem), which the
+            // client's catch-all turns into a lobby with no character and dead buttons. Since it lives in the
+            // prefs row it reproduces on every reconnect and only a prefs wipe "fixes" it - clamp it instead.
+            var selected = prefs.SelectedCharacterIndex;
+            if (characters.Count > 0 && characters.All(p => p.Key != selected))
+            {
+                var replacement = characters[0].Key;
+                _sawmill.Error(
+                    $"User {session.Name} ({session.UserId}) has selected character slot {selected} but only slots " +
+                    $"[{string.Join(", ", characters.Select(p => p.Key))}] exist. Falling back to slot {replacement}.");
+                selected = replacement;
+            }
+
+            return new PlayerPreferences(characters, selected, prefs.AdminOOCColor);
         }
 
         public IEnumerable<KeyValuePair<NetUserId, ICharacterProfile>> GetSelectedProfilesForPlayers(
@@ -385,10 +499,27 @@ namespace Content.Server.Preferences.Managers
             return loginType.HasStaticUserId();
         }
 
+        private void SendPreferences(PlayerPreferences preferences, INetChannel channel)
+        {
+            try
+            {
+                var msg = new MsgUpdatePreferences
+                {
+                    Preferences = preferences
+                };
+                _netManager.ServerSendMessage(msg, channel);
+            }
+            catch (Exception e)
+            {
+                _sawmill.Warning($"Failed to send preference rollback to {channel.UserId}: {e}");
+            }
+        }
+
         private sealed class PlayerPrefData
         {
             public bool PrefsLoaded;
             public PlayerPreferences? Prefs;
+            public readonly SemaphoreSlim WriteLock = new(1, 1);
         }
 
         void IPostInjectInit.PostInject()

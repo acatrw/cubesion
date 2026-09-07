@@ -94,6 +94,7 @@ namespace Content.Server.Power.EntitySystems
             SubscribeLocalEvent<ApcPowerReceiverComponent, ComponentRemove>(ApcPowerReceiverRemove);
             SubscribeLocalEvent<ApcPowerReceiverComponent, EntityPausedEvent>(ApcPowerReceiverPaused);
             SubscribeLocalEvent<ApcPowerReceiverComponent, EntityUnpausedEvent>(ApcPowerReceiverUnpaused);
+            SubscribeLocalEvent<ApcPowerReceiverBatteryComponent, ChargeChangedEvent>(ApcPowerReceiverBatteryChargeChanged);
 
             SubscribeLocalEvent<PowerNetworkBatteryComponent, ComponentInit>(BatteryInit);
             SubscribeLocalEvent<PowerNetworkBatteryComponent, ComponentShutdown>(BatteryShutdown);
@@ -383,6 +384,14 @@ namespace Content.Server.Power.EntitySystems
             _dirtyApcReceivers.Add(uid);
         }
 
+        private void ApcPowerReceiverBatteryChargeChanged(
+            EntityUid uid,
+            ApcPowerReceiverBatteryComponent component,
+            ref ChargeChangedEvent args)
+        {
+            QueueApcPowerReceiverUpdate(uid);
+        }
+
         private bool IsPoweredCalculate(ApcPowerReceiverComponent comp)
         {
             return !comp.PowerDisabled
@@ -446,40 +455,48 @@ namespace Content.Server.Power.EntitySystems
                 var needsBatteryTick = false;
                 if (_apcBatteryQuery.TryComp(uid, out var apcBattery) && _batteryQuery.TryComp(uid, out var battery))
                 {
-                    apcReceiver.Load = apcBattery.IdleLoad;
-
-                    // Try to draw power from the battery if there isn't sufficient external power
-                    var requireBattery = !powered && !apcReceiver.PowerDisabled;
-
-                    if (requireBattery)
+                    if (!apcBattery.PowerDrawEnabled)
                     {
-                        _battery.SetCharge(uid, battery.CurrentCharge - apcBattery.IdleLoad * frameTime, battery);
+                        apcReceiver.Load = 0f;
                     }
-                    // Otherwise try to charge the battery
-                    else if (powered && !_battery.IsFull(uid, battery))
+                    else
                     {
-                        apcReceiver.Load += apcBattery.BatteryRechargeRate * apcBattery.BatteryRechargeEfficiency;
-                        _battery.SetCharge(uid, battery.CurrentCharge + apcBattery.BatteryRechargeRate * frameTime, battery);
+                        apcReceiver.Load = apcBattery.IdleLoad;
+
+                        // Use the battery when the external supply falls short.
+                        var requireBattery = !powered && !apcReceiver.PowerDisabled;
+
+                        if (requireBattery)
+                        {
+                            _battery.SetCharge(uid, battery.CurrentCharge - apcBattery.IdleLoad * frameTime, battery);
+                        }
+                        // Charge the battery with spare external power.
+                        else if (powered && !_battery.IsFull(uid, battery))
+                        {
+                            apcReceiver.Load += apcBattery.BatteryRechargeRate * apcBattery.BatteryRechargeEfficiency;
+                            _battery.SetCharge(uid, battery.CurrentCharge + apcBattery.BatteryRechargeRate * frameTime, battery);
+                        }
+
+                        // Update the battery state only when it changes.
+                        var enableBattery = requireBattery && battery.CurrentCharge > 0;
+
+                        if (apcBattery.Enabled != enableBattery)
+                        {
+                            apcBattery.Enabled = enableBattery;
+                            metadata = MetaData(uid);
+                            Dirty(uid, apcBattery, metadata);
+
+                            var apcBatteryEv = new ApcPowerReceiverBatteryChangedEvent(enableBattery);
+                            RaiseLocalEvent(uid, ref apcBatteryEv);
+
+                            _appearance.SetData(uid, PowerDeviceVisuals.BatteryPowered, enableBattery);
+                        }
+
+                        powered |= enableBattery;
+
+                        needsBatteryTick = (requireBattery && battery.CurrentCharge > 0) ||
+                                           (powered && !_battery.IsFull(uid, battery));
                     }
-
-                    // Enable / disable the battery if the state changed
-                    var enableBattery = requireBattery && battery.CurrentCharge > 0;
-
-                    if (apcBattery.Enabled != enableBattery)
-                    {
-                        apcBattery.Enabled = enableBattery;
-                        metadata = MetaData(uid);
-                        Dirty(uid, apcBattery, metadata);
-
-                        var apcBatteryEv = new ApcPowerReceiverBatteryChangedEvent(enableBattery);
-                        RaiseLocalEvent(uid, ref apcBatteryEv);
-
-                        _appearance.SetData(uid, PowerDeviceVisuals.BatteryPowered, enableBattery);
-                    }
-
-                    powered |= enableBattery;
-
-                    needsBatteryTick = (requireBattery && battery.CurrentCharge > 0) || (powered && !_battery.IsFull(uid, battery));
                 }
 
                 // If new value is the same as the old, then exit

@@ -18,6 +18,7 @@ public sealed class StockMarketCartridgeSystem : EntitySystem
     [Dependency] private readonly StockCompanySystem _stockCompanies = default!;
     [Dependency] private readonly BankSystem _bank = default!;
     [Dependency] private readonly StockPortfolioPersistenceSystem _portfolios = default!;
+    [Dependency] private readonly StockWarLiquidationSystem _warLiquidation = default!;
     [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
@@ -85,9 +86,12 @@ public sealed class StockMarketCartridgeSystem : EntitySystem
         }
     }
 
-    private bool TryBuyStock(EntityUid playerUid, string companyId, int amount)
+    public bool TryBuyStock(EntityUid playerUid, string companyId, int amount)
     {
         if (amount <= 0 || amount > StockMarketTrading.MaxStockAmount)
+            return false;
+
+        if (!_warLiquidation.CanTradeStock(playerUid, companyId))
             return false;
 
         var company = _stockCompanies.GetCompany(companyId);
@@ -112,9 +116,12 @@ public sealed class StockMarketCartridgeSystem : EntitySystem
         return true;
     }
 
-    private bool TrySellStock(EntityUid playerUid, string companyId, int amount)
+    public bool TrySellStock(EntityUid playerUid, string companyId, int amount)
     {
         if (amount <= 0 || amount > StockMarketTrading.MaxStockAmount)
+            return false;
+
+        if (!_warLiquidation.CanTradeStock(playerUid, companyId))
             return false;
 
         if (!TryComp<PlayerStockPortfolioComponent>(playerUid, out var portfolio))
@@ -182,13 +189,18 @@ public sealed class StockMarketCartridgeSystem : EntitySystem
             if (!company.Active)
                 continue;
 
+            var (pendingShift, pendingTicks) = _stockCompanies.GetPendingPressure(company);
+
             priceData[company.Id] = new StockPriceData(
                 company.Id,
                 company.BasePrice,
                 company.CurrentPrice,
                 company.PriceMultiplier,
                 company.PriceChange,
-                new List<float>(company.PriceHistory)
+                new List<float>(company.PriceHistory),
+                pendingShift,
+                pendingTicks,
+                company.Neutral
             );
         }
 

@@ -65,20 +65,24 @@ public sealed class PsionicAbilitiesSystem : EntitySystem
     }
 
     /// <summary>
-    ///     The most shorthand route to creating a Psion. If an entity is not already psionic, it becomes one. This also adds a random new PsionicPower.
-    ///     To create a "Latent Psychic"(Psion with no powers) just add or ensure the PsionicComponent normally.
+    ///     The most shorthand route to creating a Psion. New psions begin at level one with a
+    ///     development point and select their first power through the skill tree.
     /// </summary>
     public void AddPsionics(EntityUid uid)
     {
-        if (Deleted(uid))
+        // Mindbreaking is supposed to be permanent, and species that are born inert (Oni, skeletons)
+        // carry the same component from the start. Without this the glimmer events and the accept-
+        // psionics EUI would happily hand either of them a fresh PsionicComponent.
+        if (Deleted(uid)
+            || HasComp<MindbrokenComponent>(uid))
             return;
 
-        AddRandomPsionicPower(uid);
+        EnsureComp<PsionicComponent>(uid);
     }
 
     /// <summary>
-    ///     Pretty straightforward, adds a random psionic power to a given Entity. If that Entity is not already Psychic, it will be made one.
-    ///     If an entity already has all possible powers, this will not add any new ones.
+    ///     Explicit random-power override retained for admin/debug commands and legacy scripted content.
+    ///     Normal progression should use the psionic skill tree.
     /// </summary>
     public void AddRandomPsionicPower(EntityUid uid, bool forced = false)
     {
@@ -118,7 +122,10 @@ public sealed class PsionicAbilitiesSystem : EntitySystem
     public void InitializePsionicPower(EntityUid uid, PsionicPowerPrototype proto, PsionicComponent psionic, bool playFeedback = true)
     {
         if (!_prototypeManager.HasIndex<PsionicPowerPrototype>(proto.ID)
-            || psionic.ActivePowers.Contains(proto))
+            || psionic.ActivePowers.Contains(proto)
+            // A Psion who kept their component through a mindbreak, or an inert species someone handed
+            // one to, must not be able to spend skill points on powers they could never cast.
+            || HasComp<MindbrokenComponent>(uid))
             return;
 
         psionic.ActivePowers.Add(proto);

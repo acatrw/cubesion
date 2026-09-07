@@ -25704,99 +25704,6 @@ entities:
       rot: 1.5707963267948966 rad
       pos: 60.5,-77.5
       parent: 1
-- proto: HandheldGPSBasic
-  entities:
-  - uid: 149
-    components:
-    - type: Transform
-      parent: 138
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 165
-    components:
-    - type: Transform
-      parent: 160
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 173
-    components:
-    - type: Transform
-      parent: 152
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1213
-    components:
-    - type: Transform
-      parent: 1212
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1221
-    components:
-    - type: Transform
-      parent: 1219
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1232
-    components:
-    - type: Transform
-      parent: 1229
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1308
-    components:
-    - type: Transform
-      parent: 1306
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1316
-    components:
-    - type: Transform
-      parent: 1313
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1321
-    components:
-    - type: Transform
-      parent: 1320
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1330
-    components:
-    - type: Transform
-      parent: 1327
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1335
-    components:
-    - type: Transform
-      parent: 1334
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1342
-    components:
-    - type: Transform
-      parent: 1341
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1415
-    components:
-    - type: Transform
-      parent: 1414
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
 - proto: HandheldHealthAnalyzer
   entities:
   - uid: 1052
@@ -26409,7 +26316,6 @@ entities:
           - 1475
           - 1476
           - 1478
-          - 1610
           - 1609
           - 1470
         paper_label: !type:ContainerSlot
@@ -34962,7 +34868,6 @@ entities:
           occludes: True
           ents:
           - 150
-          - 149
           - 148
           - 145
           - 143
@@ -35000,7 +34905,6 @@ entities:
           - 185
           - 175
           - 174
-          - 173
           - 154
           - 153
           - 91
@@ -35036,7 +34940,6 @@ entities:
           - 161
           - 163
           - 164
-          - 165
           - 166
           - 167
   - uid: 1212
@@ -35069,7 +34972,6 @@ entities:
           occludes: True
           ents:
           - 1214
-          - 1213
           - 92
           - 1218
           - 1217
@@ -35108,7 +35010,6 @@ entities:
           - 1224
           - 1223
           - 1222
-          - 1221
           - 1220
           - 94
   - uid: 1229
@@ -35143,7 +35044,6 @@ entities:
           - 1235
           - 1234
           - 1233
-          - 1232
           - 1231
           - 1230
   - uid: 1306
@@ -35176,7 +35076,6 @@ entities:
           occludes: True
           ents:
           - 1307
-          - 1308
           - 1309
           - 1310
           - 1311
@@ -35212,7 +35111,6 @@ entities:
           ents:
           - 1314
           - 1315
-          - 1316
           - 1317
           - 1318
           - 1319
@@ -35245,7 +35143,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 1321
           - 1322
           - 1323
           - 1324
@@ -35282,7 +35179,6 @@ entities:
           ents:
           - 1328
           - 1329
-          - 1330
           - 1331
           - 1332
           - 1333
@@ -35297,7 +35193,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 1335
           - 1336
           - 1337
           - 1338
@@ -35314,7 +35209,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 1342
           - 1343
           - 1344
           - 1345
@@ -35349,7 +35243,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 1415
           - 1416
           - 1417
           - 1418

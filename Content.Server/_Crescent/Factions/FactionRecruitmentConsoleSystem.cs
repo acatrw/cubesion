@@ -4,6 +4,7 @@ using Content.Server.Administration.Logs;
 using Content.Server.Crescent.Chat;
 using Content.Server.Jobs;
 using Content.Server.Popups;
+using Content.Server._Crescent.Squad;
 using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
@@ -27,7 +28,8 @@ namespace Content.Server._Crescent.Factions;
 /// by diplomacy, squads, payroll and the chat name prefix — and rewrites their held ID card to the chosen role's
 /// title, icon, department and access. It can also dismiss a member, clearing their faction membership.
 ///
-/// Membership lives on the body, not the ID card, so the console acts on nearby people rather than on an inserted
+/// Authoritative membership lives on the body, while the rewritten ID advertises the same faction to credential
+/// readers such as anti-boarder turrets. The console therefore acts on nearby people rather than on an inserted
 /// card. No character profile is touched, so death/respawn returns a recruit to their character's own faction.
 /// </summary>
 public sealed class FactionRecruitmentConsoleSystem : EntitySystem
@@ -43,6 +45,9 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly SharedJobSystem _jobs = default!;
+    [Dependency] private readonly HullrotNpcFactionSyncSystem _hullrotNpcFaction = default!;
+    [Dependency] private readonly FactionIdCardSystem _factionIds = default!;
+    [Dependency] private readonly SquadSystem _squad = default!;
 
     public override void Initialize()
     {
@@ -260,7 +265,7 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
         }
 
         // Chat rank is the primary signal, but it only works for factions that hand ranks out: Shinohara
-        // gives none at all, and two of the Coalition's department heads carry none either. So also refuse
+        // gives none at all, and two TFCF member-organization leaders carry none either. So also refuse
         // anyone whose round-start job belongs to this faction yet is off this console's list — that job is
         // command by definition. The faction check matters: a drifter recruited off the street holds a job
         // that is on nobody's list, and moving them between the faction's own roles is not a demotion.
@@ -309,6 +314,14 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
 
     private void ApplyRecruitment(EntityUid uid, FactionRecruitmentConsoleComponent comp, EntityUid actor, EntityUid target, JobPrototype job)
     {
+        // Squad IDs belong to a faction. Keep a same-faction reassignment in its existing squad, but never carry
+        // an old faction's squad membership through a lateral recruitment (or revive an already-stale one).
+        if (!TryComp<HullrotFactionComponent>(target, out var previousFaction) ||
+            previousFaction.Faction != comp.Faction)
+        {
+            _squad.RemoveFromSquad(target);
+        }
+
         // 1. Re-run the role's component grants (AddComponentSpecial) so the recruit matches a fresh spawn of the
         //    job: this is what refreshes ChatRankComponent — the source of the chat/radio name prefix ("rank") —
         //    along with faction languages. Only AddComponentSpecial is replayed; item/implant/trait specials would
@@ -325,10 +338,27 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
         var factionComp = EnsureComp<HullrotFactionComponent>(target);
         factionComp.Faction = comp.Faction;
         Dirty(target, factionComp);
+        // Assigning the field raises nothing, so the NPC-facing membership has to be pushed by hand or the
+        // recruit still reads as their old side to every turret in the sector.
+        _hullrotNpcFaction.Sync(target, factionComp);
 
-        // 3. ID card: title, icon, department, and (additively) the role's access.
-        if (_idCard.TryFindIdCard(target, out var idCard))
+        // 3. ID card: title, icon, department, and (additively) the role's access. Only the equipped ID slot counts;
+        // TryFindIdCard prefers an active-hand card and would let a recruit stamp an arbitrary spare credential.
+        var previousCredential = CompOrNull<FactionCredentialTrackerComponent>(target);
+        if (_factionIds.TryGetWornIdCard(target, out var idCard))
         {
+            if (previousCredential != null && previousCredential.Faction != comp.Faction)
+            {
+                foreach (var oldCard in previousCredential.Cards)
+                    _factionIds.ClearFaction(oldCard, previousCredential.Faction);
+
+                previousCredential.Cards.Clear();
+            }
+
+            _factionIds.SetFaction(idCard, comp.Faction);
+            var credential = EnsureComp<FactionCredentialTrackerComponent>(target);
+            credential.Cards.Add(idCard);
+            credential.Faction = comp.Faction;
             _idCard.TryChangeJobTitle(idCard, job.LocalizedName, player: actor);
 
             if (_proto.TryIndex(job.Icon, out var icon))
@@ -342,6 +372,14 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
             tags.UnionWith(job.Access);
             _access.TrySetTags(idCard, tags);
             _access.TryAddGroups(idCard, job.AccessGroups);
+        }
+        else if (previousCredential != null && previousCredential.Faction != comp.Faction)
+        {
+            // Lateral recruitment without an equipped replacement ID must still revoke the old faction's card.
+            foreach (var oldCard in previousCredential.Cards)
+                _factionIds.ClearFaction(oldCard, previousCredential.Faction);
+
+            RemComp<FactionCredentialTrackerComponent>(target);
         }
 
         var factionName = FactionDisplayName(comp.Faction);
@@ -385,8 +423,24 @@ public sealed class FactionRecruitmentConsoleSystem : EntitySystem
             return;
         }
 
-        factionComp.Faction = string.Empty;
-        Dirty(target, factionComp);
+        // Removing the membership component lets every lifecycle subscriber invalidate its state immediately:
+        // NPC factions are cleaned up and overwatch cannot retain this member in a stale roster cache.
+        _squad.RemoveFromSquad(target);
+        RemComp<HullrotFactionComponent>(target);
+
+        // Revoke the exact card stamped during recruitment, even if the member hid or swapped it. Round-start members
+        // have no tracker, so their currently equipped card is the safe fallback. Active-hand cards never qualify.
+        var revokedTrackedCard = false;
+        if (TryComp<FactionCredentialTrackerComponent>(target, out var trackedCredential))
+        {
+            foreach (var trackedCard in trackedCredential.Cards)
+                revokedTrackedCard |= _factionIds.ClearFaction(trackedCard, comp.Faction);
+
+            RemComp<FactionCredentialTrackerComponent>(target);
+        }
+
+        if (!revokedTrackedCard && _factionIds.TryGetWornIdCard(target, out var idCard))
+            _factionIds.ClearFaction(idCard, comp.Faction);
 
         var factionName = FactionDisplayName(comp.Faction);
 

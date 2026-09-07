@@ -4,7 +4,11 @@
 - type: vessel
   id: Nemesis
   name: DSM Nemesis
-  description: A heavy destroyer carrier, the starboard flakgun gunbattery & cargo area has been salvaged and converted into a docking-port.
+  description: |
+    A heavy destroyer carrier, the starboard flakgun gunbattery & cargo area has been salvaged and converted into a docking-port.
+    LOADOUT: 2x 330mm 'Catapult' Cruise Missile Platform, 1x 300w 'Curse' EMP Projector, 3x Navy 600cc 'Dominus' Carronade
+    SHIELD: Absent
+    SPEED: 15 m/s
   price: 226750
   category: Large
   group: None
@@ -29,6 +33,7 @@
             !type:NanotrasenNameGenerator
             prefixCreator: '14'
         - type: VesselDesignation
+          designation: vessel-designation-destroyer
         - type: StationJobs
           overflowJobs: []
-          availableJobs: {} # Encore - drone cruiser, no crew roles spawn here
+          availableJobs: {} # Eclipsion - drone cruiser, no crew roles spawn here

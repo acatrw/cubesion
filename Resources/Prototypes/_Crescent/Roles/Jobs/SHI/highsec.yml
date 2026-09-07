@@ -79,7 +79,6 @@
     eyes: ClothingEyesGlassesSunglasses
     ears: ClothingHeadsetShinohara
     pocket1: WeaponPistolLiquidator
-    pocket2: TradePassport
     back: ClothingBackpackSHISatchel
     belt: ClothingBeltSecurityFilled
   storage:
@@ -123,6 +122,8 @@
   special:
   - !type:AddComponentSpecial
     components:
+      - type: HullrotFaction
+        faction: SHI
       - type: LanguageAdder
         addSpoken:
           - Kaishago
@@ -151,7 +152,6 @@
     eyes: ClothingEyesGlassesSunglasses
     ears: ClothingHeadsetShinohara
     pocket1: WeaponPistolLiquidator
-    pocket2: TradePassport
     back: ClothingBackpackSHISatchel
     head: ClothingHeadHatShinoharaBeretHOS
     mask: ClothingMaskSHIHOSMask

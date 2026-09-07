@@ -1,14 +1,16 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using Content.Server.Administration.Managers;
 using Content.Shared.Administration;
 using Content.Shared.Mapping;
 using Robust.Server.GameObjects;
+using Robust.Server.GameStates;
 using Robust.Server.Player;
 using Robust.Shared.ContentPack;
 using Robust.Shared.EntitySerialization;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -25,7 +27,8 @@ public sealed class MappingManager : IPostInjectInit
 {
     [Dependency] private readonly IAdminManager _admin = default!;
     [Dependency] private readonly ILogManager _log = default!;
-    [Dependency] private readonly IMapManager _map = default!;
+    // SharedMapSystem is an entity system, not an IoC service.
+    private SharedMapSystem Map => _ent.System<SharedMapSystem>();
     [Dependency] private readonly IServerNetManager _net = default!;
     [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IEntitySystemManager _systems = default!;
@@ -46,31 +49,58 @@ public sealed class MappingManager : IPostInjectInit
 
         _sawmill = _log.GetSawmill("mapping");
 
-#if !FULL_RELEASE
+        // These used to be compiled out of release builds, which left the client registering messages the
+        // server didn't know about and silently killed map saving on every published build.
         _net.RegisterNetMessage<MappingSaveMapMessage>(OnMappingSaveMap);
         _net.RegisterNetMessage<MappingSaveMapErrorMessage>();
         _net.RegisterNetMessage<MappingMapDataMessage>();
+        _net.RegisterNetMessage<MappingScreenshotPvsMessage>(OnScreenshotPvs);
 
         _zstd = new ZStdCompressionContext();
-#endif
     }
 
     private void OnMappingSaveMap(MappingSaveMapMessage message)
     {
-#if !FULL_RELEASE
         try
         {
             if (!_players.TryGetSessionByChannel(message.MsgChannel, out var session) ||
                 !_admin.IsAdmin(session, true) ||
-                !_admin.HasAdminFlag(session, AdminFlags.Host) ||
+                !(_admin.HasAdminFlag(session, AdminFlags.Host) || _admin.HasAdminFlag(session, AdminFlags.Mapping)) ||
                 !_ent.TryGetComponent(session.AttachedEntity, out TransformComponent? xform) ||
-                xform.MapUid is not {} mapUid)
+                xform.MapUid is not { } mapUid)
             {
                 return;
             }
 
+            // Save the grid the mapper is standing on, so that what comes out of the save is the thing they
+            // were actually working on, as a grid file. Only when they're off-grid (in space, or on a map that
+            // is itself the grid, like a planet) does the whole map get saved instead.
+            var opts = SerializationOptions.Default;
+            EntityUid target;
+
+            if (xform.GridUid is { } gridUid && gridUid != mapUid)
+            {
+                target = gridUid;
+                opts.Category = FileCategory.Grid;
+            }
+            else
+            {
+                target = mapUid;
+                opts.Category = FileCategory.Map;
+            }
+
             var sys = _systems.GetEntitySystem<MapLoaderSystem>();
-            var data = sys.SerializeEntitiesRecursive([mapUid]).Node;
+            var (data, category) = sys.SerializeEntitiesRecursive([target], opts);
+
+            if (category != opts.Category)
+            {
+                _sawmill.Error($"Saved {_ent.ToPrettyString(target)} as {category} instead of {opts.Category}.");
+                _net.ServerSendMessage(new MappingSaveMapErrorMessage(), message.MsgChannel);
+                return;
+            }
+
+            _sawmill.Info($"Mapper {session.Name} saved {category.ToString().ToLower()} {_ent.ToPrettyString(target)}.");
+
             var document = new YamlDocument(data.ToYaml());
             var stream = new YamlStream { document };
             var writer = new StringWriter();
@@ -89,7 +119,33 @@ public sealed class MappingManager : IPostInjectInit
             var msg = new MappingSaveMapErrorMessage();
             _net.ServerSendMessage(msg, message.MsgChannel);
         }
-#endif
+    }
+
+    /// <summary>
+    ///     Lifts (or restores) PVS range culling on a single grid for a single mapper, so that the client actually
+    ///     has every entity on a large ship or station while it renders a grid screenshot.
+    /// </summary>
+    private void OnScreenshotPvs(MappingScreenshotPvsMessage message)
+    {
+        if (!_players.TryGetSessionByChannel(message.MsgChannel, out var session) ||
+            !_admin.IsAdmin(session, true) ||
+            !(_admin.HasAdminFlag(session, AdminFlags.Host) || _admin.HasAdminFlag(session, AdminFlags.Mapping)))
+        {
+            return;
+        }
+
+        if (!_ent.TryGetEntity(message.Grid, out var grid) || !_ent.HasComponent<MapGridComponent>(grid))
+            return;
+
+        // A session override on the grid covers everything parented to it, so this is a single call for the whole
+        // ship instead of one per entity. The client sends the disable half itself; if it never gets there because
+        // the mapper disconnected, the engine drops the session's overrides anyway.
+        var pvs = _systems.GetEntitySystem<PvsOverrideSystem>();
+
+        if (message.Enabled)
+            pvs.AddSessionOverride(grid.Value, session);
+        else
+            pvs.RemoveSessionOverride(grid.Value, session);
     }
 
     private void OnMappingFavoritesSave(MappingFavoritesSaveMessage message)
@@ -99,7 +155,7 @@ public sealed class MappingManager : IPostInjectInit
 
         var path = new ResPath(FavoritesPath);
         using var writer = _resourceMan.UserData.OpenWriteText(path);
-        var stream = new YamlStream {new(mapping.ToYaml())};
+        var stream = new YamlStream { new(mapping.ToYaml()) };
         stream.Save(new YamlMappingFix(new Emitter(writer)), false);
     }
 

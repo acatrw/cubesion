@@ -9,6 +9,7 @@ using Content.Server.Popups;
 using Content.Shared.Popups;
 using Content.Shared.Silicon.Systems;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Movement.Components;
 using Content.Server.Body.Components;
 using Robust.Shared.Containers;
 using Content.Shared.Mind.Components;
@@ -20,6 +21,7 @@ using Robust.Shared.Utility;
 using Content.Shared.CCVar;
 using Content.Shared.PowerCell.Components;
 using Content.Shared.Alert;
+using Content.Shared.Gravity;
 
 namespace Content.Server.Silicon.Charge;
 
@@ -34,6 +36,7 @@ public sealed class SiliconChargeSystem : EntitySystem
     [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly SharedGravitySystem _gravity = default!; // _Crescent
     public override void Initialize()
     {
         base.Initialize();
@@ -105,6 +108,14 @@ public sealed class SiliconChargeSystem : EntitySystem
                 continue;
 
             var drainRate = siliconComp.DrainPerSecond;
+
+            if (TryComp<InputMoverComponent>(silicon, out var mover)
+                && mover.Sprinting
+                && (mover.HeldMoveButtons & MoveButtons.AnyDirection) != MoveButtons.None
+                && _gravity.HasTraction(silicon)) // _Crescent: movers without traction never actually sprint.
+            {
+                drainRate += siliconComp.SprintDrainPerSecond;
+            }
 
             // All multipliers will be subtracted by 1, and then added together, and then multiplied by the drain rate. This is then added to the base drain rate.
             // This is to stop exponential increases, while still allowing for less-than-one multipliers.

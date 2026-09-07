@@ -231,7 +231,7 @@
   parent: VendingMachine
   id: SyndicateCigVendor
   name: Interdyne Corporation Cigarette Machine
-  description: A generic looking smokes machine selling "Ethically sourced tobacco" produced by Interdyne and other members of the Freestations Coalition.
+  description: A generic-looking smokes machine selling "ethically sourced tobacco" produced by Interdyne and other TFCF members.
   components:
   - type: VendingMachine
     pack: SyndieCigVendorPack
@@ -498,3 +498,33 @@
       map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: MarketModifier
     mod: 1
+
+- type: entity
+  parent: [BaseStructureUnanchorable, VendingMachine]
+  id: TaypaniSurplusVendor
+  name: taypani surplus armory vendor
+  description: Walking through a rough station with no iron? Allow us to sell you a temporary safeguard!
+  components:
+  - type: VendingMachine
+    pack: TaypaniSurplusVendorPack
+    globalPriceMod: 1.5
+    offState: off
+    brokenState: broken
+    normalState: normal-unshaded
+  - type: Advertise
+    pack: AmmoVendAds
+  - type: SpeakOnUIClosed
+    pack: GenericVendGoodbyes
+  - type: Speech
+  - type: Sprite
+    sprite: _Crescent/Structures/drivevend.rsi
+    layers:
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.Base"]
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
+      shader: unshaded
+    - state: panel
+      map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  - type: MarketModifier
+    mod: 1.5

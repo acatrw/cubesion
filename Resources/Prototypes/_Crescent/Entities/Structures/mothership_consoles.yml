@@ -59,6 +59,18 @@
     - Corvax
     - Ouroboros
     #- Cleaver - why the fuck is this designated upgrade available roundstart
+    # post new conception syndie shit
+    # CD section
+    - Taipan #jacked up the price
+    - Spriggan #mining ship
+    # IPM section
+    - Matabele #corpse recovery
+    # SAW section
+    - Hyena
+    - Shanty
+    - Rokh
+    - Scarab
+    - Amadeus
 
 - type: entity
   id: CountsmanMothershipComputer
@@ -132,7 +144,7 @@
     - Thanapod
     - Mercurymk2
     - Scarab
-    
+
 - type: entity
   id: TatsumotoMothershipComputer
   parent: BaseMothershipComputer
@@ -149,7 +161,7 @@
 - type: entity
   id: RamziMothershipComputer
   parent: BaseMothershipComputer
-  name: ramzi internal shipyard
+  name: cyberdawn internal shipyard
   components:
   - type: ShipyardListing
     iffColor: IndianRed
@@ -239,7 +251,7 @@
 - type: entity
   id: AuthorityMothershipComputer
   parent: BaseMothershipComputer
-  name: authority shipyard
+  name: Crown expeditionary shipyard
   components:
   - type: ShipyardListing
     shuttles:

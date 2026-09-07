@@ -49,7 +49,6 @@
     - FibreAlloyFromCombinedScrap
     - BasicElectronicsFromCombinedScrap
     - BasicMechatronicsFromCombinedScrap
-    - BallisticCyclerFromCombinedScrap
     - HardsuitElectronicsFromCombinedScrap
 
 - type: entity
@@ -103,7 +102,6 @@
     - FibreAlloyFromCombinedScrap
     - BasicElectronicsFromCombinedScrap
     - BasicMechatronicsFromCombinedScrap
-    - BallisticCyclerFromCombinedScrap
     - HardsuitElectronicsFromCombinedScrap
 
 #drugs
@@ -261,6 +259,7 @@
       - MagazineBoxImperialRifleBig
       - MagazineHeavyRifleSmall
       - CombatKnife
+      - IndependentMachete
       - ExplosivePayload
       - FlashPayload
       - ChemicalPayload
@@ -268,8 +267,7 @@
       - SignalTrigger
       - TimerTrigger
       - EMPGrenadeElectronics
-      # GrenadeDSMG4Twistcap moved to the DSM dynamicRecipes block below: it's DSM gear (Imperial
-      # discipline, SurplusImperialRifling) and must not print for free on a non-faction forge.
+      - GrenadeDSMG4Twistcap
       - DrumMagazineShotgunSlug
       - DrumMagazineShotgunEmpty
       - DrumMagazineShotgunBuck
@@ -329,6 +327,8 @@
       - TRayScanner
       - AirTank
       - GasAnalyzer
+      - TinyAirVent
+      - TinyAirVentCartridge
       - UtilityBelt
       - Pickaxe
       - ModularReceiver
@@ -362,6 +362,8 @@
       - TradebandTranslator
       - ClothingBeltSalvageWebbing
     dynamicRecipes:
+      - M14IncendiaryHandgrenade
+      - M18SmokeHandgrenade
       #Minutemen
       - MinutemanLPC
       - CorsairLPC
@@ -407,6 +409,9 @@
       - JetpackMiniFilledAstronautics
       - RCDAstronautics
       - RCDAmmoAstronautics
+      - ShipRepairDeviceFieldAstronautics
+      - AmeJarT2Craft
+      - AmeJarT3Craft
       - MiningDrill
       - BorgModuleMining
       - MechEquipmentDrill
@@ -516,6 +521,7 @@
       - WeaponCivilianDisabler
       - WeaponEnergyGunMini
       - ClothingEyesNightVisionGoggles
+      - ClothingBeltShieldElectronics
       - Terminus
       - ClothingOuterHardsuitShanlinUnpainted
       - BorgModuleGPS
@@ -576,7 +582,6 @@
       - EnergySword
       - EnergySwordDouble
       - MarauderFlatpack
-      - BallisticCycler1Craft
       - TubeLoader1Craft
       - LaserLocus1Craft
       - HardlightGenerator1Craft
@@ -634,6 +639,7 @@
       - ClothingOuterHardsuitSyndieDonator
       - HerculesFlatpack #Actual stuff
       - EinsteinFlatpack
+      - TitanGeneratorFlatpack
       - FixedHardpointFlatpack
       - LargeBallisticHardpointFlatpack
       - MediumBallisticHardpointFlatpack
@@ -725,7 +731,6 @@
       - AlkhuldLPC
       # TAP end
       # DSM start
-      - GrenadeDSMG4Twistcap # Imperial: SurplusImperialRifling (was wrongly in staticRecipes)
       - RedemptorLPC # Imperial: ImperialFighter (unlocked alongside IbisLPC but was missing here)
       - ClothingNeckCloakImperialCapelet # Imperial: AdvancedImperialClothes (was missing here)
       - ClothingMaskImperialCombatGasmask
@@ -947,12 +952,9 @@
       - AdvancedMechatronics1
       - PlastitaniumFibreAlloySHI
       - HardlightGenerator1
-      - BallisticCycler1
       - TubeLoader1
       - LaserLocus1
-      - BallisticCyclerNCWL
       - TubeLoaderNCWL
-      - BallisticCyclerDSM
       - TubeLoaderDSM
       - MagwellFlatpack
       - IdnaFlatpack
@@ -1020,13 +1022,54 @@
       - TermiteLPC
       - ParacelsusLPC
       - ExhumerLPC
+      # Pang Tai start
+      - WeaponPistolRongyu
+      - WeaponPistolViper
+      - WeaponPistolCobra
+      - WeaponSubMachineGunPTAVektor
+      - WeaponSubMachineGunDroz
+      - WeaponShotgunBulldog
+      - WeaponShotgunPTATwinshot
+      - WeaponRifleVintorez
+      - WeaponSubMachineGunPTAAsVal
+      - WeaponSubMachineGunGhost
+      - WeaponRifleTakemura
+      - WeaponRifleHalyadMarksman
+      - WeaponSubMachineGunCheshyre
+      - WeaponShotgunKS23
+      - WeaponSpecialRailgun
+      - WeaponSniperSpear
+      - WeaponSpecialMako
+      - WeaponSpecialChargeRifle
+      - WeaponLauncherChinaLake
+      - WeaponLauncherCommando
+      - WeaponLauncherGustav
       - ClothingHeadHatPangtaiKorundHelmet
       - ClothingOuterArmorPangTaiKorund
       - ClothingHeadHatPangtaiCorvidHelmet
       - ClothingOuterArmorPangTaiVest
-      - WeaponSpecialMako
-      - WeaponSubMachineGunCheshyre
-      - WeaponPistolRongyu
+      - ClothingOuterHardsuitPangTai
+      - PTAImpactHandgrenade
+      - PTAWarcrimeHandgrenade
+      - Magazine6x24mmCharge
+      - Magazine6x24mmConcentrated
+      - Magazine6x24mmIon
+      - Magazine6x24mmIncendiary
+      - Magazine6x24mmShock
+      - Cartridge40mmFrag
+      - Cartridge40mmCan
+      - Cartridge40mmHEDP
+      - Cartridge40mmSmoke
+      - Cartridge40mmThermobaric
+      - Cartridge40mmEMP
+      - Cartridge44mmCommando
+      - Cartridge84mmRecoillessFrag
+      - Cartridge84mmRecoillessCan
+      - Cartridge84mmRecoillessHEAT
+      - Cartridge84mmRecoillessTandem
+      - Cartridge84mmRecoillessEMP
+      - Cartridge84mmRecoillessSmoke
+      # Pang Tai end
       #protolathe, exosuit fab, etc. recipies for the techdisk printer stuff. So we can go gambling with our points!
       - PowerDrill
       - MiningDrill
@@ -1660,6 +1703,15 @@
       - FlatpackComputerDroneControl
       - FlatpackDroneController
       - ThrusterHighImpulseTAP
+      # Modular pouches - ModularPouchesElectronics, civilian discipline so every faction can unlock them.
+      - PouchUtilityElectronics
+      - PouchMagazineElectronics
+      - PouchMagazineLargeElectronics
+      - PouchMagazinePistolElectronics
+      - PouchMedicalElectronics
+      - PouchMedicalLargeElectronics
+      - PouchGrenadeElectronics
+      - PouchFlareElectronics
     #  - ClothingOuterHardsuitCybersunDreadnoughtCyberdawn #Has to go since Egui is working now.
   - type: MaterialStorageMagnetPickup
     magnetEnabled: True
@@ -1699,6 +1751,16 @@
     runningState: base_machine_processing
     staticRecipes:
     - JugBoriaticFuelCraft
+    # Capacity upgrades remain research-gated.
+    - JugBoriaticFuelEmptyCraft
+    dynamicRecipes:
+    - FuelCanisterBoriaticT2Craft
+    - FuelCanisterBoriaticT3Craft
+    - AmeJarT2Craft
+    - AmeJarT3Craft
+    - BoriaticFuelTankCraft
+    - AmeFuelTankCraft
+    - FuelExtractorFlatpackCraft
 
 #organs
 
@@ -1819,7 +1881,7 @@
 - type: entity
   parent: BaseLathe
   id: SawsTradeGoodPrinter
-  name: Shipfitters commodity fablathe
+  name: Shipbreaker commodity fablathe
   description: An hacked fablathe preloaded with many commodity patterns. A salvager merchant's best friend.
   components:
   - type: Sprite
@@ -2124,7 +2186,6 @@
       - ClothingOuterArmorImperialTrooperArmor
       - ClothingHeadHelmetImperialKnightCommanderHelmet
       - ClothingOuterArmorImperialArmorPrestige
-      - ClothingHeadHatClarizeBeret
       - ImperialPsionBoundlightStaff
       - WeaponRifleMiller
       - WeaponRevolverArgenti
@@ -2150,8 +2211,12 @@
       - WeaponSubMachineGunBeetle
       - WeaponRifleHunter
       - WeaponLauncherM320
-      - BallisticCyclerDSM
       - TubeLoaderDSM
+      # Component feedstock. Most of the guns and gear above are priced in BasicMechatronics or
+      # BasicElectronics, and there is no research server on the surface to unlock the recipes that make
+      # them, so the field forge prints its own. Same recipes the station forges get from research.
+      - BasicMechatronics1Mechatronics
+      - BasicElectronics1Electronics
       # Shared
       - BaseCartridgeRailgun15mm
       - MagazineClip18gBuck
@@ -2162,6 +2227,7 @@
       - MagazineBoxImperialRifleBig
       - MagazineHeavyRifleSmall
       - CombatKnife
+      - IndependentMachete
       - ExplosivePayload
       - FlashPayload
       - ChemicalPayload
@@ -2228,6 +2294,8 @@
       - TRayScanner
       - AirTank
       - GasAnalyzer
+      - TinyAirVent
+      - TinyAirVentCartridge
       - UtilityBelt
       - Pickaxe
       - ModularReceiver
@@ -2396,8 +2464,12 @@
       - WeaponLauncherGM94
       - NCWLKukri
       - ClothingBeltSheathNCWLKukri
-      - BallisticCyclerNCWL
       - TubeLoaderNCWL
+      # Component feedstock. Most of the guns and gear above are priced in BasicMechatronics or
+      # BasicElectronics, and there is no research server on the surface to unlock the recipes that make
+      # them, so the field forge prints its own. Same recipes the station forges get from research.
+      - BasicMechatronics1Mechatronics
+      - BasicElectronics1Electronics
       # Shared
       - BaseCartridgeRailgun15mm
       - MagazineClip18gBuck
@@ -2408,6 +2480,7 @@
       - MagazineBoxImperialRifleBig
       - MagazineHeavyRifleSmall
       - CombatKnife
+      - IndependentMachete
       - ExplosivePayload
       - FlashPayload
       - ChemicalPayload
@@ -2474,6 +2547,8 @@
       - TRayScanner
       - AirTank
       - GasAnalyzer
+      - TinyAirVent
+      - TinyAirVentCartridge
       - UtilityBelt
       - Pickaxe
       - ModularReceiver

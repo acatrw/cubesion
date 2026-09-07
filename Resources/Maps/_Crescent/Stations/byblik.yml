@@ -19729,22 +19729,6 @@ entities:
     - type: Transform
       pos: 11.507727,-17.453432
       parent: 1
-- proto: EncryptionKeySyndiesCyberdawn
-  entities:
-  - uid: 1202
-    components:
-    - type: Transform
-      parent: 1201
-    - type: Physics
-      canCollide: False
-- proto: EncryptionKeyTraffic
-  entities:
-  - uid: 1203
-    components:
-    - type: Transform
-      parent: 1201
-    - type: Physics
-      canCollide: False
 - proto: ExosuitFabricator
   entities:
   - uid: 1204
@@ -19928,7 +19912,7 @@ entities:
       pos: -14.5,10.5
       parent: 1
     - type: FaxMachine
-      name: CyberDawn - Patriarch
+      name: CyberDawn - Supervisor
 - proto: FaxMachineSyndie
   entities:
   - uid: 1209
@@ -23280,8 +23264,6 @@ entities:
       pos: -14.5,14.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 48
     - type: AtmosPipeColor
@@ -23678,71 +23660,6 @@ entities:
     - type: Transform
       pos: -8.613073,-18.258228
       parent: 1
-- proto: HandheldGPSBasic
-  entities:
-  - uid: 1081
-    components:
-    - type: Transform
-      parent: 1074
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1090
-    components:
-    - type: Transform
-      parent: 1084
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1099
-    components:
-    - type: Transform
-      parent: 1093
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1108
-    components:
-    - type: Transform
-      parent: 1102
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1117
-    components:
-    - type: Transform
-      parent: 1111
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1126
-    components:
-    - type: Transform
-      parent: 1120
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1135
-    components:
-    - type: Transform
-      parent: 1129
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1144
-    components:
-    - type: Transform
-      parent: 1138
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 1153
-    components:
-    - type: Transform
-      parent: 1147
-    - type: Physics
-      canCollide: False
-    - type: InsideEntityStorage
 - proto: HandHeldMassScannerEE
   entities:
   - uid: 1082
@@ -29558,7 +29475,6 @@ entities:
           - 1079
           - 1077
           - 1082
-          - 1081
           - 1076
   - uid: 1084
     components:
@@ -29574,7 +29490,6 @@ entities:
           - 1089
           - 1085
           - 1087
-          - 1090
           - 1092
           - 1091
           - 1088
@@ -29595,7 +29510,6 @@ entities:
           - 1096
           - 1098
           - 1101
-          - 1099
           - 1097
           - 1095
   - uid: 1102
@@ -29613,7 +29527,6 @@ entities:
           - 1103
           - 1107
           - 1106
-          - 1108
           - 1110
           - 1105
           - 1104
@@ -29632,7 +29545,6 @@ entities:
           - 1118
           - 1116
           - 1119
-          - 1117
           - 1114
           - 1115
           - 1113
@@ -29650,7 +29562,6 @@ entities:
           - 1125
           - 1121
           - 1123
-          - 1126
           - 1128
           - 1124
           - 1127
@@ -29669,7 +29580,6 @@ entities:
           - 1136
           - 1130
           - 1137
-          - 1135
           - 1133
           - 1134
           - 1132
@@ -29691,7 +29601,6 @@ entities:
           - 1146
           - 1142
           - 1145
-          - 1144
           - 1140
   - uid: 1147
     components:
@@ -29704,7 +29613,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 1153
           - 1148
           - 1150
           - 1151
@@ -30082,29 +29990,13 @@ entities:
     - type: Transform
       pos: -10.5,17.5
       parent: 1
-- proto: TelecomServer
+- proto: TelecomServerTFCF
   entities:
   - uid: 1201
     components:
     - type: Transform
       pos: -2.5,4.5
       parent: 1
-    - type: ContainerContainer
-      containers:
-        key_slots: !type:Container
-          showEnts: False
-          occludes: True
-          ents:
-          - 1202
-          - 1203
-        machine_board: !type:Container
-          showEnts: False
-          occludes: True
-          ents: []
-        machine_parts: !type:Container
-          showEnts: False
-          occludes: True
-          ents: []
 - proto: TFSCRGD2BSmokeHandgrenade
   entities:
   - uid: 2608

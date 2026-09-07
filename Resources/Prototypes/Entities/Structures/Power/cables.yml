@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   abstract: true
   id: CableBase
   placement:
@@ -24,6 +24,9 @@
   - type: Damageable
     damageContainer: Inorganic
     damageModifierSet: Metallic
+  - type: ExplosionResistance
+    damageCoefficient: 0.7
+    worn: false
   - type: Destructible
     thresholds:
     - trigger:
@@ -122,7 +125,6 @@
     sprite: Structures/Power/Cables/mv_cable.rsi
     state: mvcable_0
   - type: Icon
-    color: Yellow
     sprite: Structures/Power/Cables/mv_cable.rsi
     state: mvcable_4
   - type: NodeContainer
@@ -174,7 +176,6 @@
     sprite: Structures/Power/Cables/lv_cable.rsi
     state: lvcable_0
   - type: Icon
-    color: Green
     sprite: Structures/Power/Cables/lv_cable.rsi
     state: lvcable_4
   - type: NodeContainer

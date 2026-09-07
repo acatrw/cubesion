@@ -26,7 +26,7 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly ShuttleSystem _shuttle = default!;
     [Dependency] private readonly MapLoaderSystem _mapLoader = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedMapSystem _mapMan = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
 
     private readonly ResPath _miningShuttlePath = new("/Maps/_Lavaland/mining.yml");
@@ -131,7 +131,9 @@ public sealed class DockingConsoleSystem : SharedDockingConsoleSystem
         if (ent.Comp.Shuttle is not {} shuttle || !TryComp<DockingShuttleComponent>(shuttle, out var docking))
             return;
 
-        if (args.Index < 0 || args.Index > docking.Destinations.Count)
+        // Bounds-checked against the list actually being indexed: Destinations and LocationUID are
+        // appended in lockstep, but the index comes from the client, so guard the real one.
+        if (args.Index < 0 || args.Index >= docking.LocationUID.Count)
             return;
 
         var grid = docking.LocationUID[args.Index];

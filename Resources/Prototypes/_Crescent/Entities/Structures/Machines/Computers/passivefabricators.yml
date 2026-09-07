@@ -11,7 +11,7 @@
   id: PassiveSpawnerDebugPrototype
   name: Excelsior Material Drop-In Uplink
   suffix: DEBUG, DO NOT MAP
-  description: A advanced machine used by the Excelsior revolutionary group to bring material support to violent revolutions at points of interest.
+  description: An advanced machine used by the Excelsior revolutionary group to bring material support to violent revolutions at points of interest.
   components:
   - type: Sprite
     sprite: _Shitmed/Structures/Machines/limbgrower.rsi
@@ -201,6 +201,11 @@
   entities:
   - SteelOre
 
+- type: entityList
+  id: autominerQuartzDropTable
+  entities:
+  - SpaceQuartz
+
 - type: entity
   parent: BaseSingleOreAutominerPassiveFactory
   id: AutominerPassiveFactoryTungsten
@@ -272,6 +277,15 @@
   components:
   - type: PassiveSpawningMachine
     entityListProto: autominerSteelDropTable
+
+- type: entity
+  parent: BaseSingleOreAutominerPassiveFactory
+  id: AutominerPassiveFactoryQuartz
+  name: antique NT-AD-2 quartz automated drill
+  description: An antique NanoTrasen mining drill calibrated to extract only quartz ore. Looks like you could get it back in working order with some effort.
+  components:
+  - type: PassiveSpawningMachine
+    entityListProto: autominerQuartzDropTable
 #AUTOFOUNDRY
 
 - type: entityList
@@ -327,7 +341,6 @@
   - BasicElectronics1
   - BasicMechatronics1
   - LaserLocus1
-  - BallisticCycler1
   - TubeLoader1
   - HardlightGenerator
   - ScrapPlasma1

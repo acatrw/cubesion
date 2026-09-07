@@ -148,14 +148,6 @@ namespace Content.Server.GameTicking
             if (jobBans == null || jobId != null && jobBans.Contains(jobId))
                 return;
 
-            if (jobId != null)
-            {
-                var ev = new IsJobAllowedEvent(player, new ProtoId<JobPrototype>(jobId));
-                RaiseLocalEvent(ref ev);
-                if (ev.Cancelled)
-                    return;
-            }
-
             SpawnPlayer(player, character, station, jobId, lateJoin, silent);
         }
 
@@ -169,6 +161,22 @@ namespace Content.Server.GameTicking
             // Can't spawn players with a dummy ticker!
             if (DummyTicker)
                 return;
+
+            // Keep explicit-job validation in the common path so both late joins and round-start
+            // assignments are enforced. Round-start spawning already has a resolved profile and calls
+            // this overload directly.
+            if (jobId != null)
+            {
+                var allowedEvent = new IsJobAllowedEvent(player, new ProtoId<JobPrototype>(jobId));
+                RaiseLocalEvent(ref allowedEvent);
+                if (allowedEvent.Cancelled)
+                {
+                    // The player has already committed to entering the round. Leaving them without an
+                    // attached entity makes the refusal a soft-lock, so complete the join as an observer.
+                    JoinAsObserver(player);
+                    return;
+                }
+            }
 
             if (station == EntityUid.Invalid)
             {
@@ -245,6 +253,12 @@ namespace Content.Server.GameTicking
             DebugTools.AssertNotNull(data);
 
             var jobPrototype = _prototypeManager.Index<JobPrototype>(jobId);
+
+            // Canonical job characters use an in-memory profile copy. This keeps the mob, mind,
+            // ID/PDA, station records, passports, announcements, and spawn events consistent while
+            // leaving the player's saved lobby character untouched.
+            if (jobPrototype.CharacterOverride is { } characterOverride)
+                character = characterOverride.ApplyTo(character);
 
             _playTimeTrackings.PlayerRolesChanged(player);
 
@@ -526,7 +540,7 @@ namespace Content.Server.GameTicking
                 var spawn = _robustRandom.Pick(_possiblePositions);
                 var toMap = spawn.ToMap(EntityManager, _transform);
 
-                if (_mapManager.TryFindGridAt(toMap, out var gridUid, out _))
+                if (_map.TryFindGridAt(toMap, out var gridUid, out _))
                 {
                     var gridXform = Transform(gridUid);
 
@@ -536,17 +550,17 @@ namespace Content.Server.GameTicking
                 return spawn;
             }
 
-            if (_mapManager.MapExists(DefaultMap))
+            if (_map.MapExists(DefaultMap))
             {
-                var mapUid = _mapManager.GetMapEntityId(DefaultMap);
+                var mapUid = _map.GetMap(DefaultMap);
                 if (!TerminatingOrDeleted(mapUid))
                     return new EntityCoordinates(mapUid, Vector2.Zero);
             }
 
             // Just pick a point at this point I guess.
-            foreach (var map in _mapManager.GetAllMapIds())
+            foreach (var map in _map.GetAllMapIds())
             {
-                var mapUid = _mapManager.GetMapEntityId(map);
+                var mapUid = _map.GetMap(map);
 
                 if (!metaQuery.TryGetComponent(mapUid, out var meta)
                     || meta.EntityPaused

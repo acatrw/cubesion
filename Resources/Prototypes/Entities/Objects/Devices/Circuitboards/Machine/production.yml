@@ -84,7 +84,8 @@
     - type: MachineBoard
       prototype: Biofabricator
       requirements:
-        MatterBin: 4
+        MatterBin: 3
+        Manipulator: 1
       materialRequirements:
         Glass: 1
     - type: ReverseEngineering # Delta
@@ -124,6 +125,8 @@
       requirements:
         MatterBin: 1
         Manipulator: 1
+    - type: StaticPrice # eclipsion
+      price: 7500
 
 - type: entity
   id: AmmoTechFabTAPCircuitboard

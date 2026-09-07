@@ -36,12 +36,17 @@
     impactEffect: BulletImpactEffectFlamer
     damage:
       types:
-        Heat: 6
+        Heat: 10
     soundHit:
       path: /Audio/_Crescent/Weapons/Guns/non_collection/flamethrower.ogg
     forceSound: true
   - type: IgniteOnCollide
-    fireStacks: 0.4
+    fireStacks: 1.5
+  - type: CrescentFlameProjectile
+    spawnDelay: 0.12
+    trailInterval: 0.1
+    impactRadius: 1.2
+    impactFireCount: 5
   - type: IgnitionSource
     temperature: 700
 

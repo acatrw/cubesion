@@ -16,7 +16,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 1000
+            damage: 750
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -31,24 +31,39 @@
           ents: []
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 40
-      burstCooldown: 2.5
-      shotsPerBurst: 2
-      burstFireRate: 8
+      projectileSpeed: 75
+      burstCooldown: 6
+      shotsPerBurst: 20
+      burstFireRate: 20
       selectedMode: Burst
       availableModes:
         - Burst
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 12
-      fillWithDoAfter: false
-      proto: Cartridge48mmRocket
-      whitelist:
-        tags:
-        - CartridgeShortbow
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine48mmRocket
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineShortbow
+    - type: MagazineAmmoProvider
+      reloadDuration: 13
+    - type: FullSalvo
+      requiredShots: 20
     - type: ApcPowerReceiver
-      powerLoad: 2000
+      powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 3675
+    - type: Battery
+      maxCharge: 73500
+      startingCharge: 73500
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Small
@@ -69,7 +84,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 1200
+            damage: 900
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -86,14 +101,21 @@
       selectedMode: Burst
       availableModes:
         - Burst
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 18
-      fillWithDoAfter: false
-      proto: Cartridge48mmRocket
-      whitelist:
-        tags:
-        - CartridgeShortbow
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine48mmRocketGorlex
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineShortbow
+    - type: MagazineAmmoProvider
+      reloadDuration: 6
+    - type: FullSalvo
+      requiredShots: 3
 
 #azimuth
 
@@ -113,7 +135,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 1200
+            damage: 900
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -128,22 +150,35 @@
           ents: []
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 60
-      fireRate: 4
+      projectileSpeed: 85
+      fireRate: 2.2
       selectedMode: FullAuto
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 6
-      fillWithDoAfter: false
-      proto: Cartridge60mmRocket
-      whitelist:
-        tags:
-        - CartridgeAzimuth
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine60mm
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineAzimuth
+    - type: MagazineAmmoProvider
+      reloadDuration: 4
     - type: ApcPowerReceiver
-      powerLoad: 1500
+      powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 1364
+    - type: Battery
+      maxCharge: 6820
+      startingCharge: 6820
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Small
@@ -164,7 +199,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 1200
+            damage: 900
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -185,16 +220,29 @@
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 6
-      fillWithDoAfter: false
-      proto: Cartridge60mmRocket
-      whitelist:
-        tags:
-        - CartridgeAzimuth
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine60mmCDT
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineAzimuth
+    - type: MagazineAmmoProvider
+      reloadDuration: 4
     - type: ApcPowerReceiver
-      powerLoad: 1500
+      powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 750
+    - type: Battery
+      maxCharge: 3750
+      startingCharge: 3750
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Small
@@ -215,7 +263,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 2400
+            damage: 1800
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -225,22 +273,35 @@
                 collection: MetalGlassBreak
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 70
-      fireRate: 3
+      projectileSpeed: 95
+      fireRate: 2
       selectedMode: FullAuto
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 6
-      fillWithDoAfter: false
-      proto: Cartridge60mmRocket
-      whitelist:
-        tags:
-        - CartridgeAzimuth
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine60mmNCWL
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineAzimuth
+    - type: MagazineAmmoProvider
+      reloadDuration: 4
     - type: ApcPowerReceiver
-      powerLoad: 1500
+      powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 1500
+    - type: Battery
+      maxCharge: 7500
+      startingCharge: 7500
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
 
 - type: entity
   parent: BaseWeaponTurretAzimuth
@@ -258,7 +319,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 1800
+            damage: 1350
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -274,16 +335,29 @@
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 6
-      fillWithDoAfter: false
-      proto: Cartridge60mmRocket
-      whitelist:
-        tags:
-        - CartridgeAzimuth
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine60mmGorlex
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineAzimuth
+    - type: MagazineAmmoProvider
+      reloadDuration: 4
     - type: ApcPowerReceiver
-      powerLoad: 1500
+      powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 600
+    - type: Battery
+      maxCharge: 3000
+      startingCharge: 3000
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
 
 #arbalest
 
@@ -303,7 +377,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 2400
+            damage: 1800
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -318,22 +392,35 @@
           ents: []
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 60
-      fireRate: 1.2
+      projectileSpeed: 110
+      fireRate: .65
       selectedMode: FullAuto
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 5
-      fillWithDoAfter: false
-      proto: Cartridge95mmRocket
-      whitelist:
-        tags:
-        - CartridgeArbalest
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine95mmRocket
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineArbalest
+    - type: MagazineAmmoProvider
+      reloadDuration: 5
     - type: ApcPowerReceiver
-      powerLoad: 3000
+      powerLoad: 1500
+    - type: WeaponPowerDraw
+      energyPerShot: 7692
+    - type: Battery
+      maxCharge: 38460
+      startingCharge: 38460
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1500
+      batteryRechargeRate: 10000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Medium
@@ -354,7 +441,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 2800
+            damage: 2100
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -375,16 +462,29 @@
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 8
-      fillWithDoAfter: false
-      proto: Cartridge95mmRocket
-      whitelist:
-        tags:
-        - CartridgeArbalest
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine95mmRocketGorlex
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineArbalest
+    - type: MagazineAmmoProvider
+      reloadDuration: 5
     - type: ApcPowerReceiver
-      powerLoad: 4000
+      powerLoad: 1500
+    - type: WeaponPowerDraw
+      energyPerShot: 3333
+    - type: Battery
+      maxCharge: 16665
+      startingCharge: 16665
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1500
+      batteryRechargeRate: 10000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Medium
@@ -405,7 +505,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 4500
+            damage: 3375
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -420,22 +520,35 @@
           ents: []
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 50
-      fireRate: 1
+      projectileSpeed: 100
+      fireRate: .6
       selectedMode: FullAuto
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: BallisticAmmoProvider
-      cycleable: false
-      capacity: 4
-      fillWithDoAfter: false
-      proto: Cartridge95mmRocket
-      whitelist:
-        tags:
-        - CartridgeArbalest
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine95mmRocketNCWL
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazineArbalest
+    - type: MagazineAmmoProvider
+      reloadDuration: 5
     - type: ApcPowerReceiver
-      powerLoad: 3000
+      powerLoad: 1500
+    - type: WeaponPowerDraw
+      energyPerShot: 8333
+    - type: Battery
+      maxCharge: 41665
+      startingCharge: 41665
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1500
+      batteryRechargeRate: 10000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Medium
@@ -460,7 +573,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 2600
+            damage: 1950
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -479,22 +592,31 @@
       zeroVisible: true
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 30
-      fireRate: 0.25
+      projectileSpeed: 50
+      fireRate: .2
       selectedMode: FullAuto
       availableModes:
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rocket_launcher.ogg
     - type: BallisticAmmoProvider
-      fillWithDoAfter: false
+      fillWithDoAfter: true
+      fillDelay: 2.5
       cycleable: false
-      capacity: 4
+      capacity: 3
       proto: Cartridge240mmRocket
       whitelist:
         tags:
         - CartridgeGargoyle
     - type: ApcPowerReceiver
-      powerLoad: 3500
+      powerLoad: 1500
+    - type: WeaponPowerDraw
+      energyPerShot: 25000
+    - type: Battery
+      maxCharge: 125000
+      startingCharge: 125000
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1500
+      batteryRechargeRate: 10000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Medium
@@ -517,7 +639,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 5000
+            damage: 3750
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -543,7 +665,8 @@
         - FullAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rocket_launcher.ogg
     - type: BallisticAmmoProvider
-      fillWithDoAfter: false
+      fillWithDoAfter: true
+      fillDelay: 2.5
       cycleable: false
       capacity: 4
       proto: Cartridge240mmRocketNCWL
@@ -551,7 +674,15 @@
         tags:
         - CartridgeGargoyle
     - type: ApcPowerReceiver
-      powerLoad: 3500
+      powerLoad: 1500
+    - type: WeaponPowerDraw
+      energyPerShot: 25000
+    - type: Battery
+      maxCharge: 125000
+      startingCharge: 125000
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1500
+      batteryRechargeRate: 10000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Medium
@@ -578,7 +709,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 8000
+            damage: 6000
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -593,23 +724,31 @@
           ents: []
     - type: Gun
       fireOnDropChance: 0
-      projectileSpeed: 40
-      fireRate: 0.35
-      selectedMode: FullAuto
+      projectileSpeed: 80
+      fireRate: .12
+      selectedMode: SemiAuto
       availableModes:
-        - FullAuto
+        - SemiAuto
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
     - type: BallisticAmmoProvider
       cycleable: false
-      capacity: 3
+      capacity: 2
       fillWithDoAfter: true
-      fillDelay: 2
-      proto: Cartridge95mmRocketNCWL
+      fillDelay: 4
+      proto: Cartridge330mmRocket
       whitelist:
         tags:
         - CartridgeCatapult
     - type: ApcPowerReceiver
-      powerLoad: 6000
+      powerLoad: 2500
+    - type: WeaponPowerDraw
+      energyPerShot: 66667
+    - type: Battery
+      maxCharge: 333335
+      startingCharge: 333335
+    - type: ApcPowerReceiverBattery
+      idleLoad: 2500
+      batteryRechargeRate: 16000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Large
@@ -632,7 +771,7 @@
       thresholds:
         - trigger:
             !type:DamageTrigger
-            damage: 900
+            damage: 675
           # TODO: Construction graph
           behaviors:
             - !type:ChangeConstructionNodeBehavior
@@ -648,24 +787,39 @@
     - type: Gun
       fireOnDropChance: 0
       projectileSpeed: 30
-      fireRate: 4
-      selectedMode: FullAuto
+      fireRate: 20
+      burstCooldown: 6
+      shotsPerBurst: 10
+      burstFireRate: 20
+      selectedMode: Burst
       availableModes:
-        - FullAuto
+        - Burst
       soundGunshot: /Audio/Weapons/Guns/Gunshots/rpgfire.ogg
-    - type: RechargeBasicEntityAmmo
-      rechargeCooldown: 2
-      rechargeSound:
-        path: /Audio/Weapons/Guns/Bolt/lmg_bolt_closed.ogg
-        params:
-          pitch: 1.2
-          variation: 0.08
-    - type: BasicEntityAmmoProvider
-      proto: PilaRocketProjectile
-      capacity: 12
-      count: 12
+    - type: ItemSlots
+      slots:
+        gun_magazine:
+          name: Magazine
+          startingItem: Magazine30mmPila
+          insertSound: /Audio/Weapons/Guns/MagIn/ltrifle_magin.ogg
+          ejectSound: /Audio/Weapons/Guns/MagOut/ltrifle_magout.ogg
+          priority: 2
+          whitelist:
+            tags:
+              - MagazinePila
+    - type: MagazineAmmoProvider
+      reloadDuration: 5
+    - type: FullSalvo
+      requiredShots: 10
     - type: ApcPowerReceiver
       powerLoad: 1000
+    - type: WeaponPowerDraw
+      energyPerShot: 750
+    - type: Battery
+      maxCharge: 7500
+      startingCharge: 7500
+    - type: ApcPowerReceiverBattery
+      idleLoad: 1000
+      batteryRechargeRate: 6000
     - type: HardpointAnchorableOnly
       class: Missile
       size: Small

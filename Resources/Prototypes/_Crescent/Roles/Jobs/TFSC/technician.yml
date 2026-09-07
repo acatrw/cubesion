@@ -16,6 +16,7 @@
       inverted: true
       species:
         - Voidborn
+        - Skeleton # Restricted to selected TFSC roles, including Gorlex Infanteer.
     - !type:CharacterOverallTimeRequirement
       min: 0
     - !type:FactionRequirement
@@ -41,9 +42,10 @@
   access:
   - Command
   - Maintenance
-  # One Coalition, one keyring: the old company tags survive only as department names.
+  # Shared TFCF gameplay keyring; company access still marks GSC's internal facilities.
   - SyndicateBasic
   - SyndicateGorlex
+  - SyndicateGorlexArmory
   - SyndicateInterdyne
   - SyndicateSaws
   - SyndicateRamzi

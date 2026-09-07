@@ -12,6 +12,7 @@ namespace Content.Client.Movement.Systems;
 
 public sealed class JetpackSystem : SharedJetpackSystem
 {
+    [Dependency] private readonly SharedMapSystem _mapSystemCompat = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly ClothingSystem _clothing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -52,6 +53,9 @@ public sealed class JetpackSystem : SharedJetpackSystem
 
         while (query.MoveNext(out var uid, out var comp))
         {
+            if (!IsProvidingThrust(uid))
+                continue;
+
             if (_timing.CurTime < comp.TargetTime)
                 continue;
 
@@ -77,7 +81,7 @@ public sealed class JetpackSystem : SharedJetpackSystem
 
         if (TryComp<MapGridComponent>(gridUid, out var grid))
         {
-            coordinates = new EntityCoordinates(gridUid.Value, grid.WorldToLocal(coordinates.ToMapPos(EntityManager, _transform)));
+            coordinates = new EntityCoordinates(gridUid.Value, _mapSystemCompat.WorldToLocal(gridUid.Value, grid, coordinates.ToMapPos(EntityManager, _transform)));
         }
         else if (uidXform.MapUid != null)
         {

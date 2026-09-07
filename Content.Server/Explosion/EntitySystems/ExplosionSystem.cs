@@ -2,6 +2,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
+using Content.Server.Body.Systems;
 using Content.Server.Chat.Managers;
 using Content.Server.Explosion.Components;
 using Content.Server.NodeContainer.EntitySystems;
@@ -30,17 +31,11 @@ using Robust.Shared.Random;
 using Robust.Shared.Utility;
 using Robust.Server.GameObjects;
 using System.Diagnostics;
-// Rat-start
-using Content.Server.Fluids.EntitySystems;
-using Content.Server.Chemistry.Containers.EntitySystems;
-using Content.Shared.Chemistry.Components.SolutionManager;
-using Content.Shared.Chemistry.Components;
 
 namespace Content.Server.Explosion.EntitySystems;
 
 public sealed partial class ExplosionSystem : SharedExplosionSystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
@@ -48,7 +43,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly BodySystem _bodySystem = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly NodeGroupSystem _nodeGroupSystem = default!;
     [Dependency] private readonly PathfindingSystem _pathfindingSystem = default!;
     [Dependency] private readonly SharedCameraRecoilSystem _recoilSystem = default!;
@@ -60,8 +57,6 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly SmokeSystem _smoke = default!;    // Retgore changes
-    [Dependency] private readonly SolutionContainerSystem _solutionContainer = default!;    // Rargore changes
 
     private EntityQuery<TransformComponent> _transformQuery;
     private EntityQuery<FlammableComponent> _flammableQuery;
@@ -74,6 +69,8 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     public const ushort DefaultTileSize = 1;
 
     public const int MaxExplosionAudioRange = 30;
+
+    private const string OuterClothingSlot = "outerClothing";
 
     /// <summary>
     ///     The "default" explosion prototype.
@@ -357,7 +354,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     private Explosion? SpawnExplosion(QueuedExplosion queued)
     {
         var pos = queued.Epicenter;
-        if (!_mapManager.MapExists(pos.MapId))
+        if (!_map.MapExists(pos.MapId))
             return null;
 
         var results = GetExplosionTiles(pos, queued.Proto.ID, queued.TotalIntensity, queued.Slope, queued.MaxTileIntensity);
@@ -369,13 +366,11 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
 
         var visualEnt = CreateExplosionVisualEntity(pos, queued.Proto.ID, spaceMatrix, spaceData, gridData.Values, iterationIntensity);
 
-        SpawnSmoke(queued.Epicenter, 3f, 5); // Ratgore changes
-
         // camera shake
         CameraShake(iterationIntensity.Count * 4f, pos, queued.TotalIntensity);
 
         //For whatever bloody reason, sound system requires ENTITY coordinates.
-        var mapEntityCoords = EntityCoordinates.FromMap(_mapManager.GetMapEntityId(pos.MapId), pos, _transformSystem, EntityManager);
+        var mapEntityCoords = EntityCoordinates.FromMap(_map.GetMap(pos.MapId), pos, _transformSystem, EntityManager);
 
         // play sound.
         // for the normal audio, we want everyone in pvs range
@@ -413,7 +408,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             queued.MaxTileBreak,
             queued.CanCreateVacuum,
             EntityManager,
-            _mapManager,
+            _map,
             visualEnt);
     }
 
@@ -422,7 +417,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         // Try to determine which grid the explosion is on.
         // If no grid is found (open space, boundary tile, etc.) we skip the grid filter
         // and fall back to range-only filtering so players always feel nearby blasts.
-        _mapManager.TryFindGridAt(epicenter, out var explosionGrid, out _);
+        _map.TryFindGridAt(epicenter, out var explosionGrid, out _);
 
         var players = Filter.Empty();
         players.AddInRange(epicenter, range, _playerManager, EntityManager);
@@ -451,20 +446,4 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
                 _recoilSystem.KickCamera(uid, -delta.Normalized() * effect);
         }
     }
-
-    // Rat-start
-    private void SpawnSmoke(MapCoordinates coords, float duration, int spreadAmount)
-    {
-        var smokeEntity = Spawn("Smoke", coords);
-
-        var solutionComp = EntityManager.AddComponent<SolutionComponent>(smokeEntity);
-        TryComp<SmokeComponent>(smokeEntity, out var smokeComp);
-
-        var solution = new Solution();
-
-        _solutionContainer.TryAddSolution((smokeEntity, solutionComp), solution);
-
-        _smoke.StartSmoke(smokeEntity, solution, duration, spreadAmount, smokeComp);
-    }
-    // Rat-stop
 }

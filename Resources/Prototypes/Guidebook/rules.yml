@@ -5,17 +5,25 @@
 
 - type: guideEntry
   id: HullrotRuleset
-  name: Hullrot
+  name: "Hullrot: Eclipsion"
   text: "/ServerInfo/_Crescent/ServerRules/HullrotRuleset.xml"
   children:
+  - GettingStarted
   - RoleplayRules
   - Tutorial
-  - Lore
   - Factions
   - Gamemodes
-  - Glossary
   - Radio
+  - HullrotSystems
+  - Lore
+  - Glossary
   - Chemicals
+
+- type: guideEntry
+  id: GettingStarted
+  name: "Start Here: Your First Round"
+  text: "/ServerInfo/_Crescent/Guidebook/GettingStarted.xml"
+  priority: 0
 
 - type: guideEntry
   id: RoleplayRules

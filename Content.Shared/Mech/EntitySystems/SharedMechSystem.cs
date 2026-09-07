@@ -5,6 +5,7 @@ using Content.Shared.Actions;
 using Content.Shared.Destructible;
 using Content.Shared.DoAfter;
 using Content.Shared.DragDrop;
+using Content.Shared.Emp;
 using Content.Shared.FixedPoint;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
@@ -143,13 +144,16 @@ public abstract class SharedMechSystem : EntitySystem
         component.EquipmentContainer = _container.EnsureContainer<Container>(uid, component.EquipmentContainerId);
         component.BatterySlot = _container.EnsureContainer<ContainerSlot>(uid, component.BatterySlotId);
 
-        // Ensure mechs have a fixed stable speed equal to the default player walk speed
-        // and that their sprint speed is the same (i.e., they cannot sprint faster than walking).
+        // Mechs keep the speed their prototype declares - chassis size drives it, so a bigger
+        // (higher tier) mech is slower. Two invariants are enforced here regardless of the prototype:
+        // a mech may never outpace a walking, unarmored human, and it may not sprint faster than it
+        // walks (i.e., there is no sprint bonus to escape the cap with).
         var moveComp = EnsureComp<MovementSpeedModifierComponent>(uid);
+        var speed = Math.Min(moveComp.BaseWalkSpeed, MovementSpeedModifierComponent.DefaultBaseWalkSpeed);
         _movementSpeed.ChangeBaseSpeed(
             uid,
-            MovementSpeedModifierComponent.DefaultBaseWalkSpeed,
-            MovementSpeedModifierComponent.DefaultBaseWalkSpeed,
+            speed,
+            speed,
             moveComp.Acceleration,
             moveComp);
 
@@ -523,18 +527,30 @@ public abstract class SharedMechSystem : EntitySystem
 
     private void OnAttackAttempt(EntityUid uid, MechPilotComponent component, AttackAttemptEvent args)
     {
-        if (args.Target == component.Mech)
+        if (args.Target == component.Mech || HasComp<EmpDisabledComponent>(component.Mech))
             args.Cancel();
     }
 
     // Goobstation: Prevent guns being used out of mechs if CCVAR is set.
     private void OnShotAttempted(EntityUid uid, MechEquipmentComponent component, ref ShotAttemptedEvent args)
     {
+        if (HasComp<EmpDisabledComponent>(uid))
+        {
+            args.Cancel();
+            return;
+        }
+
         if (!component.EquipmentOwner.HasValue
             || !HasComp<MechComponent>(component.EquipmentOwner.Value))
         {
             if (!_canUseMechGunOutside)
                 args.Cancel();
+            return;
+        }
+
+        if (HasComp<EmpDisabledComponent>(component.EquipmentOwner.Value))
+        {
+            args.Cancel();
             return;
         }
 

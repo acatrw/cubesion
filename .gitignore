@@ -298,6 +298,12 @@ desktop.ini
 # Images generated using the MapRenderer
 Resources/MapImages
 
+# Temporary image-generation working files
+/tmp/imagegen/
+
+# Local passport validation databases
+/tmp/passport-validation-data/
+
 ## Docfx stuff
 /Content.Docfx/api/
 /Content.Docfx/*site
@@ -309,5 +315,9 @@ Resources/MapImages
 
 # Changelog package lock
 package-lock.json
+
 Resources/.vscode/settings.json
 nul
+/tmp/rmc14-source/
+
+tmp/

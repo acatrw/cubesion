@@ -35,6 +35,7 @@ using Robust.Client.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
+using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -64,8 +65,8 @@ namespace Content.Client.Lobby.UI
         private readonly ClientGameTicker _gameTicker;
 
         private FlavorText.FlavorText? _flavorText;
-        private BoxContainer _ccustomspecienamecontainerEdit => CCustomSpecieName;
-        private LineEdit _customspecienameEdit => CCustomSpecieNameEdit;
+        private BoxContainer CustomSpecieNameContainer => CCustomSpecieName;
+        private LineEdit CustomSpecieNameEditor => CCustomSpecieNameEdit;
         private TextEdit? _flavorTextEdit;
 
         /// If we're attempting to save
@@ -89,7 +90,13 @@ namespace Content.Client.Lobby.UI
         private List<LifepathPrototype> _lifepaths = new();
         // EE - Contractor System Changes End
         private List<(string, RequirementsSelector)> _jobPriorities = new();
-        private readonly Dictionary<string, BoxContainer> _jobCategories;
+        private readonly Dictionary<string, AlternatingBGContainer> _jobCategories;
+
+        /// Every job row currently in the list, so the search bar can show and hide them without a rebuild.
+        private readonly List<(JobPrototype Job, Control Row, AlternatingBGContainer Category)> _jobRows = new();
+
+        /// Key of the catch-all category holding gamemode roles that sit in no department.
+        private const string GamemodeRolesCategory = "GamemodeRoles";
 
         private Dictionary<Button, ConfirmationData> _confirmationData = new();
         private List<TraitPreferenceSelector> _traitPreferences = new();
@@ -129,7 +136,7 @@ namespace Content.Client.Lobby.UI
         )
         {
             RobustXamlLoader.Load(this);
-            
+
             _cfgManager = cfgManager;
             _entManager = entManager;
             _dialogManager = dialogManager;
@@ -167,7 +174,7 @@ namespace Content.Client.Lobby.UI
 
             #region Custom Species Name
 
-            _customspecienameEdit.OnTextChanged += args => { SetCustomSpecieName(args.Text); };
+            CustomSpecieNameEditor.OnTextChanged += args => { SetCustomSpecieName(args.Text); };
 
             #endregion Custom Species Name
 
@@ -265,7 +272,7 @@ namespace Content.Client.Lobby.UI
 
             #region Contractors
 
-            if(_cfgManager.GetCVar(CCVars.ContractorsEnabled))
+            if (_cfgManager.GetCVar(CCVars.ContractorsEnabled))
             {
                 Background.Orphan();
                 CTabContainer.AddTab(Background, Loc.GetString("humanoid-profile-editor-background-tab"));
@@ -400,7 +407,7 @@ namespace Content.Client.Lobby.UI
                 ReloadProfilePreview();
             };
 
-            HairStylePicker.OnSlotAdd += delegate()
+            HairStylePicker.OnSlotAdd += delegate ()
             {
                 if (Profile is null)
                     return;
@@ -421,7 +428,7 @@ namespace Content.Client.Lobby.UI
                 ReloadProfilePreview();
             };
 
-            FacialHairPicker.OnSlotAdd += delegate()
+            FacialHairPicker.OnSlotAdd += delegate ()
             {
                 if (Profile is null)
                     return;
@@ -497,7 +504,9 @@ namespace Content.Client.Lobby.UI
                 IsDirty = true;
             };
 
-            _jobCategories = new Dictionary<string, BoxContainer>();
+            _jobCategories = new Dictionary<string, AlternatingBGContainer>();
+
+            JobSearchBar.OnTextChanged += _ => ApplyJobSearch();
 
             #endregion Jobs
 
@@ -515,11 +524,13 @@ namespace Content.Client.Lobby.UI
             CTabContainer.AddTab(TraitsTab, Loc.GetString("humanoid-profile-editor-traits-tab"));
             _traitPreferences = new List<TraitPreferenceSelector>();
 
-            // Show/Hide the traits tab if they ever get enabled/disabled
+            // Show/Hide the traits tab if they ever get enabled/disabled.
+            // Addressed by control, not by index: the Background tab above is only added when contractors
+            // are enabled, so index 3 is the loadouts tab on a server that has them off.
             var traitsEnabled = cfgManager.GetCVar(CCVars.GameTraitsEnabled);
-            CTabContainer.SetTabVisible(3, traitsEnabled);
+            CTabContainer.SetTabVisible(TraitsTab, traitsEnabled);
             cfgManager.OnValueChanged(CCVars.GameTraitsEnabled,
-                enabled => CTabContainer.SetTabVisible(3, enabled));
+                enabled => CTabContainer.SetTabVisible(TraitsTab, enabled));
 
             TraitsShowUnusableButton.OnToggled += args => UpdateTraits(args.Pressed);
             TraitsRemoveUnusableButton.OnPressed += _ => TryRemoveUnusableTraits();
@@ -537,7 +548,7 @@ namespace Content.Client.Lobby.UI
 
             // Show/Hide the loadouts tab if they ever get enabled/disabled
             var loadoutsEnabled = cfgManager.GetCVar(CCVars.GameLoadoutsEnabled);
-            CTabContainer.SetTabVisible(4, loadoutsEnabled);
+            CTabContainer.SetTabVisible(LoadoutsTab, loadoutsEnabled);
             ShowLoadouts.Visible = loadoutsEnabled;
             cfgManager.OnValueChanged(CCVars.GameLoadoutsEnabled, LoadoutsChanged);
 
@@ -627,19 +638,18 @@ namespace Content.Client.Lobby.UI
             _species.Clear();
             var userId = _playerManager.LocalUser;
 
-            _species.AddRange(_prototypeManager.EnumeratePrototypes<SpeciesPrototype>().Where(o => o.RoundStart));
+            // A species may be locked to a set of factions. An empty Factions list is open to everyone,
+            // otherwise the character's chosen faction has to be in it. Faction is picked in the separate
+            // FactionSelectorGui before the editor opens, so Profile already carries it by this point.
+            var profileFaction = Profile?.Faction ?? string.Empty;
+            _species.AddRange(_prototypeManager.EnumeratePrototypes<SpeciesPrototype>()
+                .Where(o => o.RoundStart
+                            && (o.Factions.Count == 0 || o.Factions.Any(f => f.Id == profileFaction))
+                            && CanPickSpecies(o, userId)));
             var speciesIds = _species.Select(o => o.ID).ToList();
 
             for (var i = 0; i < _species.Count; i++)
             {
-                if (_species[i].SponsorLevel != SponsorLevel.None && userId != null)
-                {
-                    if (!_sponsorMan.TryGetSponsor(userId.Value, out var level))
-                        continue;
-                    if (_species[i].SponsorLevel > level)
-                        continue;
-                }
-
                 SpeciesButton.AddItem(Loc.GetString(_species[i].Name), i);
 
                 if (Profile?.Species.Equals(_species[i].ID) == true)
@@ -648,7 +658,30 @@ namespace Content.Client.Lobby.UI
 
             // If our species isn't available, reset it to default
             if (Profile != null && !speciesIds.Contains(Profile.Species))
+            {
                 SetSpecies(SharedHumanoidAppearanceSystem.DefaultSpecies);
+
+                // Move the dropdown with it, or it keeps naming the species we just dropped.
+                var defaultIndex = speciesIds.IndexOf(SharedHumanoidAppearanceSystem.DefaultSpecies);
+                if (defaultIndex != -1)
+                    SpeciesButton.SelectId(defaultIndex);
+            }
+        }
+
+        /// <summary>
+        ///     Whether this species can be put in the dropdown. Sponsor species the player has not unlocked are
+        ///     hidden, except for the one the character is already using: the server does not strip those, so
+        ///     dropping it here would just leave the selector showing a species the character is not.
+        /// </summary>
+        private bool CanPickSpecies(SpeciesPrototype species, NetUserId? userId)
+        {
+            if (species.SponsorLevel == SponsorLevel.None || userId == null)
+                return true;
+
+            if (Profile?.Species == species.ID)
+                return true;
+
+            return _sponsorMan.TryGetSponsor(userId.Value, out var level) && species.SponsorLevel <= level;
         }
 
         public void RefreshNationalities()
@@ -681,7 +714,7 @@ namespace Content.Client.Lobby.UI
             if (Profile != null && !nationalityIds.Contains(Profile.Nationality))
                 SetNationality(SharedHumanoidAppearanceSystem.DefaultNationality);
 
-            if(Profile != null)
+            if (Profile != null)
                 UpdateNationalityDescription(Profile.Nationality);
         }
 
@@ -715,7 +748,7 @@ namespace Content.Client.Lobby.UI
             if (Profile != null && !employerIds.Contains(Profile.Employer))
                 SetEmployer(SharedHumanoidAppearanceSystem.DefaultEmployer);
 
-            if(Profile != null)
+            if (Profile != null)
                 UpdateEmployerDescription(Profile.Employer);
         }
 
@@ -749,7 +782,7 @@ namespace Content.Client.Lobby.UI
             if (Profile != null && !lifepathIds.Contains(Profile.Lifepath))
                 SetLifepath(SharedHumanoidAppearanceSystem.DefaultLifepath);
 
-            if(Profile != null)
+            if (Profile != null)
                 UpdateLifepathDescription(Profile.Lifepath);
         }
 
@@ -953,7 +986,7 @@ namespace Content.Client.Lobby.UI
 
         private void LoadoutsChanged(bool enabled)
         {
-            CTabContainer.SetTabVisible(4, enabled);
+            CTabContainer.SetTabVisible(LoadoutsTab, enabled);
             ShowLoadouts.Visible = enabled;
         }
 
@@ -974,7 +1007,7 @@ namespace Content.Client.Lobby.UI
                 var dict = new Dictionary<ProtoId<GuideEntryPrototype>, GuideEntry>();
                 dict.Add(DefaultSpeciesGuidebook, guideRoot);
                 //TODO: Don't close the guidebook if its already open, just go to the correct page
-                guidebookController.OpenGuidebook(dict, includeChildren:true, selected: page);
+                guidebookController.OpenGuidebook(dict, includeChildren: true, selected: page);
             }
         }
 
@@ -984,6 +1017,7 @@ namespace Content.Client.Lobby.UI
             JobList.DisposeAllChildren();
             _jobCategories.Clear();
             _jobPriorities.Clear();
+            _jobRows.Clear();
 
             // Get all displayed departments
             var departments = new List<DepartmentPrototype>();
@@ -1005,8 +1039,10 @@ namespace Content.Client.Lobby.UI
                 ("humanoid-profile-editor-job-priority-high-button", (int) JobPriority.High),
             };
 
-            var gamemodeJobs = _gameTicker.GamemodeAvailableJobs;
-            var excludedJobs = _gameTicker.GamemodeExcludedJobs;
+            // Sets, not the networked lists: this is checked once per job per department, and Contains on a
+            // list is a linear scan.
+            var gamemodeJobs = new HashSet<string>(_gameTicker.GamemodeAvailableJobs);
+            var excludedJobs = new HashSet<string>(_gameTicker.GamemodeExcludedJobs);
             var hasGamemodeFilter = gamemodeJobs.Count > 0;
             var shownJobIds = new HashSet<string>();
 
@@ -1030,7 +1066,7 @@ namespace Content.Client.Lobby.UI
                     SetDirty();
             }
 
-            void AddJobToCategory(BoxContainer cat, JobPrototype job)
+            void AddJobToCategory(AlternatingBGContainer cat, JobPrototype job)
             {
                 var jobContainer = new BoxContainer { Orientation = LayoutOrientation.Horizontal, HorizontalExpand = true, };
                 var selector = new RequirementsSelector { Margin = new(3f, 3f, 3f, 0f), HorizontalExpand = true, };
@@ -1084,6 +1120,7 @@ namespace Content.Client.Lobby.UI
                 };
 
                 _jobPriorities.Add((job.ID, selector));
+                _jobRows.Add((job, jobContainer, cat));
                 jobContainer.AddChild(selector);
                 cat.AddChild(jobContainer);
             }
@@ -1156,14 +1193,14 @@ namespace Content.Client.Lobby.UI
                     var gmCategory = new AlternatingBGContainer
                     {
                         Orientation = LayoutOrientation.Vertical,
-                        Name = "GamemodeRoles",
+                        Name = GamemodeRolesCategory,
                         Margin = new(0, firstCategory ? 0 : 20, 0, 0),
                         Children =
                         {
                             new Label
                             {
                                 Text = Loc.GetString("humanoid-profile-editor-department-jobs-label",
-                                    ("departmentName", "Roles")),
+                                    ("departmentName", Loc.GetString("humanoid-profile-editor-gamemode-roles-department"))),
                                 StyleClasses = { StyleBase.StyleClassLabelHeading, },
                                 Margin = new(5f, 0, 0, 0),
                             },
@@ -1171,6 +1208,8 @@ namespace Content.Client.Lobby.UI
                     };
 
                     JobList.AddChild(gmCategory);
+                    // Tracked like any other category so the search bar can hide it too.
+                    _jobCategories[GamemodeRolesCategory] = gmCategory;
 
                     foreach (var job in remainingJobs)
                     {
@@ -1180,6 +1219,50 @@ namespace Content.Client.Lobby.UI
             }
 
             UpdateJobPriorities();
+            ApplyJobSearch();
+        }
+
+        /// <summary>
+        ///     Hides the job rows that do not match the search bar, and any department left with nothing in it.
+        ///     Filtering by visibility rather than rebuilding keeps typing responsive - every row re-runs the
+        ///     whole requirements check when it is built.
+        /// </summary>
+        private void ApplyJobSearch()
+        {
+            var filter = JobSearchBar.Text.Trim();
+            var matchedCategories = new HashSet<AlternatingBGContainer>();
+
+            foreach (var (job, row, category) in _jobRows)
+            {
+                var visible = filter.Length == 0
+                              || job.LocalizedName.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                              || job.ID.Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+                SetJobRowVisible(row, visible);
+                if (visible)
+                    matchedCategories.Add(category);
+            }
+
+            foreach (var (_, category) in _jobCategories)
+            {
+                category.Visible = filter.Length == 0 || matchedCategories.Contains(category);
+
+                // Re-stripes whatever is left, so a filtered list is not one solid block of color.
+                if (category.Visible)
+                    category.UpdateColors();
+            }
+        }
+
+        /// <summary>
+        ///     Hides a job row. <see cref="AlternatingBGContainer"/> re-parents its children into their own
+        ///     background panels, so hiding only the row would leave an empty colored strip behind it.
+        /// </summary>
+        private static void SetJobRowVisible(Control row, bool visible)
+        {
+            row.Visible = visible;
+
+            if (row.Parent is PanelContainer panel)
+                panel.Visible = visible;
         }
 
         private void OnFlavorTextChange(string content)
@@ -1212,79 +1295,79 @@ namespace Content.Client.Lobby.UI
             switch (skin)
             {
                 case HumanoidSkinColor.HumanToned:
-                {
-                    if (!Skin.Visible)
                     {
-                        Skin.Visible = true;
-                        RgbSkinColorContainer.Visible = false;
+                        if (!Skin.Visible)
+                        {
+                            Skin.Visible = true;
+                            RgbSkinColorContainer.Visible = false;
+                        }
+
+                        var color = SkinColor.HumanSkinTone((int) Skin.Value);
+
+                        Markings.CurrentSkinColor = color;
+                        Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));//
+                        break;
                     }
-
-                    var color = SkinColor.HumanSkinTone((int) Skin.Value);
-
-                    Markings.CurrentSkinColor = color;
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));//
-                    break;
-                }
                 case HumanoidSkinColor.Hues:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
-                    }
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
 
-                    Markings.CurrentSkinColor = _rgbSkinColorSelector.Color;
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(_rgbSkinColorSelector.Color));
-                    break;
-                }
+                        Markings.CurrentSkinColor = _rgbSkinColorSelector.Color;
+                        Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(_rgbSkinColorSelector.Color));
+                        break;
+                    }
                 case HumanoidSkinColor.TintedHues:
                 case HumanoidSkinColor.TintedHuesSkin: // DeltaV - Tone blending
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
+
+                        var color = skin switch // DeltaV - Tone blending
+                        {
+                            HumanoidSkinColor.TintedHues => SkinColor.TintedHues(_rgbSkinColorSelector.Color),
+                            HumanoidSkinColor.TintedHuesSkin => SkinColor.TintedHuesSkin(_rgbSkinColorSelector.Color, skinColor),
+                            _ => Color.White
+                        };
+
+                        Markings.CurrentSkinColor = color;
+                        Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                        break;
                     }
-
-                    var color = skin switch // DeltaV - Tone blending
-                    {
-                        HumanoidSkinColor.TintedHues => SkinColor.TintedHues(_rgbSkinColorSelector.Color),
-                        HumanoidSkinColor.TintedHuesSkin => SkinColor.TintedHuesSkin(_rgbSkinColorSelector.Color, skinColor),
-                        _ => Color.White
-                    };
-
-                    Markings.CurrentSkinColor = color;
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
-                    break;
-                }
                 case HumanoidSkinColor.VoxFeathers:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
+
+                        var color = SkinColor.ClosestVoxColor(_rgbSkinColorSelector.Color);
+
+                        Markings.CurrentSkinColor = color;
+                        Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                        break;
                     }
-
-                    var color = SkinColor.ClosestVoxColor(_rgbSkinColorSelector.Color);
-
-                    Markings.CurrentSkinColor = color;
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
-                    break;
-                }
                 case HumanoidSkinColor.VoidbornHues:
                     {
-                    if (!RgbSkinColorContainer.Visible)
-                    {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
+
+                        var color = SkinColor.ClosestVoidbornHues(_rgbSkinColorSelector.Color);
+
+                        Markings.CurrentSkinColor = color;
+                        Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
+                        break;
                     }
-
-                    var color = SkinColor.ClosestVoidbornHues(_rgbSkinColorSelector.Color);
-
-                    Markings.CurrentSkinColor = color;
-                    Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
-                    break;
-                }
                 case HumanoidSkinColor.AnimalFur: // Einstein Engines - Tajaran
                     {
                         if (!RgbSkinColorContainer.Visible)
@@ -1298,7 +1381,7 @@ namespace Content.Client.Lobby.UI
                         Markings.CurrentSkinColor = color;
                         Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
                         break;
-                }
+                    }
             }
 
             SetDirty();
@@ -1486,8 +1569,8 @@ namespace Content.Client.Lobby.UI
         private void UpdateCustomSpecieNameEdit()
         {
             var species = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
-            _customspecienameEdit.Text = string.IsNullOrEmpty(Profile?.Customspeciename) ? Loc.GetString(species.Name) : Profile.Customspeciename;
-            _ccustomspecienamecontainerEdit.Visible = species.CustomName;
+            CustomSpecieNameEditor.Text = string.IsNullOrEmpty(Profile?.Customspeciename) ? Loc.GetString(species.Name) : Profile.Customspeciename;
+            CustomSpecieNameContainer.Visible = species.CustomName;
         }
 
         private void UpdateFlavorTextEdit()
@@ -1549,64 +1632,64 @@ namespace Content.Client.Lobby.UI
             switch (skin)
             {
                 case HumanoidSkinColor.HumanToned:
-                {
-                    if (!Skin.Visible)
                     {
-                        Skin.Visible = true;
-                        RgbSkinColorContainer.Visible = false;
-                    }
+                        if (!Skin.Visible)
+                        {
+                            Skin.Visible = true;
+                            RgbSkinColorContainer.Visible = false;
+                        }
 
-                    Skin.Value = SkinColor.HumanSkinToneFromColor(Profile.Appearance.SkinColor);
-                    break;
-                }
+                        Skin.Value = SkinColor.HumanSkinToneFromColor(Profile.Appearance.SkinColor);
+                        break;
+                    }
                 case HumanoidSkinColor.Hues:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
-                    }
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
 
-                    // Set the RGB values to the direct values otherwise
-                    _rgbSkinColorSelector.Color = Profile.Appearance.SkinColor;
-                    break;
-                }
+                        // Set the RGB values to the direct values otherwise
+                        _rgbSkinColorSelector.Color = Profile.Appearance.SkinColor;
+                        break;
+                    }
                 case HumanoidSkinColor.TintedHues:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
-                    }
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
 
-                    // Set the RGB values to the direct values otherwise
-                    _rgbSkinColorSelector.Color = Profile.Appearance.SkinColor;
-                    break;
-                }
+                        // Set the RGB values to the direct values otherwise
+                        _rgbSkinColorSelector.Color = Profile.Appearance.SkinColor;
+                        break;
+                    }
                 case HumanoidSkinColor.VoxFeathers:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
+
+                        _rgbSkinColorSelector.Color = SkinColor.ClosestVoxColor(Profile.Appearance.SkinColor);
+
+                        break;
                     }
-
-                    _rgbSkinColorSelector.Color = SkinColor.ClosestVoxColor(Profile.Appearance.SkinColor);
-
-                    break;
-                }
                 case HumanoidSkinColor.VoidbornHues:
-                {
-                    if (!RgbSkinColorContainer.Visible)
                     {
-                        Skin.Visible = false;
-                        RgbSkinColorContainer.Visible = true;
+                        if (!RgbSkinColorContainer.Visible)
+                        {
+                            Skin.Visible = false;
+                            RgbSkinColorContainer.Visible = true;
+                        }
+
+                        _rgbSkinColorSelector.Color = SkinColor.ClosestVoidbornHues(Profile.Appearance.SkinColor);
+
+                        break;
                     }
-
-                    _rgbSkinColorSelector.Color = SkinColor.ClosestVoidbornHues(Profile.Appearance.SkinColor);
-
-                    break;
-                }
                 case HumanoidSkinColor.AnimalFur: // Einstein Engines - Tajaran
                     {
                         if (!RgbSkinColorContainer.Visible)
@@ -1618,7 +1701,7 @@ namespace Content.Client.Lobby.UI
                         _rgbSkinColorSelector.Color = SkinColor.ClosestAnimalFurColor(Profile.Appearance.SkinColor);
 
                         break;
-                }
+                    }
             }
         }
 
@@ -1837,7 +1920,7 @@ namespace Content.Client.Lobby.UI
 
             // hair color
             Color? hairColor = null;
-            if ( Profile.Appearance.HairStyleId != HairStyles.DefaultHairStyle &&
+            if (Profile.Appearance.HairStyleId != HairStyles.DefaultHairStyle &&
                 _markingManager.Markings.TryGetValue(Profile.Appearance.HairStyleId, out var hairProto))
             {
                 if (_markingManager.CanBeApplied(Profile.Species, Profile.Sex, hairProto, _prototypeManager))
@@ -2047,7 +2130,10 @@ namespace Content.Client.Lobby.UI
             // Reset the whole UI and delete caches
             if (reload)
             {
-                foreach (var tab in TraitsTabs.Tabs)
+                // Contents, not Tabs: RemoveTab is keyed by the tab's content control, so passing
+                // the buttons from Tabs silently removed nothing and every reload added a fresh
+                // duplicate set of trait tabs. Snapshot it, since removal mutates the collection.
+                foreach (var tab in TraitsTabs.Contents.ToArray())
                     TraitsTabs.RemoveTab(tab);
                 _traitPreferences.Clear();
             }
@@ -2217,6 +2303,7 @@ namespace Content.Client.Lobby.UI
                             HorizontalExpand = true,
                             VerticalExpand = true,
                             SeparatorMargin = new Thickness(0),
+                            TabsFitContent = false,
                         };
 
                         parent.AddTab(category, Loc.GetString($"trait-category-{key}"));
@@ -2341,7 +2428,7 @@ namespace Content.Client.Lobby.UI
                     loadoutPreference.CustomDescription,
                     loadoutPreference.CustomColorTint,
                     loadoutPreference.CustomHeirloom)
-                    { Selected = loadoutPreference.Selected };
+                { Selected = loadoutPreference.Selected };
 
                 preferenceSelector.Preference = preference;
 
@@ -2381,7 +2468,9 @@ namespace Content.Client.Lobby.UI
             // Reset the whole UI and delete caches
             if (reload)
             {
-                foreach (var tab in LoadoutsTabs.Tabs)
+                // See the equivalent comment in the traits rebuild: RemoveTab takes content
+                // controls, and the collection is mutated as we go.
+                foreach (var tab in LoadoutsTabs.Contents.ToArray())
                     LoadoutsTabs.RemoveTab(tab);
                 foreach (var uid in _dummyLoadouts)
                     _entManager.QueueDeleteEntity(uid.Value);
@@ -2473,7 +2562,7 @@ namespace Content.Client.Lobby.UI
             // Fill categories with loadouts
             foreach (var (loadout, usable) in _loadouts
                 .OrderBy(l => l.Key.ID)
-                .ThenBy(l => Loc.GetString($"loadout-name-{l.Key.ID}"))
+                .ThenBy(l => Loc.TryGetString($"loadout-name-{l.Key.ID}", out var name) ? name : l.Key.ID)
                 .ThenBy(l => l.Key.Cost))
             {
                 if (_loadoutPreferences.Select(lps => lps.Loadout.ID).Contains(loadout.ID))
@@ -2489,7 +2578,7 @@ namespace Content.Client.Lobby.UI
                     loadout, highJob ?? new JobPrototype(),
                     Profile ?? HumanoidCharacterProfile.DefaultWithSpecies(), ref _dummyLoadouts,
                     _entManager, _prototypeManager, _cfgManager, _characterRequirementsSystem, _requirements)
-                    { Preference = new(loadout.ID) };
+                { Preference = new(loadout.ID) };
                 UpdateSelector(selector, usable);
                 AddSelector(selector);
 
@@ -2586,6 +2675,9 @@ namespace Content.Client.Lobby.UI
                             HorizontalExpand = true,
                             VerticalExpand = true,
                             SeparatorMargin = new Thickness(0),
+                            // Same reason as LoadoutsTabs: a subcategory's tab strip shouldn't decide how
+                            // wide the character editor is.
+                            TabsFitContent = false,
                         };
 
                         parent.AddTab(category, Loc.GetString($"loadout-category-{key}"));

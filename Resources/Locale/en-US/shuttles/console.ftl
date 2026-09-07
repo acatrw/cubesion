@@ -16,6 +16,7 @@ shuttle-console-angular-velocity = Angular velocity:
 
 shuttle-console-unknown = Unknown
 shuttle-console-iff-label = {$name} ({$distance}m)
+shuttle-console-iff-motion = {$speed} m/s  {$heading}
 shuttle-console-exclusion = Exclusion area
 
 shuttle-console-nav-settings = Settings
@@ -39,6 +40,7 @@ shuttle-console-map-beacons = Show beacons
 shuttle-console-no-signal = No signal
 
 shuttle-console-map-objects = Sector objects
+shuttle-console-map-sector-crescent = Sector Crescent
 
 # DOCK
 shuttle-console-docked = Docked objects
@@ -47,6 +49,9 @@ shuttle-console-view = View
 shuttle-console-undock = Undock
 shuttle-console-dock = Dock
 shuttle-console-docks-label = Docks
+shuttle-console-dock-entry = Dock {$index}
+shuttle-console-dock-status-docked = Docked: {$name}
+shuttle-console-dock-status-undocked = Undocked
 
 shuttle-console-undock-fail = Undocking failed
 shuttle-console-dock-fail = Docking failed

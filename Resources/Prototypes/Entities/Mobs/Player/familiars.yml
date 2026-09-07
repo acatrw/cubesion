@@ -12,16 +12,6 @@
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: bat
       sprite: Mobs/Animals/bat.rsi
-  - type: GhostRole
-    makeSentient: true
-    allowMovement: true
-    allowSpeech: true
-    name: ghost-role-information-familiar-name
-    description: ghost-role-information-familiar-description
-    rules: ghost-role-information-familiar-rules
-    raffle:
-      settings: default
-  - type: GhostTakeoverAvailable
   - type: Tag
     tags:
     - DoorBumpOpener
@@ -68,9 +58,28 @@
       types:
         Heat: 100
 
+# Familiars a ghost is allowed to claim. Kept separate from the base because a familiar that answers
+# to its summoner and a familiar that answers to whoever grabbed the ghost role are two different
+# things, and the commandable ones cannot be both.
+- type: entity
+  parent: BaseMobPsionicFamiliar
+  id: BaseMobPsionicFamiliarGhostRole
+  abstract: true
+  components:
+  - type: GhostRole
+    makeSentient: true
+    allowMovement: true
+    allowSpeech: true
+    name: ghost-role-information-familiar-name
+    description: ghost-role-information-familiar-description
+    rules: ghost-role-information-familiar-rules
+    raffle:
+      settings: default
+  - type: GhostTakeoverAvailable
+
 - type: entity
   name: Remilia
-  parent: BaseMobPsionicFamiliar
+  parent: BaseMobPsionicFamiliarGhostRole
   id: MobBatRemilia
   description: The chaplain's familiar. Likes fruit.
   components:
@@ -224,6 +233,33 @@
       - TelepathyPower
       - PyrokineticFlare
       - XenoglossyPower
+  - type: PsionicFamiliar
+    commandable: true
+  # Corporeal spirits halve ordinary ballistic damage. At 20 total damage this makes
+  # the imp die to roughly two rifle rounds or three standard pistol rounds.
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      20: Dead
+  - type: HTN
+    rootTask:
+      task: RangedPsionicFamiliarCompound
+  - type: NPCRangedCombat
+  - type: Gun
+    fireRate: 0.4
+    useKey: false
+    showExamineText: false
+    selectedMode: SemiAuto
+    availableModes:
+    - SemiAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
+  - type: RechargeBasicEntityAmmo
+    rechargeCooldown: 3
+  - type: BasicEntityAmmoProvider
+    proto: ProjectileImpFireball
+    capacity: 1
+    count: 1
   - type: MeleeWeapon
     damage:
       types:
@@ -244,8 +280,11 @@
           !type:PhysShapeCircle
           radius: 0.35
         density: 13
+        # Opaque is the light-blocking layer, not a movement one. As a mask it left the imp's physics
+        # and the pathfinder disagreeing about what it could walk through, so it kept planning routes
+        # it then bounced off. It is a mote of fire: give it the flying mob mask.
         mask:
-        - Opaque
+        - FlyingMobMask
         layer:
         - MobLayer
   - type: RandomMetadata

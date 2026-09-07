@@ -16,6 +16,8 @@ using Content.Shared.ActionBlocker;
 using Content.Shared.Alert;
 using Content.Shared._Crescent.CCvars;
 using Content.Shared.Crescent.Radar;
+using Content.Shared.Damage; // KS14
+using Robust.Shared.Timing; // KS14
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Shuttles.BUIStates;
@@ -48,7 +50,7 @@ namespace Content.Server.Shuttles.Systems;
 
 public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
 {
-    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _mapManager = default!;
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly AlertsSystem _alertsSystem = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
@@ -69,11 +71,22 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly _Lavaland.Shuttles.Systems.DockingConsoleSystem _dockingConsole = default!; // Lavaland Change: FTL
     [Dependency] private readonly IConfigurationManager _cfg = default!; // hullrot: console ratelimits
+    [Dependency] private readonly IGameTiming _timing = default!; // KS14
 
     private EntityQuery<MetaDataComponent> _metaQuery;
     private EntityQuery<TransformComponent> _xformQuery;
 
     private readonly HashSet<Entity<ShuttleConsoleComponent>> _consoles = new();
+
+    /// <summary>
+    ///     KS14: when each grid last took damage, for the console's TAKING FIRE warning.
+    ///     Written from a subscription on every damageable entity, so the handler stays a
+    ///         grid lookup and a dictionary write and nothing more.
+    /// </summary>
+    private readonly Dictionary<EntityUid, TimeSpan> _lastGridDamage = new();
+
+    /// <summary>KS14: how long after the last hit the warning stays lit.</summary>
+    private static readonly TimeSpan TakingFireHold = TimeSpan.FromSeconds(3);
 
     private float _accumulatedFrameTime;
     private float _uiTps;
@@ -114,6 +127,13 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
             subs.Event<BoundUIClosedEvent>(OnDronePilotConsoleClose);
         });
 
+        // KS14: universal damage hook for the TAKING FIRE warning. DamageableComponent is on
+        //   every damageable entity and nothing else claims this pair, so one subscription
+        //   covers hull, walls, machines and crew alike - the shield-only signal it replaces
+        //   went quiet exactly when the ship was worst off.
+        SubscribeLocalEvent<DamageableComponent, DamageChangedEvent>(OnAnyDamageChanged);
+        SubscribeLocalEvent<GridRemovalEvent>(OnGridRemovedForDamage);
+
         SubscribeLocalEvent<DockEvent>(OnDock);
         SubscribeLocalEvent<UndockEvent>(OnUndock);
 
@@ -137,6 +157,13 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         while (query.MoveNext(out var uid, out var console))
         {
             if (console.LastUpdatedState == null || console.LastUpdatedState.IFFState == null)
+            {
+                continue;
+            }
+
+            // Closed consoles rebuild their state when opened, so refreshing their turret cache only wastes a
+            // world-wide turret scan.
+            if (!_ui.IsUiOpen(uid, ShuttleConsoleUiKey.Key))
             {
                 continue;
             }
@@ -259,10 +286,20 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         if (!TryComp<IdCardComponent>(args.Used, out var _))
             return;
         var dynIdComp = EnsureComp<DynamicCodeHolderComponent>(args.Used);
+        // Crescent - a console that was not standing here when the ship was keyed has no key names of
+        // its own yet; the grid keeps them so it can take them now rather than refuse every ID forever.
+        AdoptGridKeyNames(component, dynamicAccesComponent);
         if (component.captainIdentifier is null || component.pilotIdentifier is null)
             return;
 
-        if (_codes.hasKey(dynamicAccesComponent.mappedCodes[component.captainIdentifier],dynIdComp))
+        // Crescent - a ship keyed off a mapping that files neither name would otherwise throw here.
+        if (!dynamicAccesComponent.mappedCodes.TryGetValue(component.captainIdentifier, out var captainCodes)
+            || !dynamicAccesComponent.mappedCodes.TryGetValue(component.pilotIdentifier, out var pilotCodes))
+        {
+            return;
+        }
+
+        if (_codes.hasKey(captainCodes, dynIdComp))
         {
             if (component.accesState != ShuttleConsoleAccesState.NoAcces)
             {
@@ -279,7 +316,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
             return;
         }
 
-        if (_codes.hasKey(dynamicAccesComponent.mappedCodes[component.pilotIdentifier], dynIdComp))
+        if (_codes.hasKey(pilotCodes, dynIdComp))
         {
             if (component.accesState != ShuttleConsoleAccesState.NoAcces)
             {
@@ -305,15 +342,31 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         var grid = Transform(uid).GridUid;
         if (grid is  null)
             return;
-        if (HasComp<DynamicCodeHolderComponent>(grid.Value))
+        if (TryComp<DynamicCodeHolderComponent>(grid.Value, out var gridCodes))
         {
             component.accesState = ShuttleConsoleAccesState.NoAcces;
+            AdoptGridKeyNames(component, gridCodes);
         }
         else
         {
             component.accesState = ShuttleConsoleAccesState.NotDynamic;
         }
         RefreshShuttleConsoles(grid.Value);
+    }
+
+    /// <summary>
+    ///     Crescent - takes the ship's captain and pilot key names off the grid.
+    /// </summary>
+    /// <remarks>
+    ///     A ship hands those names out once, as its map initialises, to the consoles standing on it at that
+    ///     moment. A console stood up later - built by a crewman, or welded back on by the drydock after the
+    ///     original was shot out - misses that pass, and a console with no key names matches no swiped ID at
+    ///     all: it sits on "swipe ID to authorize yourself" forever, whatever is presented to it.
+    /// </remarks>
+    private void AdoptGridKeyNames(ShuttleConsoleComponent component, DynamicCodeHolderComponent gridCodes)
+    {
+        component.captainIdentifier ??= gridCodes.captainIdentifier;
+        component.pilotIdentifier ??= gridCodes.pilotIdentifier;
     }
 
     private void OnComponentRemove(EntityUid uid, ShuttleConsoleComponent component, ComponentRemove args)
@@ -350,6 +403,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         if (TryComp<DynamicCodeHolderComponent>(args.Grid, out var accesComp))
         {
             comp.accesState = ShuttleConsoleAccesState.NoAcces;
+            AdoptGridKeyNames(comp, accesComp);
             _itemSlotsSystem.TryEject(uid, comp.targetIdSlot, null, out var item);
             _itemSlotsSystem.SetLock(uid, comp.targetIdSlot, true);
         }
@@ -514,9 +568,10 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         {
 
 
-            if (HasComp<DynamicCodeHolderComponent>(args.Transform.GridUid))
+            if (TryComp<DynamicCodeHolderComponent>(args.Transform.GridUid, out var gridCodes))
             {
                 component.accesState = ShuttleConsoleAccesState.NoAcces;
+                AdoptGridKeyNames(component, gridCodes);
                 _itemSlotsSystem.TryEject(uid, component.targetIdSlot, null, out var item);
                 _itemSlotsSystem.SetLock(uid, component.targetIdSlot, true);
             }
@@ -638,22 +693,59 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     {
         var projectiles = GetProjectilesInRange(consoleUid);
         turrets ??= GetAllTurrets(consoleUid);
-        return new IFFInterfaceState(projectiles, turrets);
+        return new IFFInterfaceState(projectiles, turrets)
+        {
+            TakingFire = KsIsGridTakingFire(Transform(consoleUid).GridUid), // KS14
+        };
+    }
+
+    /// <summary>
+    ///     KS14: stamps the damaged entity's grid. Healing and no-op changes are ignored, so
+    ///         a medbay patching someone up never reads as the ship being shot at.
+    /// </summary>
+    private void OnAnyDamageChanged(EntityUid uid, DamageableComponent component, DamageChangedEvent args)
+    {
+        if (args.DamageDelta is not { } delta || delta.GetTotal() <= 0)
+            return;
+
+        if (_xformQuery.TryGetComponent(uid, out var xform) && xform.GridUid is { } grid)
+            _lastGridDamage[grid] = _timing.CurTime;
+    }
+
+    /// <summary>KS14: a deleted grid can never be hit again, so drop its stamp.</summary>
+    private void OnGridRemovedForDamage(GridRemovalEvent args)
+    {
+        _lastGridDamage.Remove(args.EntityUid);
+    }
+
+    /// <summary>KS14: whether this grid was hit inside the warning's hold window.</summary>
+    private bool KsIsGridTakingFire(EntityUid? grid)
+    {
+        return grid is { } gridUid
+            && _lastGridDamage.TryGetValue(gridUid, out var last)
+            && _timing.CurTime - last < TakingFireHold;
     }
 
     public List<ProjectileState> GetProjectilesInRange(EntityUid consoleUid)
     {
         var projectiles = new List<ProjectileState>();
+        var consoleXform = Transform(consoleUid);
+        var consoleMap = consoleXform.MapID;
         var consolePosition = _transform.GetWorldPosition(consoleUid);
         var range = SharedRadarConsoleSystem.DefaultMaxRange;
+        var rangeSq = range * range;
 
         var query = EntityQueryEnumerator<ProjectileIFFComponent, MetaDataComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var projectileIFF, out var metadata, out var transform))
         {
+            // World positions are only comparable on the same map.
+            if (transform.MapID != consoleMap)
+                continue;
+
             if (HasComp<RadarPingerComponent>(uid) && !_ui.IsUiOpen(uid, RadarConsoleUiKey.Key))
                 continue;
-			
-            if ((consolePosition - _transform.GetWorldPosition(uid)).Length() > range)
+
+            if ((consolePosition - _transform.GetWorldPosition(uid)).LengthSquared() > rangeSq)
             {
                 continue;
             }
@@ -705,7 +797,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         return turrets;
     }
 
-    private void UpdateState(EntityUid consoleUid, ShuttleConsoleComponent console)
+    public void UpdateState(EntityUid consoleUid, ShuttleConsoleComponent console)
     {
         EntityUid? entity = consoleUid;
 
@@ -740,6 +832,8 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
                 new List<ShuttleBeaconObject>(),
                 new List<ShuttleExclusionObject>());
         }
+
+        navState.WeaponTargetingMode = EntityManager.System<ShipWeaponTargetingSystem>().GetMode(consoleUid);
 
         if (_ui.HasUi(consoleUid, ShuttleConsoleUiKey.Key))
         {
@@ -923,6 +1017,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         var state = new NavInterfaceState(entity.Comp1.MaxRange, GetNetCoordinates(coordinates), angle, docks, _shuttle.NfGetInertiaDampeningMode(entity), GetNetEntity(entity.Owner))
         {
             AlignToWorld = entity.Comp1.KeepWorldAligned,
+            WeaponTargetingMode = EntityManager.System<ShipWeaponTargetingSystem>().GetMode(entity.Owner),
         }; // Frontier: inertia dampening
         state.Target = entity.Comp1.Target;
         state.TargetEntity = GetNetEntity(entity.Comp1.TargetEntity);

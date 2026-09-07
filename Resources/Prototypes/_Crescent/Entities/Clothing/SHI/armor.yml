@@ -29,8 +29,8 @@
         Heat: 15
         Caustic: 15
   - type: ClothingSpeedModifier
-    walkModifier: 0.95
-    sprintModifier: 0.95
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitMetrocop
   - type: ClothingAddFaction
@@ -159,8 +159,8 @@
         Heat: 15
         Caustic: 15
   - type: ClothingSpeedModifier
-    walkModifier: 0.9
-    sprintModifier: 0.95
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitCorpsec
   - type: ClothingAddFaction
@@ -277,6 +277,18 @@
     coefficient: 0.01
   - type: FireProtection
     reduction: 0.75
+  - type: IgniteFromGasImmunity # sealed suit, so it has to seal a plasmaman too. Head comes from the helmet.
+    parts:
+    - Torso
+    - Groin
+    - LeftArm
+    - LeftHand
+    - RightArm
+    - RightHand
+    - LeftLeg
+    - LeftFoot
+    - RightLeg
+    - RightFoot
   - type: ExplosionResistance
     damageCoefficient: 1
   - type: DegradeableArmor

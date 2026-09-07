@@ -43,4 +43,20 @@ public sealed class CrescentCVars : CVars
     /// </summary>
     public static readonly CVarDef<float> ShuttleConsoleUiTps =
         CVarDef.Create("shuttle.console_tps", 10.0f, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Radar console updates per second. 0 (the default) means every tick, which is what radar has always done.
+    /// Projectile blips are drawn straight from these snapshots with no smoothing in between, so lowering this
+    /// makes them visibly step. Only worth turning down on a host that is measurably struggling.
+    /// </summary>
+    public static readonly CVarDef<float> RadarConsoleUiTps =
+        CVarDef.Create("radar.console_tps", 0f, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Whether ship weapons and shield emitters consume power.
+    /// Keep disabled until existing ship maps have been updated for the new power budget.
+    /// A server restart is required after changing this value.
+    /// </summary>
+    public static readonly CVarDef<bool> ShipSystemsPowerDrawEnabled =
+        CVarDef.Create("sc.ship_systems_power_draw_enabled", false, CVar.SERVERONLY);
 }

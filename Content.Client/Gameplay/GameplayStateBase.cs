@@ -36,7 +36,8 @@ namespace Content.Client.Gameplay
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
         [Dependency] private readonly IGameTiming _timing = default!;
-        [Dependency] private readonly IMapManager _mapManager = default!;
+        // SharedMapSystem is an entity system, not an IoC service.
+        private SharedMapSystem _mapManager => _entityManager.System<SharedMapSystem>();
         [Dependency] protected readonly IUserInterfaceManager UserInterfaceManager = default!;
         [Dependency] private readonly IEntityManager _entityManager = default!;
         [Dependency] private readonly IViewVariablesManager _vvm = default!;
@@ -211,18 +212,28 @@ namespace Content.Client.Gameplay
             {
                 var mousePosWorld = vp.PixelToMap(kArgs.PointerLocation.Position);
 
-                if (vp is ScalingViewport svp)
+                // The eye's map can disappear while input is being released during a round restart.
+                if (_mapManager.TryGetMap(mousePosWorld.MapId, out var mapUid))
                 {
-                    entityToClick = GetClickedEntity(mousePosWorld, svp.Eye);
-                }
-                else
-                {
-                    entityToClick = GetClickedEntity(mousePosWorld);
-                }
+                    if (vp is ScalingViewport svp)
+                    {
+                        entityToClick = GetClickedEntity(mousePosWorld, svp.Eye);
+                    }
+                    else
+                    {
+                        entityToClick = GetClickedEntity(mousePosWorld);
+                    }
 
-                coordinates = _mapManager.TryFindGridAt(mousePosWorld, out _, out var grid) ?
-                    grid.MapToGrid(mousePosWorld) :
-                    EntityCoordinates.FromMap(_mapManager, mousePosWorld);
+                    if (_mapManager.TryFindGridAt(mousePosWorld, out var clickedGrid, out _))
+                    {
+                        coordinates = _mapManager.MapToGrid(clickedGrid, mousePosWorld);
+                    }
+                    else
+                    {
+                        coordinates = EntityCoordinates.FromMap(mapUid.Value, mousePosWorld,
+                            _entityManager.System<SharedTransformSystem>(), _entityManager);
+                    }
+                }
             }
 
             var message = new ClientFullInputCmdMessage(_timing.CurTick, _timing.TickFraction, funcId)

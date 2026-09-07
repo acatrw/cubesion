@@ -21,16 +21,16 @@ job-name-ncwl-newbie = Union Worker
 
 # syndicate
 
-job-name-ringleader = Ringleader
+job-name-ringleader = Administrator
 job-name-lieutenant = Lieutenant
 job-name-infanteer = Gorlex Infanteer
 job-name-technician = Newblood
-job-name-coordinator = Interdyne Coordinator
+job-name-coordinator = Interdyne Supervisor
 job-name-ripperdoc = Ripperdoc
 job-name-traumasec = TraumaSec Agent
 job-name-operative = Cyberdawn Asset Security
 job-name-cyberdawntech = Cyberdawn Researcher
-job-name-intelligenceofficer = Patriarch
+job-name-intelligenceofficer = Cyberdawn Supervisor
 job-name-shipbreaker = Shipbreaker
 job-name-foreman = SAW Foreman
 ghost-role-information-syndicate-cyborg-assault-name = CS 5401 Xigou assault cyborg
@@ -40,12 +40,13 @@ ghost-role-information-syndicate-cyborg-saboteur-name = CS 3201 Sun Wukong Comba
 # empire
 
 job-name-freeholder = Freeholder
+job-name-oathbound = Oathbound
 job-name-levyman = Man-at-Arms
 job-name-knight = Knight Banneret
 job-name-ritter = Baronial Ritter
 job-name-courtier = Courtier
-job-name-ministerlabor = Minister of Finance
-job-name-logisticsofficer = Minister of Wealth
+job-name-ministerlabor = Minister of Labor
+job-name-logisticsofficer = Charter Treasurer
 job-name-adjutant = Imperial Adjutant
 job-name-archmaester = Scribe Archmaester
 job-name-governor = Lord Admiral

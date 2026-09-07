@@ -41,6 +41,35 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         SubscribeLocalEvent<JukeboxComponent, PowerChangedEvent>(OnPowerChanged);
     }
 
+    /// <summary>
+    /// Params every jukebox track is started with. The volume here is only the base level; each
+    /// client scales it further with their own boombox volume slider once the stream arrives.
+    /// </summary>
+    private static AudioParams GetAudioParams(JukeboxComponent component)
+    {
+        return AudioParams.Default.WithMaxDistance(component.Range).WithVolume(component.Volume);
+    }
+
+    /// <summary>
+    /// Starts a jukebox track and applies jukebox-specific spatial audio behavior.
+    /// Long-form music is especially unpleasant through OpenAL's aggressive low-pass occlusion,
+    /// so prototypes with occlusion disabled retain distance attenuation without that filter.
+    /// </summary>
+    private EntityUid? PlayTrack(EntityUid uid, JukeboxComponent component, JukeboxPrototype track)
+    {
+        var stream = Audio.PlayPvs(track.Path, uid, GetAudioParams(component));
+        if (stream == null)
+            return null;
+
+        if (!component.Occlusion)
+        {
+            stream.Value.Component.Flags |= AudioFlags.NoOcclusion;
+            Dirty(stream.Value.Entity, stream.Value.Component);
+        }
+
+        return stream.Value.Entity;
+    }
+
     private void OnComponentInit(EntityUid uid, JukeboxComponent component, ComponentInit args)
     {
         if (HasComp<ApcPowerReceiverComponent>(uid))
@@ -65,7 +94,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
                 return;
             }
 
-            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f))?.Entity;
+            component.AudioStream = PlayTrack(uid, component, jukeboxProto);
             Dirty(uid, component);
         }
 
@@ -167,7 +196,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
             return;
         }
 
-        component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f))?.Entity;
+        component.AudioStream = PlayTrack(uid, component, jukeboxProto);
 
         // If the track failed to start there is no stream, which would make the queue
         // try to advance again every tick. Stop the queue instead of spinning.

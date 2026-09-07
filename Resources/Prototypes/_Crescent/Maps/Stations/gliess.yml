@@ -41,6 +41,10 @@
     GliessSanto:
       stationProto: StandardCrescentStation
       gridComponents:
+        - type: FactionStation # conquest win condition
+          faction: GS
+          fallAnnouncement: faction-station-fall-gliess
+          stationName: Gliess Santo
         - type: BlockShipWeaponProjectileGrid
         - type: PreventPilot
         - type: VesselIcon
@@ -64,13 +68,10 @@
         - type: StationJobs
           overflowJobs: []
           availableJobs:
-            MarshalCMM: [ 1, 1 ]
-            DeputyMarshalCMM: [ 1, 1 ]
-            MinutemanCMM: [ 8, 8 ]
             GliessianDockmaster: [ 1, 1 ]
             GliessianSheriff: [ 1, 1 ]
-            GliessianDeputy: [ 2, 2 ]
-            GliessianDockhand: [ 3, 3 ]
+            GliessianDeputy: [ 4, 4 ]
+            GliessianDockhand: [ 4, 4 ]
             Spacer: [ -1, -1 ]
 
 

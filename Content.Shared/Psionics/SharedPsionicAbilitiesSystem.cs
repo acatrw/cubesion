@@ -1,6 +1,7 @@
 using Content.Shared.Administration.Logs;
 using Content.Shared.Contests;
 using Content.Shared.Popups;
+using Content.Shared.Psionics;
 using Content.Shared.Psionics.Glimmer;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization;
@@ -9,6 +10,11 @@ namespace Content.Shared.Abilities.Psionics
 {
     public sealed class SharedPsionicAbilitiesSystem : EntitySystem
     {
+        // Eclipsion - psionic concealment is a stealth field rather than a hard visibility layer swap, so this
+        // value is the only thing hiding a concealed psion: low enough to break their silhouette at a glance,
+        // high enough that anyone looking carefully still picks the shimmer out.
+        public const float ConcealmentVisibility = 0.5f;
+
         [Dependency] private readonly EntityLookupSystem _lookup = default!;
         [Dependency] private readonly SharedPopupSystem _popups = default!;
         [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
@@ -93,7 +99,14 @@ namespace Content.Shared.Abilities.Psionics
             var ev = new PsionicPowerUsedEvent(uid, power);
             RaiseLocalEvent(uid, ev, false);
 
-            _glimmerSystem.DeltaGlimmerInput(_robustRandom.NextFloat(minGlimmer, maxGlimmer));
+            var glimmer = _robustRandom.NextFloat(minGlimmer, maxGlimmer);
+
+            // Progression is paid out of the same number that feeds the noosphere, so a power that stirs
+            // glimmer harder is also worth more experience.
+            var castEv = new PsionicPowerCastEvent(uid, power, glimmer);
+            RaiseLocalEvent(uid, ref castEv);
+
+            _glimmerSystem.DeltaGlimmerInput(glimmer);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
   id: ResearchAndDevelopmentServerMinutemen
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: minutemen research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -52,8 +52,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -74,7 +74,7 @@
   id: ResearchAndDevelopmentServerInterdyne
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: interdyne pharmaceuticals research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -124,8 +124,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -146,7 +146,7 @@
   id: ResearchAndDevelopmentServerCyberdawn
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: cyberdawn technologies research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -196,8 +196,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -218,7 +218,7 @@
   id: ResearchAndDevelopmentServerImperial
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: imperial research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -268,8 +268,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -290,7 +290,7 @@
   id: ResearchAndDevelopmentServerCommunard
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: communard research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -340,8 +340,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -362,7 +362,7 @@
   id: ResearchAndDevelopmentServerCorporate
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: shinohara research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -412,8 +412,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -434,7 +434,7 @@
   id: ResearchAndDevelopmentServerGliessian
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: Gliess Santo research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -483,8 +483,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -500,6 +500,21 @@
   - type: GuideHelp
     guides:
     - Science
+
+# Gu Tian's server carries Pang Tai's proprietary catalogue alongside civilian research.
+- type: entity
+  id: ResearchAndDevelopmentServerPangTai
+  parent: ResearchAndDevelopmentServerGliessian
+  name: PTA Gu Tian research server
+  description: Stores Gu Tian's restricted Pang Tai Arms manufacturing catalogue and a complete civilian research archive.
+  components:
+  - type: TechnologyDatabase
+    supportedDisciplines:
+    - PangTai
+    - Mechatronics
+    - Electronics
+    - Astronautics
+    - Biochemical
 
 - type: entity
   id: ResearchAndDevelopmentServerFamilies
@@ -555,8 +570,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -573,13 +588,13 @@
     guides:
     - Science
 
-# Extra combined server: serves the Coalition discipline, which duplicates the whole Interdyne + Cyberdawn
+# Extra combined server: serves the TFCF discipline, which duplicates the whole Interdyne + Cyberdawn
 # catalogue under one tree. Drop this on a TFSC grid to research everything from a single server instead of two.
 - type: entity
   id: ResearchAndDevelopmentServerCoalition
   parent: [ BaseMachinePowered, ConstructibleMachine ]
-  name: coalition technology research server
-  description: Contains the collective knowledge of the station's scientists. Destroying it would send them back to the stone age. You don't want that do you?
+  name: TFCF technology research server
+  description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
     sprite: Structures/Machines/server.rsi
@@ -629,8 +644,8 @@
   - type: Appearance
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ServerSFX
       params:
@@ -721,3 +736,78 @@
   components:
   - type: ResearchServer
     passivePointsPerMinute: 0
+
+# Pre-researched servers. FullyResearched hands the server its own disciplines' entire tree at map init, so a map
+# can ship a station whose R&D is already finished -- every lathe and microforge bound to it prints its faction's
+# full catalogue from round start. Nothing else changes: the server still generates points, they just have nothing
+# left to buy. Hidden technologies stay hidden. Use these only on maps that are meant to skip R&D entirely.
+
+- type: entity
+  id: ResearchAndDevelopmentServerMinutemenFullyResearched
+  parent: ResearchAndDevelopmentServerMinutemen
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerInterdyneFullyResearched
+  parent: ResearchAndDevelopmentServerInterdyne
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerCyberdawnFullyResearched
+  parent: ResearchAndDevelopmentServerCyberdawn
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerImperialFullyResearched
+  parent: ResearchAndDevelopmentServerImperial
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerCommunardFullyResearched
+  parent: ResearchAndDevelopmentServerCommunard
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerCorporateFullyResearched
+  parent: ResearchAndDevelopmentServerCorporate
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerGliessianFullyResearched
+  parent: ResearchAndDevelopmentServerGliessian
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerPangTaiFullyResearched
+  parent: ResearchAndDevelopmentServerPangTai
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerFamiliesFullyResearched
+  parent: ResearchAndDevelopmentServerFamilies
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched
+
+- type: entity
+  id: ResearchAndDevelopmentServerCoalitionFullyResearched
+  parent: ResearchAndDevelopmentServerCoalition
+  suffix: Fully Researched
+  components:
+  - type: FullyResearched

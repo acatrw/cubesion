@@ -4,6 +4,10 @@
   color: "#374b4e"
   weight: 10
   roles:
+  - MarshalCMM
+  - DeputyMarshalCMM
+  - MinutemanCMM
+  # Gliess Santo crew.
   - GliessianDockmaster
   - GliessianSheriff
   - GliessianDeputy

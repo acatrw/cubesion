@@ -205,9 +205,9 @@ namespace Content.Server.Lathe
         }
 
         /// <summary>
-        /// The recipes this lathe can make. The returned list is the caller's own copy — the cached original
-        /// backs every later call, so handing it out directly would let one caller's edit silently change what
-        /// every other caller sees. Internal hot paths use <see cref="EnsureCachedRecipes"/> and skip the copy.
+        /// The recipes this lathe can make. The returned list is the caller's own copy; the cached original
+        /// backs every later call, so handing it out would let one caller's edit change what everyone else sees.
+        /// Internal hot paths use <see cref="EnsureCachedRecipes"/> and skip the copy.
         /// </summary>
         public List<ProtoId<LatheRecipePrototype>> GetAvailableRecipes(EntityUid uid, LatheComponent component, bool getUnavailable = false)
         {
@@ -220,6 +220,8 @@ namespace Content.Server.Lathe
                 Recipes = new List<ProtoId<LatheRecipePrototype>>(component.StaticRecipes)
             };
             RaiseLocalEvent(uid, ev);
+
+            ev.Recipes.RemoveAll(component.ExcludedRecipes.Contains);
 
             return ev.Recipes;
         }
@@ -239,6 +241,8 @@ namespace Content.Server.Lathe
             };
             RaiseLocalEvent(uid, ev);
 
+            ev.Recipes.RemoveAll(component.ExcludedRecipes.Contains);
+
             component.CachedRecipes = ev.Recipes;
             component.CachedRecipeLookup = new HashSet<ProtoId<LatheRecipePrototype>>(ev.Recipes);
 
@@ -247,7 +251,10 @@ namespace Content.Server.Lathe
 
         public static List<ProtoId<LatheRecipePrototype>> GetAllBaseRecipes(LatheComponent component)
         {
-            return component.StaticRecipes.Union(component.DynamicRecipes).ToList();
+            return component.StaticRecipes
+                .Union(component.DynamicRecipes)
+                .Except(component.ExcludedRecipes)
+                .ToList();
         }
 
         public bool TryAddToQueue(EntityUid uid, LatheRecipePrototype recipe, LatheComponent? component = null)
@@ -583,26 +590,14 @@ namespace Content.Server.Lathe
             component.BaseTimeMultiplier ??= component.TimeMultiplier;
             component.BaseMaterialUseMultiplier ??= component.MaterialUseMultiplier;
 
-            var printTimeRating = Rating(args, component.MachinePartPrintSpeed);
-            var materialUseRating = Rating(args, component.MachinePartMaterialUse);
+            var printTimeRating = args.GetRating(component.MachinePartPrintSpeed);
+            var materialUseRating = args.GetRating(component.MachinePartMaterialUse);
 
             component.TimeMultiplier = component.BaseTimeMultiplier.Value *
                                        MathF.Pow(component.PartRatingPrintTimeMultiplier, printTimeRating - 1);
             component.MaterialUseMultiplier = component.BaseMaterialUseMultiplier.Value *
                                               MathF.Pow(component.PartRatingMaterialUseMultiplier, materialUseRating - 1);
             Dirty(uid, component);
-        }
-
-        /// <summary>
-        /// A part rating, treating "no such part fitted" as the stock rating of 1 rather than 0.
-        /// <see cref="ConstructionSystem.GetPartsRatings"/> reports 0 for every part type the machine does not
-        /// have, and most lathes here are mapped in with no machine board at all, so a raw lookup would read
-        /// as rating 0 and hand every one of them pow(0.5, -1) = double print time for having no upgrades to
-        /// begin with. Rating 1 is the neutral value: the prototype's own multipliers come through unchanged.
-        /// </summary>
-        private static float Rating(RefreshPartsEvent args, string partId)
-        {
-            return args.PartRatings.TryGetValue(partId, out var rating) && rating > 0f ? rating : 1f;
         }
 
         private void OnDeconstructed(EntityUid uid, LatheComponent component, MachineDeconstructedEvent args)

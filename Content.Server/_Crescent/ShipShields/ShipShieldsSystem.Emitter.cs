@@ -1,5 +1,8 @@
 using Content.Shared._Crescent.ShipShields;
+using Content.Shared._Crescent.CCvars;
+using Content.Server._Crescent.RoundEnd;
 using Content.Server.Power.Components;
+using Robust.Shared.Configuration;
 using Content.Shared.Projectiles;
 using Robust.Shared.Physics.Components;
 using Content.Server.Emp;
@@ -19,12 +22,17 @@ public partial class ShipShieldsSystem
     [Dependency] private readonly TriggerSystem _trigger = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+	[Dependency] private readonly IConfigurationManager _config = default!;
 	[Dependency] private readonly EntityLookupSystem _lookup = default!; // Rat
+	private bool _powerDrawEnabled;
+
     public void InitializeEmitters()
     {
+		_powerDrawEnabled = _config.GetCVar(CrescentCVars.ShipSystemsPowerDrawEnabled);
+
         SubscribeLocalEvent<ShipShieldEmitterComponent, ShieldDeflectedEvent>(OnShieldDeflected);
         SubscribeLocalEvent<ShipShieldEmitterComponent, ExaminedEvent>(OnExamined);
-        SubscribeLocalEvent<ShipShieldEmitterComponent, ComponentRemove>(OnRemoved);
+        SubscribeLocalEvent<ShipShieldEmitterComponent, ComponentShutdown>(OnEmitterShutdown);
 		SubscribeLocalEvent<ShipShieldEmitterComponent, ComponentStartup>(OnEmitterStartup); // Rat
     }
 
@@ -32,16 +40,54 @@ public partial class ShipShieldsSystem
     private void OnEmitterStartup(EntityUid uid, ShipShieldEmitterComponent component, ComponentStartup args)
     {
         _pvsSys.AddGlobalOverride(uid);
+
+        var grid = Transform(uid).GridUid;
+        if (grid != null && HasComp<StationInfestationComponent>(grid.Value))
+        {
+            SetForcedDisabled(uid, true, component);
+            return;
+        }
+
+		if (_powerDrawEnabled || !TryComp<ApcPowerReceiverComponent>(uid, out var receiver))
+			return;
+
+		receiver.Load = 0f;
+		receiver.NeedsPower = false;
     }
     // Rat-end
 
-    private void OnRemoved(Entity<ShipShieldEmitterComponent> owner,ref ComponentRemove remove)
+    private void OnEmitterShutdown(Entity<ShipShieldEmitterComponent> owner, ref ComponentShutdown args)
     {
         _pvsSys.RemoveGlobalOverride(owner.Owner);
-		var parent = Transform(owner.Owner).GridUid;
-        if (parent is null)
+        RemoveEmitterShield(owner.Owner, owner.Comp);
+    }
+
+    /// <summary>
+    /// Removes only the shield owned by this emitter. Uses the stored relationship because an entity being deleted
+    /// may already have lost its grid parent by the time its component shuts down.
+    /// </summary>
+    private void RemoveEmitterShield(EntityUid uid, ShipShieldEmitterComponent emitter)
+    {
+        var shielded = emitter.Shielded;
+        var shield = emitter.Shield;
+        emitter.Shielded = null;
+        emitter.Shield = null;
+
+        if (shielded is { } grid
+            && TryComp<ShipShieldedComponent>(grid, out var shieldedComp)
+            && shieldedComp.Source == uid)
+        {
+            UnshieldEntity(grid, shieldedComp);
             return;
-        UnshieldEntity(parent.Value, null);
+        }
+
+        if (shield is { } shieldUid
+            && !TerminatingOrDeleted(shieldUid)
+            && TryComp<ShipShieldComponent>(shieldUid, out var shieldComp)
+            && shieldComp.Source == uid)
+        {
+            Del(shieldUid);
+        }
     }
 
     private void OnShieldDeflected(EntityUid uid, ShipShieldEmitterComponent component, ShieldDeflectedEvent args)
@@ -82,9 +128,13 @@ public partial class ShipShieldsSystem
             return;
         }
 
-        var ratio = component.Damage / component.DamageLimit;
+        // The locale line prints this into a "%" slot, so it has to be scaled here. Handing it the
+        // raw 0-1 ratio read a half-wrecked emitter out as "0.5% damaged".
+        var percent = component.DamageLimit > 0f
+            ? (int) MathF.Round(component.Damage / component.DamageLimit * 100f)
+            : 100;
 
-        args.PushMarkup(Loc.GetString("shield-emitter-examine-damaged", ("percent", ratio)));
+        args.PushMarkup(Loc.GetString("shield-emitter-examine-damaged", ("percent", percent)));
     }
 
     // Rat-start
@@ -107,9 +157,40 @@ public partial class ShipShieldsSystem
         if (ents.Count < 1)
             return false;
 
+        // A hull may carry more than one emitter, and HashSet order is not stable, so taking whatever
+        // came out first handed back a different emitter from one call to the next. Lowest EntityUid
+        // is arbitrary, but it is the same answer every time for a given ship.
         var emitterEnt = ents.First();
+        foreach (var candidate in ents)
+        {
+            if (candidate.Owner.CompareTo(emitterEnt.Owner) < 0)
+                emitterEnt = candidate;
+        }
+
         emitter = emitterEnt;
         emitterComp = emitterEnt.Comp;
+        return true;
+    }
+
+    /// <summary>
+    /// Keeps an emitter down independently of its power state. Disabling immediately removes an active shield;
+    /// enabling lets the normal update loop rebuild it on its next pass.
+    /// </summary>
+    public bool SetForcedDisabled(EntityUid uid, bool disabled, ShipShieldEmitterComponent? emitter = null)
+    {
+        if (!Resolve(uid, ref emitter, false) || emitter.ForcedDisabled == disabled)
+            return false;
+
+        emitter.ForcedDisabled = disabled;
+
+        if (disabled && emitter.Shielded is { } shielded)
+        {
+            UnshieldEntity(shielded);
+            emitter.Shield = null;
+            emitter.Shielded = null;
+        }
+
+        Dirty(uid, emitter);
         return true;
     }
     // Rat-end

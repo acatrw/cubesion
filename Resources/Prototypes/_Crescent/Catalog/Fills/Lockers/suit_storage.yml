@@ -22,7 +22,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitImperialWorker
@@ -39,7 +38,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitImperialSoldier
@@ -56,7 +54,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitImperialKnight
@@ -73,7 +70,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitImperialCommand
@@ -90,7 +86,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitImperialCoronet
@@ -107,7 +102,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskImperialCombatGasmask
         - id: ClothingOuterHardsuitInspector
@@ -141,7 +135,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingMaskNCWLBalaclava
         - id: ClothingOuterHardsuitNCWLMedi
@@ -158,7 +151,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskNCWLBalaclava
         - id: ClothingOuterHardsuitNCWLInfantry
@@ -175,7 +167,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskNCWLBalaclava
         - id: ClothingOuterHardsuitNCWLPetya
@@ -194,7 +185,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingOuterHardsuitHEV
         - id: ClothingShoesBootsMagCombat
@@ -209,7 +199,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitHighsecUA
@@ -226,7 +215,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitHighsec
@@ -241,7 +229,7 @@
 - type: entity
   id: CrescentSuitStorageTSFCVacsuit
   parent: SuitStorageBase
-  suffix: TSFC Vacsuit
+  suffix: TFCF Vacsuit
   components:
   - type: StorageFill
     contents:
@@ -255,12 +243,11 @@
 - type: entity
   id: CrescentSuitStorageTSFCVSAWLugnutHardsuit
   parent: SuitStorageBase
-  suffix: TSFC SAW Mk.I 'LUGNUT' Hardsuit
+  suffix: TFCF SAW Mk.I 'LUGNUT' Hardsuit
   components:
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitRamzi
@@ -272,12 +259,11 @@
 - type: entity
   id: CrescentSuitStorageTSFCSAWUnionizerHardsuit
   parent: SuitStorageBase
-  suffix: TSFC SAW 'UNIONIZER' Hardsuit
+  suffix: TFCF SAW 'UNIONIZER' Hardsuit
   components:
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitSyndieDonator
@@ -289,12 +275,11 @@
 - type: entity
   id: CrescentSuitStorageTSFCInterdyneTraumasecHardsuit
   parent: SuitStorageBase
-  suffix: TSFC Interdyne Traumasec Hardsuit
+  suffix: TFCF Interdyne Traumasec Hardsuit
   components:
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackMiniFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitTraumasec
@@ -306,12 +291,11 @@
 - type: entity
   id: CrescentSuitStorageTSFCGorlexBulwarkHardsuit
   parent: SuitStorageBase
-  suffix: TSFC Gorlex Mk.II 'BULWARK' Hardsuit
+  suffix: TFCF Gorlex Mk.II 'BULWARK' Hardsuit
   components:
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitSyndicateBG
@@ -330,7 +314,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitIzdari
@@ -347,7 +330,6 @@
   - type: StorageFill
     contents:
         - id: DoubleEmergencyOxygenTankFilled
-        - id: HandheldGPSBasic
         - id: JetpackBlackFilled
         - id: ClothingMaskSyndicateFacemask
         - id: ClothingOuterHardsuitDraugr

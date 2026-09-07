@@ -518,7 +518,7 @@ public abstract partial class SharedSurgerySystem
 
         // Adding organs is generally done for a single one at a time, so we only need to check for the first.
         var firstOrgan = organComp.Organ.Values.FirstOrDefault();
-        if (firstOrgan == default)
+        if (firstOrgan.Component == null)
             return;
 
         foreach (var tool in args.Tools)
@@ -638,7 +638,7 @@ public abstract partial class SharedSurgerySystem
             return;
 
         var organType = ent.Comp.Organ.Values.FirstOrDefault();
-        if (organType == default)
+        if (organType.Component == null)
             return;
 
         var markingCategory = MarkingCategoriesConversion.FromHumanoidVisualLayers(ent.Comp.MarkingCategory);
@@ -691,8 +691,8 @@ public abstract partial class SharedSurgerySystem
     private void OnSurgeryTargetStepChosen(Entity<SurgeryTargetComponent> ent, ref SurgeryStepChosenBuiMsg args)
     {
         var user = args.Actor;
-        if (GetEntity(args.Entity) is {} body &&
-            GetEntity(args.Part) is {} targetPart)
+        if (GetEntity(args.Entity) is { } body &&
+            GetEntity(args.Part) is { } targetPart)
         {
             TryDoSurgeryStep(body, targetPart, user, args.Surgery, args.Step);
         }
@@ -746,10 +746,6 @@ public abstract partial class SharedSurgerySystem
 
         var ev = new SurgeryDoAfterEvent(surgeryId, stepId);
         var duration = GetSurgeryDuration(step, user, body, speed);
-
-        if (TryComp(user, out SurgerySpeedModifierComponent? surgerySpeedMod)
-            && surgerySpeedMod is not null)
-            duration = duration / surgerySpeedMod.SpeedModifier;
 
         var doAfter = new DoAfterArgs(EntityManager, user, TimeSpan.FromSeconds(duration), ev, body, part)
         {

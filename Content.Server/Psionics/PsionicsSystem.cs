@@ -21,7 +21,6 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Mobs;
 using Content.Shared.Damage;
 using Content.Shared.Interaction.Events;
-using Timer = Robust.Shared.Timing.Timer;
 using Content.Shared.Alert;
 using Content.Shared.NPC.Components;
 using Content.Shared.NPC.Systems;
@@ -32,7 +31,6 @@ namespace Content.Server.Psionics;
 public sealed class PsionicsSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly PsionicAbilitiesSystem _psionicAbilitiesSystem = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
     [Dependency] private readonly ElectrocutionSystem _electrocutionSystem = default!;
     [Dependency] private readonly MindSwapPowerSystem _mindSwapPowerSystem = default!;
@@ -47,32 +45,24 @@ public sealed class PsionicsSystem : EntitySystem
     [Dependency] private readonly PsionicFamiliarSystem _psionicFamiliar = default!;
     [Dependency] private readonly NPCRetaliationSystem _retaliationSystem = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly PsionicSkillTreeSystem _skillTreeSystem = default!;
 
     private const string BaselineAmplification = "Baseline Amplification";
     private const string BaselineDampening = "Baseline Dampening";
 
-    // Yes these are a mirror of what's normally default datafields on the PsionicPowerPrototype.
+    // Baseline values used for Potentia-based level progression.
     // We haven't generated a prototype yet, and I'm not going to duplicate them on the PsionicComponent.
-    private const string PsionicRollFailedMessage = "psionic-roll-failed";
-    private const string PsionicRollFailedColor = "#8A00C2";
-    private const int PsionicRollFailedFontSize = 12;
-    private const ChatChannel PsionicRollFailedChatChannel = ChatChannel.Emotes;
+    private const string PsionicLevelUpMessage = "psionic-skill-tree-level-up";
+    private const string PsionicLevelUpColor = "#B55CFF";
+    private const int PsionicLevelUpFontSize = 14;
+    private const ChatChannel PsionicLevelUpChatChannel = ChatChannel.Emotes;
 
-    /// <summary>
-    ///     Unfortunately, since spawning as a normal role and anything else is so different,
-    ///     this is the only way to unify them, for now at least.
-    /// </summary>
-    Queue<(PsionicComponent component, EntityUid uid)> _rollers = new();
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-        if (!_cfg.GetCVar(CCVars.PsionicRollsEnabled))
-            return;
+    private static readonly HashSet<string> ProgressionCatalysts =
+    [
+        "LotophagoiOil",
+        "OusianaDust",
+    ];
 
-        foreach (var roller in _rollers)
-            RollPsionics(roller.uid, roller.component, true);
-        _rollers.Clear();
-    }
     public override void Initialize()
     {
         base.Initialize();
@@ -89,47 +79,27 @@ public sealed class PsionicsSystem : EntitySystem
 
     private void OnStartup(EntityUid uid, PsionicComponent component, MapInitEvent args)
     {
-        if (!component.CanReroll)
-            return;
-
-        Timer.Spawn(TimeSpan.FromSeconds(30), () => DeferRollers(uid));
-
-    }
-
-    /// <summary>
-    ///     We wait a short time before starting up the rolled powers, so that other systems have a chance to modify the list first.
-    ///     This is primarily for the sake of TraitSystem and AddJobSpecial.
-    /// </summary>
-    private void DeferRollers(EntityUid uid)
-    {
-        if (!Exists(uid)
-            || !TryComp(uid, out PsionicComponent? component))
-            return;
-
         CheckPowerCost(uid, component);
         GenerateAvailablePowers(component);
-        _rollers.Enqueue((component, uid));
     }
 
     /// <summary>
-    ///     On MapInit, PsionicComponent isn't going to contain any powers.
-    ///     So before we send a Latent Psychic into the roundstart roll queue, we need to calculate their power cost in advance.
+    ///     Keep the next threshold tied to level rather than to a randomly selected power count.
     /// </summary>
     private void CheckPowerCost(EntityUid uid, PsionicComponent component)
     {
-        if (!TryComp<InnatePsionicPowersComponent>(uid, out var innate))
-            return;
+        component.NextPowerCost = GetNextLevelCost(component);
+        Dirty(uid, component);
+    }
 
-        var powerCount = 0;
-        foreach (var powerId in innate.PowersToAdd)
-            if (_protoMan.TryIndex(powerId, out var power))
-                powerCount += power.PowerSlotCost;
-
-        component.NextPowerCost = 100 * MathF.Pow(2, powerCount);
+    private static float GetNextLevelCost(PsionicComponent component)
+    {
+        return Math.Max(1f,
+            Math.Abs(component.BaselinePowerCost * MathF.Pow(2, Math.Max(0, component.PsionicLevel - 1))));
     }
 
     /// <summary>
-    ///     The power pool is itself a DataField, and things like Traits/Antags are allowed to modify or replace the pool.
+    ///     Populate the legacy random-power pool for admin/debug and scripted overrides.
     /// </summary>
     private void GenerateAvailablePowers(PsionicComponent component)
     {
@@ -178,6 +148,7 @@ public sealed class PsionicsSystem : EntitySystem
 
     private void OnInit(EntityUid uid, PsionicComponent component, ComponentStartup args)
     {
+        _skillTreeSystem.InitializeTreeAction(uid, component);
         component.AmplificationSources.Add(BaselineAmplification, _random.NextFloat(component.BaselineAmplification.Item1, component.BaselineAmplification.Item2));
         component.DampeningSources.Add(BaselineDampening, _random.NextFloat(component.BaselineDampening.Item1, component.BaselineDampening.Item2));
 
@@ -191,6 +162,8 @@ public sealed class PsionicsSystem : EntitySystem
 
     private void OnRemove(EntityUid uid, PsionicComponent component, ComponentRemove args)
     {
+        _skillTreeSystem.RemoveTreeAction(uid, component);
+
         if (!HasComp<NpcFactionMemberComponent>(uid))
             return;
 
@@ -206,48 +179,63 @@ public sealed class PsionicsSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Now we handle Potentia calculations, the more powers you have, the harder it is to obtain psionics, but the content of your roll carries over to the next roll.
-    ///     Your first power costs 100(2^0 is always 1), your second power costs 200, your 3rd power costs 400, and so on. This also considers people with roundstart powers.
-    ///     Such that a Mystagogue(who has 3 powers at roundstart) needs 800 Potentia to gain his 4th power.
+    ///     Potentia is psionic experience. Crossing a threshold grants a level and a point;
+    ///     the player chooses the power through the skill tree instead of rolling one randomly.
+    ///     This is the single entry point for every source of progression, so all of them share the
+    ///     same level maths and the same feedback.
     /// </summary>
     /// <remarks>
     ///     This exponential cost is mainly done to prevent stations from becoming "Space Hogwarts",
     ///     which was a common complaint with Psionic Refactor opening up the opportunity for people to have multiple powers.
     /// </remarks>
-    private bool HandlePotentiaCalculations(EntityUid uid, PsionicComponent component, float psionicChance)
+    /// <returns>True if the Psion gained at least one level.</returns>
+    public bool AddPotentia(EntityUid uid, PsionicComponent component, float amount)
     {
-        component.Potentia += _random.NextFloat(0 + psionicChance, 100 + psionicChance);
+        if (amount <= 0
+            || !component.Roller
+            || HasComp<MindbrokenComponent>(uid))
+            return false;
+
+        component.Potentia += amount;
 
         if (component.Potentia < component.NextPowerCost)
+        {
+            Dirty(uid, component);
+
+            // Keep the progress bar of an open tree window moving. Cheap: this is a no-op unless the
+            // Psion actually has the window up.
+            _skillTreeSystem.RefreshEui(uid);
             return false;
+        }
 
         while (component.Potentia >= component.NextPowerCost)
         {
             component.Potentia -= component.NextPowerCost;
-            _psionicAbilitiesSystem.AddPsionics(uid);
-            component.NextPowerCost = Math.Abs(component.BaselinePowerCost * MathF.Pow(2, component.PowerSlotsTaken));
+            _skillTreeSystem.GainLevel(uid, component, feedback: false);
+            component.NextPowerCost = GetNextLevelCost(component);
         }
 
+        Dirty(uid, component);
+        HandleLevelUpFeedback(uid, component);
         return true;
     }
 
     /// <summary>
-    ///     Provide the player with feedback about their roll failure, so they don't just think nothing happened.
-    ///     TODO: Add an audio cue to this and other areas of psionic player feedback.
+    ///     Make a newly earned point difficult to miss.
     /// </summary>
-    private void HandleRollFeedback(EntityUid uid)
+    private void HandleLevelUpFeedback(EntityUid uid, PsionicComponent component)
     {
         if (!_playerManager.TryGetSessionByEntity(uid, out var session)
-            || !Loc.TryGetString(PsionicRollFailedMessage, out var rollFailedMessage))
+            || !Loc.TryGetString(PsionicLevelUpMessage, out var levelUpMessage, ("level", component.PsionicLevel)))
             return;
 
-        _popups.PopupEntity(rollFailedMessage, uid, uid, PopupType.MediumCaution);
+        _popups.PopupEntity(levelUpMessage, uid, uid, PopupType.MediumCaution);
 
         // Popups only last a few seconds, and are easily ignored.
         // So we also put a message in chat to make it harder to miss.
-        var feedbackMessage = $"[font size={PsionicRollFailedFontSize}][color={PsionicRollFailedColor}]{rollFailedMessage}[/color][/font]";
+        var feedbackMessage = $"[font size={PsionicLevelUpFontSize}][color={PsionicLevelUpColor}]{levelUpMessage}[/color][/font]";
         _chatManager.ChatMessageToOne(
-            PsionicRollFailedChatChannel,
+            PsionicLevelUpChatChannel,
             feedbackMessage,
             feedbackMessage,
             EntityUid.Invalid,
@@ -256,10 +244,10 @@ public sealed class PsionicsSystem : EntitySystem
     }
 
     /// <summary>
-    ///     This function attempts to generate a psionic power by incrementing a Psion's Potentia stat by a random amount, then checking if it beats a certain threshold.
-    ///     Please consider going through RerollPsionics or PsionicAbilitiesSystem.InitializePsionicPower instead of this function, particularly if you don't have a good reason to call this directly.
+    ///     Adds a randomized amount of Potentia and converts crossed thresholds into psionic levels
+    ///     and development points.
     /// </summary>
-    public void RollPsionics(EntityUid uid, PsionicComponent component, bool applyGlimmer = true, float rollEventMultiplier = 1f)
+    private void RollPsionics(EntityUid uid, PsionicComponent component, bool applyGlimmer = true, float rollEventMultiplier = 1f)
     {
         if (!_cfg.GetCVar(CCVars.PsionicRollsEnabled)
             || !component.Roller)
@@ -276,31 +264,48 @@ public sealed class PsionicsSystem : EntitySystem
             ? _glimmerSystem.GetGlimmerEquilibriumRatio() * 25
             : 0);
 
-        // Certain sources of power rolls provide their own multiplier.
+        // Certain sources of Potentia rolls provide their own multiplier.
         baselineChance *= rollEventMultiplier;
 
         // Ask if the Roller has any other effects to contribute, such as Traits.
         var ev = new OnRollPsionicsEvent(uid, baselineChance);
         RaiseLocalEvent(uid, ref ev);
 
-        if (!HandlePotentiaCalculations(uid, component, ev.BaselineChance))
-            return;
-
-        HandleRollFeedback(uid);
+        AddPotentia(uid, component, _random.NextFloat(0 + ev.BaselineChance, 100 + ev.BaselineChance));
     }
 
     /// <summary>
-    ///     Each person has a single free reroll for their Psionics, which certain conditions can restore.
-    ///     This function attempts to "Spend" a reroll, if one is available.
+    /// Used by events that previously granted an immediate random power.
     /// </summary>
-    public void RerollPsionics(EntityUid uid, PsionicComponent? psionic = null, float bonusMuliplier = 1f)
+    public bool GrantPsionicLevel(EntityUid uid, PsionicComponent? component = null, int amount = 1)
     {
-        if (!Resolve(uid, ref psionic, false)
+        if (!Resolve(uid, ref component, false) || amount <= 0)
+            return false;
+
+        _skillTreeSystem.GainLevel(uid, component, amount);
+        component.NextPowerCost = GetNextLevelCost(component);
+        Dirty(uid, component);
+        return true;
+    }
+
+    /// <summary>
+    ///     Spends a Psion's additional progression roll, if one is available.
+    /// </summary>
+    public bool RerollPsionics(
+        EntityUid uid,
+        string catalyst,
+        PsionicComponent? psionic = null,
+        float bonusMuliplier = 1f)
+    {
+        if (!ProgressionCatalysts.Contains(catalyst)
+            || !Resolve(uid, ref psionic, false)
             || !psionic.CanReroll)
-            return;
+            return false;
 
         psionic.CanReroll = false;
         RollPsionics(uid, psionic, true, bonusMuliplier);
+        Dirty(uid, psionic);
+        return true;
     }
     private void OnMobstateChanged(EntityUid uid, PsionicComponent component, MobStateChangedEvent args)
     {

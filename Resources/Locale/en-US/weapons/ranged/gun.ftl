@@ -43,6 +43,8 @@ gun-chamber-rack = Rack
 
 # MagazineAmmoProvider
 gun-magazine-examine = It has [color={$color}]{$count}[/color] shots remaining.
+gun-magazine-reloading = Feeding the new magazine...
+gun-magazine-reloading-examine = It is [color=orange]cycling a fresh magazine[/color] and cannot fire for another {$seconds}s.
 
 # RevolverAmmoProvider
 gun-revolver-empty = Empty revolver
@@ -51,3 +53,4 @@ gun-revolver-insert = Inserted
 gun-revolver-spin = Spin revolver
 gun-revolver-spun = Spun
 gun-speedloader-empty = Speedloader empty
+gun-magazine-fired-empty = *click*

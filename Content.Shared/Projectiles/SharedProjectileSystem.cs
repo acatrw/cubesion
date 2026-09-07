@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Weapons.Ranged.Prediction;
+using Content.Shared._RMC14.Random;
 using Content.Shared._Crescent.SpaceArtillery;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared.Administration.Logs;
@@ -16,6 +17,7 @@ using Content.Shared.Popups;
 using Content.Shared.Standing;
 using Content.Shared.Throwing;
 using Content.Shared.UserInterface;
+using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
@@ -112,6 +114,15 @@ public abstract partial class SharedProjectileSystem : EntitySystem
             return;
         }
 
+        if (component.IgnoredEntities.Contains(target))
+            return;
+
+        if (ShouldMissLyingTarget(component, target))
+        {
+            component.IgnoredEntities.Add(target);
+            return;
+        }
+
         // it's here so this check is only done once before possible hit
         var attemptEv = new ProjectileReflectAttemptEvent(uid, component, false);
         RaiseLocalEvent(target, ref attemptEv);
@@ -193,6 +204,26 @@ public abstract partial class SharedProjectileSystem : EntitySystem
             else
                 RaiseLocalEvent(impactEffectEv);
         }
+    }
+
+    private bool ShouldMissLyingTarget(ProjectileComponent projectile, EntityUid target)
+    {
+        if (projectile.Weapon is not { } weapon
+            || !HasComp<GunComponent>(weapon)
+            || !TryComp(target, out LayingDownComponent? layingDown)
+            || !TryComp(target, out StandingStateComponent? standing)
+            || standing.CurrentState is not StandingState.Lying)
+        {
+            return false;
+        }
+
+        var chance = Math.Clamp(layingDown.GunshotMissChance, 0f, 1f);
+        if (chance <= 0f)
+            return false;
+
+        var targetId = GetNetEntity(target).Id;
+        var seed = projectile.LyingTargetMissSeed ^ ((long) targetId << 32) ^ (uint) targetId;
+        return new Xoroshiro64S(seed).NextFloat() < chance;
     }
 
     private void OnEmbedActivate(EntityUid uid, EmbeddableProjectileComponent component, ActivateInWorldEvent args)
@@ -341,6 +372,24 @@ public abstract partial class SharedProjectileSystem : EntitySystem
             if (ourGrid != null && ourGrid == otherGrid)
                 args.Cancelled = true;
         }
+
+        if (args.Cancelled)
+            return;
+
+        // This has to be decided before StartCollideEvent is raised. Cancelling only in
+        // ProjectileCollide would still let TriggerOnCollide, IgniteOnCollide, and other
+        // collision subscribers process a projectile that is supposed to pass overhead.
+        if (component.IgnoredEntities.Contains(args.OtherEntity))
+        {
+            args.Cancelled = true;
+            return;
+        }
+
+        if (ShouldMissLyingTarget(component, args.OtherEntity))
+        {
+            component.IgnoredEntities.Add(args.OtherEntity);
+            args.Cancelled = true;
+        }
     }
 
     private EntityUid? GetProjectileSourceGrid(ProjectileComponent projectile)
@@ -352,6 +401,24 @@ public abstract partial class SharedProjectileSystem : EntitySystem
             return Transform(shooter).GridUid;
 
         return null;
+    }
+
+    /// <summary>
+    /// Whether a ship weapon projectile should pass straight through another one fired from the same shuttle.
+    /// A saturation launcher puts its whole salvo out of one muzzle, so without this the rockets detonate on each
+    /// other before they ever reach the target - the tighter the burst, the sooner they do it.
+    /// </summary>
+    public bool IsFriendlyShipProjectile(EntityUid uid, ProjectileComponent projectile, EntityUid other)
+    {
+        if (!HasComp<ShipWeaponProjectileComponent>(uid) || !HasComp<ShipWeaponProjectileComponent>(other))
+            return false;
+
+        if (!TryComp<ProjectileComponent>(other, out var otherProjectile))
+            return false;
+
+        var ourGrid = GetProjectileSourceGrid(projectile);
+
+        return ourGrid != null && ourGrid == GetProjectileSourceGrid(otherProjectile);
     }
 
     public void SetShooter(EntityUid id, ProjectileComponent component, EntityUid? shooterId)
@@ -391,6 +458,10 @@ public abstract partial class SharedProjectileSystem : EntitySystem
     {
         // This is so entities that shouldn't get a collision are ignored.
         if (!args.targetFixture.Hard || component.DamagedEntity || component is { Weapon: null, OnlyCollideWhenShot: true })
+            return;
+
+        // PreventCollideEvent never runs for phase-prevention hits, so the same-shuttle check has to be repeated here.
+        if (IsFriendlyShipProjectile(uid, component, args.hitEntity))
             return;
 
         ProjectileCollide((uid, component, args.selfPhys), args.hitEntity);

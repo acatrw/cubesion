@@ -36,6 +36,9 @@ ui-options-ambient-music-volume = Ambient music volume:
 ui-options-ambience-volume = Ambience volume:
 ui-options-lobby-volume = Lobby & Round-end volume:
 ui-options-interface-volume = Interface volume:
+ui-options-boombox-volume = Boombox volume:
+ui-options-boombox-music-duck = Boombox music ducking:
+ui-options-boombox-music-duck-tooltip = How much a nearby playing boombox or jukebox lowers the game's own music. 0% leaves the music alone.
 ui-options-ambience-max-sounds = Ambience simultaneous sounds:
 ui-options-announcer-volume = Announcer volume:
 ui-options-communications-volume = Communications volume:
@@ -108,6 +111,8 @@ ui-options-fps-counter = Show FPS counter
 ui-options-mood-visual-effects = Enable the mood system's visual effects
 ui-options-vp-width = Viewport width: { $width }
 ui-options-hud-layout = HUD layout:
+ui-options-action-bar-vertical = Vertical action bar
+ui-options-action-bar-vertical-tooltip = Stack the action hotbar down the left of the screen instead of across the top. Actions that do not fit wrap into another column.
 
 ## Controls menu
 

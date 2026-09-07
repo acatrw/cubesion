@@ -8,7 +8,7 @@
     sprite: Objects/Weapons/Grenades/smoke.rsi
   - type: SmokeOnTrigger
     duration: 2
-    spreadAmount: 13
+    spreadAmount: 9
     smokePrototype: AluminiumMetalFoam
   - type: StaticPrice
     price: 350
@@ -137,26 +137,26 @@
     delay: 2.5
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/incendiary.rsi
-  - type: SmokeOnTrigger
-    duration: 13
-    spreadAmount: 9
-    solution:
-      reagents:
-      - ReagentId: Phlogiston
-        Quantity: 20
+  - type: ExplodeOnTrigger
+  - type: Explosive
+    explosionType: FireBomb
+    maxIntensity: 25
+    intensitySlope: 7
+    totalIntensity: 400
+    canCreateVacuum: false
+  - type: CrescentFireOnTrigger
+    radius: 5
+    count: 24
   - type: TimerTriggerVisuals
     primingSound:
       path: "/Audio/_Crescent/Weapons/Grenades/trigger1.ogg"
-  - type: SoundOnTrigger
-    sound: /Audio/_Crescent/Weapons/Grenades/smoke10s.ogg
-  - type: DeleteOnTrigger
   - type: EmitSoundOnPickup
     sound: /Audio/_Crescent/Weapons/Grenades/grab1.ogg
   - type: EmitSoundOnDrop
     sound: /Audio/_Crescent/Weapons/Grenades/drop1.ogg
   - type: EmitSoundOnLand
     sound:
-      collection: SmokeGrenadeSFX
+      collection: FragGrenadeSFX
 
 - type: entity
   name: M18 Smoke grenade
@@ -169,8 +169,8 @@
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/smoke.rsi
   - type: SmokeOnTrigger
-    duration: 13
-    spreadAmount: 18
+    duration: 12
+    spreadAmount: 16
   - type: TimerTriggerVisuals
     primingSound:
       path: "/Audio/_Crescent/Weapons/Grenades/trigger1.ogg"
@@ -214,7 +214,7 @@
       collection: FragGrenadeSFX
 
 - type: entity
-  name: TFSC RGD-5 Grenade
+  name: TFCF RGD-5 Grenade
   description: A grenade built from ancient Terran schematics, painted in NSCP colors.
   parent: GrenadeBase
   id: TFSCRGD5Handgrenade
@@ -242,7 +242,7 @@
       collection: FragGrenadeSFX
 
 - type: entity
-  name: TFSC RGD-2B Smoke grenade
+  name: TFCF RGD-2B Smoke grenade
   description: A cheap smoke grenade that resembles a stick of dynamite more than a proper smoke bomb. Produces a small but long-lasting smoke cloud.
   parent: GrenadeBase
   id: TFSCRGD2BSmokeHandgrenade
@@ -252,8 +252,8 @@
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/tfsc_smoke.rsi
   - type: SmokeOnTrigger
-    duration: 20
-    spreadAmount: 9
+    duration: 14
+    spreadAmount: 7
   - type: DeleteOnTrigger
   - type: TimerTriggerVisuals
     primingSound:
@@ -338,8 +338,8 @@
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/dsm_smoke.rsi
   - type: SmokeOnTrigger
-    duration: 13
-    spreadAmount: 8
+    duration: 9
+    spreadAmount: 6
     solution:
       reagents:
       - ReagentId: NorepinephricAcid
@@ -489,13 +489,13 @@
     - type: DamageOnLand
       damage:
         types:
-          Blunt: 50
+          Blunt: 30
   - type: ExplodeOnTrigger
   - type: Explosive
     explosionType: Fragmentation
     maxIntensity: 15
     intensitySlope: 5
-    totalIntensity: 150
+    totalIntensity: 120
     canCreateVacuum: false
   - type: EmitSoundOnPickup
     sound: /Audio/_Crescent/Weapons/Grenades/grab1.ogg
@@ -516,16 +516,16 @@
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/pta_wp.rsi
   - type: SmokeOnTrigger
-    duration: 13
-    spreadAmount: 9
+    duration: 6
+    spreadAmount: 5
     solution:
       reagents:
       - ReagentId: PolytrinicAcid
-        Quantity: 20
+        Quantity: 10
       - ReagentId: TearGas
-        Quantity: 40
+        Quantity: 25
       - ReagentId: Phlogiston
-        Quantity: 40
+        Quantity: 25
   - type: TimerTriggerVisuals
     primingSound:
       path: "/Audio/_Crescent/Weapons/Grenades/trigger1.ogg"
@@ -598,7 +598,7 @@
     totalIntensity: 450
     canCreateVacuum: false
   - type: EmpOnTrigger
-    range: 2
+    range: 4
     energyConsumption: 5000
   - type: DeleteOnTrigger
   - type: TimerTriggerVisuals
@@ -660,8 +660,8 @@
   id: SHIHG17SmartHandgrenade
   components:
   - type: OnUseTimerTrigger
-    delay: 1.5
-    delayOptions: [1, 1.5, 2.5, 3.5, 5]
+    delay: 4
+    delayOptions: [1, 1.5, 2.5, 3.5, 4, 5]
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/shi_smart.rsi
   - type: ExplodeOnTrigger
@@ -701,8 +701,8 @@
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Grenades/shi_tear.rsi
   - type: SmokeOnTrigger
-    duration: 13
-    spreadAmount: 30
+    duration: 10
+    spreadAmount: 20
     solution:
       reagents:
       - ReagentId: TearGas

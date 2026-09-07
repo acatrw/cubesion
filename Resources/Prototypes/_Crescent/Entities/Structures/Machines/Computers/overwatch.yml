@@ -16,6 +16,14 @@
   - type: ActivatableUI
     singleUser: true
     key: enum.OverwatchUiKey.Key
+
+  # Declared empty here; every variant must supply its faction's access levels. An AccessReader with no
+  # access list allows everyone, so a variant that forgets it ships open. OverwatchSystem also checks
+  # faction membership on the body, so a stolen ID alone is not enough.
+  - type: AccessReader
+  - type: ActivatableUIRequiresAccess
+    popupMessage: overwatch-console-access-denied
+
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -24,7 +32,8 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
-      state: generic
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: overwatch
     - map: ["computerLayerKeys"]
       state: generic_keys
     - map: ["enum.WiresVisualLayers.MaintenancePanel"]
@@ -34,7 +43,7 @@
     visuals:
       enum.ComputerVisuals.Powered:
         computerLayerScreen:
-          True: { visible: true, shader: unshaded }
+          True: { visible: true, shader: unshaded, color: "#78b7ff" }
           False: { visible: false }
         computerLayerKeys:
           True: { visible: true, shader: unshaded }
@@ -54,8 +63,8 @@
     castShadows: false
   - type: SpamEmitSoundRequirePower
   - type: SpamEmitSound
-    minInterval: 20
-    maxInterval: 60
+    minInterval: 60
+    maxInterval: 180
     sound:
       collection: ComputerSFX
       params:
@@ -138,10 +147,21 @@
   components:
   - type: OverwatchConsole
     faction: DSM
-  # - type: Sprite
-  #   layers:
-  #   - map: ["computerLayerScreen"]
-  #     state: dsm
+  - type: AccessReader
+    access: [["Empire"]]
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#bd7aff" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
 
 - type: entity
   parent: BaseComputerOverwatch
@@ -150,10 +170,21 @@
   components:
   - type: OverwatchConsole
     faction: NCWL
-  # - type: Sprite
-  #   layers:
-  #   - map: ["computerLayerScreen"]
-  #     state: ncwl
+  - type: AccessReader
+    access: [["NCWLGeneral"]]
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff9944" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
 
 - type: entity
   parent: BaseComputerOverwatch
@@ -162,10 +193,21 @@
   components:
   - type: OverwatchConsole
     faction: SHI
-  # - type: Sprite
-  #   layers:
-  #   - map: ["computerLayerScreen"]
-  #     state: shi
+  - type: AccessReader
+    access: [["Shinohara"]]
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#d4d4d4" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
 
 - type: entity
   parent: BaseComputerOverwatch
@@ -174,26 +216,48 @@
   components:
   - type: OverwatchConsole
     faction: TAP
+  - type: AccessReader
+    access: [["Families"]]
   # - type: Sprite
   #   layers:
   #   - map: ["computerLayerScreen"]
   #     state: tap
 
-# One console for the whole Coalition. Interdyne, the Shipfitters, Gorlex and Cyberdawn each used to
-# have their own, but the charters were folded into the TFSC and no job grants those subfaction ids any
-# more — a console watching "faction: CD" showed an empty roster. The old company names survive as
-# departments, not as separate overwatch networks.
+- type: entity
+  parent: BaseComputerOverwatch
+  id: GSOverwatchComputer
+  name: overwatch console GS
+  components:
+  - type: OverwatchConsole
+    faction: GS
+  - type: AccessReader
+    access: [["GliessSheriff", "GliessDockmaster"]]
+
+# One shared Federation console. Interdyne, Shipbreaker, GSC and Cyberdawn retain their own leadership,
+# but their jobs expose the shared TFCF gameplay faction; a console watching only "faction: CD" would show
+# an empty roster. The shared network represents joint Federation operations, not an internal merger.
 - type: entity
   parent: BaseComputerOverwatch
   id: TFSCOverwatchComputer
-  name: overwatch console TFSC
+  name: overwatch console TFCF
   components:
   - type: OverwatchConsole
     faction: TFSC
-  # - type: Sprite
-  #   layers:
-  #   - map: ["computerLayerScreen"]
-  #     state: tsp
+  - type: AccessReader
+    access: [["SyndicateBasic"]]
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff5555" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
 
 - type: entity
   parent: BaseComputerOverwatch
@@ -202,6 +266,8 @@
   components:
   - type: OverwatchConsole
     faction: SRM
+  - type: AccessReader
+    access: [["Hunter"]]
   # - type: Sprite
   #   layers:
   #   - map: ["computerLayerScreen"]
@@ -269,6 +335,12 @@
   - type: ActivatableUI
     verbText: overwatch-clipboard-computer-verb-text
     key: enum.OverwatchUiKey.Key
+
+  # A portable console is worse than a fixed one if it ships open: stealing it hands the thief the
+  # owning faction's roster, live positions and announcement channel, anywhere in the sector.
+  - type: AccessReader
+  - type: ActivatableUIRequiresAccess
+    popupMessage: overwatch-console-access-denied
   - type: UserInterface
     interfaces:
       enum.OverwatchUiKey.Key:
@@ -288,6 +360,8 @@
   components:
   - type: OverwatchConsole
     faction: DSM
+  - type: AccessReader
+    access: [["Empire"]]
 
 - type: entity
   parent: BaseOverwatchClipboard
@@ -296,6 +370,8 @@
   components:
   - type: OverwatchConsole
     faction: NCWL
+  - type: AccessReader
+    access: [["NCWLGeneral"]]
 
 - type: entity
   parent: BaseOverwatchClipboard
@@ -304,6 +380,8 @@
   components:
   - type: OverwatchConsole
     faction: SHI
+  - type: AccessReader
+    access: [["Shinohara"]]
 
 - type: entity
   parent: BaseOverwatchClipboard
@@ -312,15 +390,19 @@
   components:
   - type: OverwatchConsole
     faction: TAP
+  - type: AccessReader
+    access: [["Families"]]
 
-# As above: one Coalition tablet in place of the four per-company ones.
+# As above: one shared Federation tablet for joint operations; internal company leadership remains distinct.
 - type: entity
   parent: BaseOverwatchClipboard
   id: TFSCOverwatchClipboard
-  name: overwatch console TFSC
+  name: overwatch console TFCF
   components:
   - type: OverwatchConsole
     faction: TFSC
+  - type: AccessReader
+    access: [["SyndicateBasic"]]
 
 - type: entity
   parent: BaseOverwatchClipboard
@@ -329,3 +411,5 @@
   components:
   - type: OverwatchConsole
     faction: SRM
+  - type: AccessReader
+    access: [["Hunter"]]

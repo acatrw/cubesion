@@ -1,0 +1,349 @@
+# Psionic progression is intentionally assembled from existing psionicPower prototypes.
+# Adding a new class or rearranging prerequisites should only require prototype edits.
+
+- type: psionicSkillBranch
+  id: PsionicFireBranch
+  name: psionic-skill-branch-fire-name
+  description: psionic-skill-branch-fire-description
+  color: "#E56A35"
+
+- type: psionicSkillBranch
+  id: PsionicStealthBranch
+  name: psionic-skill-branch-stealth-name
+  description: psionic-skill-branch-stealth-description
+  color: "#7356B5"
+
+- type: psionicSkillBranch
+  id: PsionicLifeBranch
+  name: psionic-skill-branch-life-name
+  description: psionic-skill-branch-life-description
+  color: "#4FAE70"
+
+- type: psionicSkillBranch
+  id: PsionicMindBranch
+  name: psionic-skill-branch-mind-name
+  description: psionic-skill-branch-mind-description
+  color: "#4E9BCC"
+
+- type: psionicSkillBranch
+  id: PsionicKineticBranch
+  name: psionic-skill-branch-kinetic-name
+  description: psionic-skill-branch-kinetic-description
+  color: "#D2B84A"
+
+- type: psionicSkillBranch
+  id: PsionicRecurrenceBranch
+  name: psionic-skill-branch-recurrence-name
+  description: psionic-skill-branch-recurrence-description
+  color: "#9AA3B2"
+
+- type: psionicSkillBranch
+  id: PsionicDefenseBranch
+  name: psionic-skill-branch-defense-name
+  description: psionic-skill-branch-defense-description
+  color: "#65C7E8"
+
+# Fire class: three linked powers.
+- type: psionicSkill
+  id: PsiSkillFireball
+  name: psionic-skill-fireball-name
+  description: psionic-skill-fireball-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: pyrokinetic_flare }
+  branch: PsionicFireBranch
+  power: PyrokineticFlare
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillSummonImp
+  name: psionic-skill-summon-imp-name
+  description: psionic-skill-summon-imp-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: summon_imp }
+  branch: PsionicFireBranch
+  power: SummonImpPower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillFireball ]
+
+- type: psionicSkill
+  id: PsiSkillFlameBreath
+  name: psionic-skill-flame-breath-name
+  description: psionic-skill-flame-breath-description
+  icon: { sprite: Objects/Weapons/Guns/Projectiles/magic.rsi, state: fireball }
+  branch: PsionicFireBranch
+  power: FlameBreathPower
+  tier: 2
+  minimumLevel: 3
+  prerequisites: [ PsiSkillSummonImp ]
+
+# Stealth class: remote vision and shadow mobility.
+- type: psionicSkill
+  id: PsiSkillVeilSight
+  name: psionic-skill-veil-sight-name
+  description: psionic-skill-veil-sight-description
+  icon: Interface/VerbIcons/telegnosis.png
+  branch: PsionicStealthBranch
+  power: TelegnosisPower
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillShadeskip
+  name: psionic-skill-shadeskip-name
+  description: psionic-skill-shadeskip-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: shadeskip }
+  branch: PsionicStealthBranch
+  power: ShadeskipPower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillVeilSight ]
+
+- type: psionicSkill
+  id: PsiSkillDarkSwap
+  name: psionic-skill-dark-swap-name
+  description: psionic-skill-dark-swap-description
+  icon: { sprite: Interface/Actions/voidborn_icons.rsi, state: darkswap }
+  branch: PsionicStealthBranch
+  power: DarkSwapPower
+  tier: 2
+  minimumLevel: 3
+  prerequisites: [ PsiSkillShadeskip ]
+
+# Life class.
+- type: psionicSkill
+  id: PsiSkillHealingWord
+  name: psionic-skill-healing-word-name
+  description: psionic-skill-healing-word-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: healing_word }
+  branch: PsionicLifeBranch
+  power: HealingWordPower
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillRegeneration
+  name: psionic-skill-regeneration-name
+  description: psionic-skill-regeneration-description
+  icon: Interface/VerbIcons/psionic_regeneration.png
+  branch: PsionicLifeBranch
+  power: PsionicRegenerationPower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillHealingWord ]
+
+- type: psionicSkill
+  id: PsiSkillRevivify
+  name: psionic-skill-revivify-name
+  description: psionic-skill-revivify-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: revivify }
+  branch: PsionicLifeBranch
+  power: RevivifyPower
+  tier: 2
+  minimumLevel: 3
+  prerequisites: [ PsiSkillRegeneration ]
+
+# Mind class.
+- type: psionicSkill
+  id: PsiSkillTelepathy
+  name: psionic-skill-telepathy-name
+  description: psionic-skill-telepathy-description
+  icon: Interface/VerbIcons/metapsionic.png
+  branch: PsionicMindBranch
+  power: TelepathyPower
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillNoosphericZap
+  name: psionic-skill-zap-name
+  description: psionic-skill-zap-description
+  icon: Interface/VerbIcons/noospheric_zap.png
+  branch: PsionicMindBranch
+  power: NoosphericZapPower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillTelepathy ]
+
+- type: psionicSkill
+  id: PsiSkillTelekineticManipulation
+  name: psionic-skill-telekinetic-manipulation-name
+  description: psionic-skill-telekinetic-manipulation-description
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: magicmissile }
+  branch: PsionicMindBranch
+  power: TelekineticManipulationPower
+  tier: 2
+  minimumLevel: 3
+  prerequisites: [ PsiSkillNoosphericZap ]
+
+# Kinetic class.
+- type: psionicSkill
+  id: PsiSkillAnoigo
+  name: psionic-skill-anoigo-name
+  description: psionic-skill-anoigo-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: anoigo }
+  branch: PsionicKineticBranch
+  power: AnoigoPower
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillKineticSlam
+  name: psionic-skill-kinetic-slam-name
+  description: psionic-skill-kinetic-slam-description
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: knock }
+  branch: PsionicKineticBranch
+  power: KineticSlamPower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillAnoigo ]
+
+- type: psionicSkill
+  id: PsiSkillTelekineticPulse
+  name: psionic-skill-telekinetic-pulse-name
+  description: psionic-skill-telekinetic-pulse-description
+  icon: { sprite: Interface/Actions/psionics.rsi, state: telekinetic_pulse }
+  branch: PsionicKineticBranch
+  power: TelekineticPulsePower
+  tier: 2
+  minimumLevel: 3
+  prerequisites: [ PsiSkillKineticSlam ]
+
+# Defense class.
+- type: psionicSkill
+  id: PsiSkillSelfShield
+  name: psionic-skill-self-shield-name
+  description: psionic-skill-self-shield-description
+  icon: { sprite: Interface/Actions/psionic_defense.rsi, state: self_aegis }
+  branch: PsionicDefenseBranch
+  power: PsionicSelfShieldPower
+  tier: 0
+  minimumLevel: 1
+  exclusiveGroup: PsionicPrimaryDiscipline
+
+- type: psionicSkill
+  id: PsiSkillArmorUpgrade
+  name: psionic-skill-armor-upgrade-name
+  description: psionic-skill-armor-upgrade-description
+  icon: { sprite: Interface/Actions/psionic_defense.rsi, state: armor_weave }
+  branch: PsionicDefenseBranch
+  power: PsionicArmorUpgradePower
+  tier: 1
+  minimumLevel: 2
+  prerequisites: [ PsiSkillSelfShield ]
+
+# The defense capstone: a standing barrier for everyone nearby, rather than one body at a time.
+- type: psionicSkill
+  id: PsiSkillAegisDome
+  name: psionic-skill-aegis-dome-name
+  description: psionic-skill-aegis-dome-description
+  icon: { sprite: Interface/Actions/psionic_defense.rsi, state: aegis_dome }
+  branch: PsionicDefenseBranch
+  power: PsionicAegisDomePower
+  tier: 2
+  cost: 2
+  minimumLevel: 4
+  prerequisites: [ PsiSkillArmorUpgrade ]
+
+# Recurrence class. An advanced discipline: it does not open until psionic level 2, which is what
+# keeps it out of a fresh Psion's hands. Past that gate the nodes cost one point each, so the whole
+# branch fits inside the four points a Psion holds at level four even after taking a primary
+# discipline - roughly the back half of a normal round rather than all of a long one.
+- type: psionicSkill
+  id: PsiSkillStasisField
+  name: psionic-skill-stasis-field-name
+  description: psionic-skill-stasis-field-description
+  icon: { sprite: Interface/Actions/psionic_recurrence.rsi, state: stasis_field }
+  branch: PsionicRecurrenceBranch
+  power: PsionicStasisFieldPower
+  tier: 0
+  minimumLevel: 2
+
+- type: psionicSkill
+  id: PsiSkillArmorReweave
+  name: psionic-skill-armor-reweave-name
+  description: psionic-skill-armor-reweave-description
+  icon: { sprite: Interface/Actions/psionic_recurrence.rsi, state: reweave }
+  branch: PsionicRecurrenceBranch
+  power: PsionicArmorReweavePower
+  tier: 1
+  minimumLevel: 3
+  prerequisites: [ PsiSkillStasisField ]
+
+- type: psionicSkill
+  id: PsiSkillRecurrencePulse
+  name: psionic-skill-recurrence-pulse-name
+  description: psionic-skill-recurrence-pulse-description
+  icon: { sprite: Interface/Actions/psionic_recurrence.rsi, state: recurrence_pulse }
+  branch: PsionicRecurrenceBranch
+  power: PsionicRecurrencePulsePower
+  tier: 2
+  minimumLevel: 4
+  prerequisites: [ PsiSkillArmorReweave ]
+
+- type: psionicSkillTree
+  id: PsionicGeneralTree
+  name: psionic-skill-tree-general-name
+  branches:
+    - PsionicFireBranch
+    - PsionicStealthBranch
+    - PsionicLifeBranch
+    - PsionicMindBranch
+    - PsionicKineticBranch
+    - PsionicDefenseBranch
+    - PsionicRecurrenceBranch
+  skills:
+    - PsiSkillFireball
+    - PsiSkillSummonImp
+    - PsiSkillFlameBreath
+    - PsiSkillVeilSight
+    - PsiSkillShadeskip
+    - PsiSkillDarkSwap
+    - PsiSkillHealingWord
+    - PsiSkillRegeneration
+    - PsiSkillRevivify
+    - PsiSkillTelepathy
+    - PsiSkillNoosphericZap
+    - PsiSkillTelekineticManipulation
+    - PsiSkillAnoigo
+    - PsiSkillKineticSlam
+    - PsiSkillTelekineticPulse
+    - PsiSkillSelfShield
+    - PsiSkillArmorUpgrade
+    - PsiSkillAegisDome
+    - PsiSkillStasisField
+    - PsiSkillArmorReweave
+    - PsiSkillRecurrencePulse
+
+- type: psionicSkillTree
+  id: PsionicFireTree
+  name: psionic-skill-tree-fire-name
+  branches: [ PsionicFireBranch ]
+  skills: [ PsiSkillFireball, PsiSkillSummonImp, PsiSkillFlameBreath ]
+
+- type: psionicSkillTree
+  id: PsionicLifeTree
+  name: psionic-skill-tree-life-name
+  branches: [ PsionicLifeBranch ]
+  skills: [ PsiSkillHealingWord, PsiSkillRegeneration, PsiSkillRevivify ]
+
+- type: psionicSkillTree
+  id: PsionicMindTree
+  name: psionic-skill-tree-mind-name
+  branches: [ PsionicMindBranch ]
+  skills: [ PsiSkillTelepathy, PsiSkillNoosphericZap, PsiSkillTelekineticManipulation ]
+
+- type: entity
+  id: ActionPsionicSkillTree
+  name: action-name-psionic-skill-tree
+  description: action-description-psionic-skill-tree
+  categories: [ HideSpawnMenu ]
+  components:
+    - type: InstantAction
+      icon: Interface/VerbIcons/metapsionic.png
+      itemIconStyle: BigAction
+      event: !type:OpenPsionicSkillTreeActionEvent

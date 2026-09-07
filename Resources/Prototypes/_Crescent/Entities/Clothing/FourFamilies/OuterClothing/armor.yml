@@ -27,8 +27,8 @@
         Heat: 20
         Caustic: 5
   - type: ClothingSpeedModifier
-    walkModifier: 1
-    sprintModifier: 1
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitDraugr
   - type: StaticPrice
@@ -39,9 +39,6 @@
       - ClothingOuterHardsuitDraugr
       - ClothingOuterHardsuitIzdari
       - ClothingOuterHardsuitThukker
-  - type: FootstepModifier
-    footstepSoundCollection:
-      collection: FootstepSilent
 
 - type: entity
   parent: ClothingOuterHardsuitBase
@@ -70,15 +67,12 @@
         Heat: 55
         Caustic: 25
   - type: ClothingSpeedModifier
-    walkModifier: 1
-    sprintModifier: 1
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitArabet
   - type: StaticPrice
     price: 1000
-  - type: FootstepModifier
-    footstepSoundCollection:
-      collection: FootstepSilent
 
 - type: entity
   parent: ClothingOuterHardsuitBase
@@ -107,8 +101,8 @@
         Heat: 30
         Caustic: 25
   - type: ClothingSpeedModifier
-    walkModifier: 1
-    sprintModifier: 1
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitIzdari
   - type: StaticPrice
@@ -119,9 +113,6 @@
       - ClothingOuterHardsuitIzdari
       - ClothingOuterHardsuitThukker
       - ClothingOuterHardsuitDraugr
-  - type: FootstepModifier
-    footstepSoundCollection:
-      collection: FootstepSilent
 
 - type: entity
   parent: ClothingOuterHardsuitBase
@@ -151,8 +142,8 @@
         Caustic: 25
         Radiation: 35
   - type: ClothingSpeedModifier
-    walkModifier: 1
-    sprintModifier: 1
+    walkModifier: 0.90
+    sprintModifier: 0.90
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitThukker
   - type: StaticPrice
@@ -163,9 +154,6 @@
       - ClothingOuterHardsuitThukker
       - ClothingOuterHardsuitIzdari
       - ClothingOuterHardsuitDraugr
-  - type: FootstepModifier
-    footstepSoundCollection:
-      collection: FootstepSilent
 
 
 - type: entity

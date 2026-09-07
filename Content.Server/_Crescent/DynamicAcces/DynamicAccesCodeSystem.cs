@@ -186,6 +186,12 @@ public sealed class DynamicCodeSystem : SharedDynamicCodeSystem
             var key = retrieveKey();
             AddKeyToComponent(codeHolder, key, prototype.pilotKey);
         }
+        // Kept on the grid so a console built or rebuilt later can adopt them; the pass below only ever
+        // reaches the consoles standing here right now.
+        codeHolder.captainIdentifier = prototype.captainKey;
+        codeHolder.pilotIdentifier = prototype.pilotKey;
+        codeHolder.accesMapping = component.accesMapping;
+
         AddComp(grid, codeHolder);
 
         foreach (var console in consoles)
@@ -202,39 +208,104 @@ public sealed class DynamicCodeSystem : SharedDynamicCodeSystem
         RemComp<DynamicAccesGridInitializerComponent>(grid);
         Dirty(grid, codeHolder);
     }
+    /// <summary>
+    /// Cuts a newly built entity the keys its ship's mapping entitles it to.
+    /// </summary>
+    /// <remarks>
+    /// A hull is keyed once, as it initialises, and the pass only reaches what is standing on it at that
+    /// moment. Anything raised afterwards - a door a crewman builds, an airlock the drydock welds back on
+    /// after the old one was blown in - never went through it, so it answers to its prototype's static
+    /// access instead of the ship's, and opens for the wrong people. This puts a late arrival on the same
+    /// footing as the doors either side of it.
+    /// </remarks>
+    public void ApplyGridKeys(EntityUid grid, EntityUid target)
+    {
+        if (TerminatingOrDeleted(target)
+            || !TryComp<DynamicCodeHolderComponent>(grid, out var gridCodes)
+            || gridCodes.accesMapping is not { } mappingId
+            || !_prototypes.TryIndex<ShipDynamicAccesMappingPrototype>(mappingId, out var prototype))
+        {
+            return;
+        }
+
+        var identifiers = new HashSet<string>();
+        var protoId = MetaData(target).EntityPrototype?.ID;
+
+        if (protoId is not null)
+        {
+            foreach (var (identifier, protos) in prototype.accesIdentifierToEntity)
+            {
+                if (protos.Contains(protoId))
+                    identifiers.Add(identifier);
+            }
+        }
+
+        foreach (var (identifier, components) in prototype.accesIdentifierToComponent)
+        {
+            foreach (var entry in components.Values)
+            {
+                if (!HasComp(target, entry.Component.GetType()))
+                    continue;
+
+                identifiers.Add(identifier);
+                break;
+            }
+        }
+
+        if (identifiers.Count == 0)
+            return;
+
+        var holder = EnsureComp<DynamicCodeHolderComponent>(target);
+        foreach (var identifier in identifiers)
+        {
+            if (gridCodes.mappedCodes.TryGetValue(identifier, out var codes))
+                AddKeyToComponent(holder, codes, null);
+        }
+
+        Dirty(target, holder);
+    }
+
     private void onAdd(EntityUid owner, DynamicCodeHolderComponent component, ref ComponentInit args)
     {
+        // Everything the holder is carrying by now - keys pushed in while it was still detached, keys it was
+        // serialised with on a map - is counted here, once. Keying this off the holder rather than off whether
+        // the dictionary has heard of the code is what makes two holders of the same key count as two: the old
+        // check skipped the second one, and then the first removal recycled a key the other still carried.
+        if (component.counted)
+            return;
+
+        component.counted = true;
         foreach (var key in component.codes)
         {
-            if (!instancesPerKey.ContainsKey(key))
-                instancesPerKey.Add(key, 0);
-            if (!existingKeys.Contains(key))
-                existingKeys.Add(key);
-            instancesPerKey[key]++;
+            IncrementKey(key);
         }
     }
 
     private void onRemove(EntityUid owner, DynamicCodeHolderComponent component, object? args)
     {
+        if (!component.counted)
+            return;
+
+        component.counted = false;
         foreach (var key in component.codes)
         {
-            instancesPerKey[key]--;
-            if (instancesPerKey[key] <= 0)
-            {
-                releaseKey(key);
-            }
+            DecrementKey(key);
         }
     }
 
     public void AddKeyToComponent(DynamicCodeHolderComponent component, int key, string? identifier)
     {
-        component.codes.Add(key);
+        // Most holders (doors, consoles, ID cards) are handed keys with a null identifier. Counting only the
+        // identified ones made the refcount far too low, so a grid being sold released keys its own doors
+        // still carried and every later removal threw on the missing dictionary entry.
+        // A holder that is not live yet is counted in full by ComponentInit instead, so it is skipped here.
+        if (component.codes.Add(key) && component.counted)
+            IncrementKey(key);
         if (identifier is null)
             return;
         if(!component.mappedCodes.ContainsKey(identifier))
             component.mappedCodes.Add(identifier, new HashSet<int>());
         component.mappedCodes[identifier].Add(key);
-        instancesPerKey[key]++;
     }
 
     public void AddKeyToComponent(DynamicCodeHolderComponent component, HashSet<int> keys, string? identifier)
@@ -259,12 +330,8 @@ public sealed class DynamicCodeSystem : SharedDynamicCodeSystem
 
     public void RemoveKeyFromComponent(DynamicCodeHolderComponent component, int key, string? identifier)
     {
-        component.codes.Remove(key);
-        instancesPerKey[key]--;
-        if (instancesPerKey[key] <= 0)
-        {
-            releaseKey(key);
-        }
+        if (component.codes.Remove(key) && component.counted)
+            DecrementKey(key);
         string? containedIn = null;
         if (identifier is not null && component.mappedCodes.ContainsKey(identifier) && component.mappedCodes[identifier].Contains(key))
             containedIn = identifier;
@@ -297,6 +364,35 @@ public sealed class DynamicCodeSystem : SharedDynamicCodeSystem
 
     }
 
+    /// <summary>
+    /// Registers one more holder for this key, resurrecting it if it had already been released.
+    /// </summary>
+    private void IncrementKey(int key)
+    {
+        existingKeys.Add(key);
+        freeKeys.Remove(key);
+        instancesPerKey[key] = instancesPerKey.GetValueOrDefault(key) + 1;
+    }
+
+    /// <summary>
+    /// Drops one holder of this key, releasing it once nothing holds it anymore. Untracked keys are ignored
+    /// instead of throwing, since component removal runs during entity deletion where an exception aborts it.
+    /// </summary>
+    private void DecrementKey(int key)
+    {
+        if (!instancesPerKey.TryGetValue(key, out var instances))
+            return;
+
+        instances--;
+        if (instances > 0)
+        {
+            instancesPerKey[key] = instances;
+            return;
+        }
+
+        releaseKey(key);
+    }
+
     public int retrieveKey()
     {
         var key = 0;
@@ -313,7 +409,7 @@ public sealed class DynamicCodeSystem : SharedDynamicCodeSystem
         }
 
         existingKeys.Add(key);
-        instancesPerKey.Add(key,0);
+        instancesPerKey[key] = 0;
         return key;
 
     }

@@ -6,8 +6,6 @@
     - type: loadout
       id: LoadoutBeltGenericThin
     - type: loadout
-      id: LoadoutBeltGenericThick
-    - type: loadout
       id: LoadoutBeltWaist
     - type: loadout
       id: LoadoutBeltWaistThin
@@ -53,3 +51,7 @@
     - type: loadout
       id: LoadoutClothingBeltSheathSHIKatana
     #Hullrot edit end
+    - type: loadout
+      id: LoadoutBeltSheathNCWLKukri
+    - type: loadout
+      id: LoadoutBeltSheathSRMDuelingKhopesh

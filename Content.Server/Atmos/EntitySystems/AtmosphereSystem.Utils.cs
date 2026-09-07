@@ -3,6 +3,7 @@ using Content.Server.Atmos.Components;
 using Content.Server.Maps;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
+using Content.Shared.Atmos.Piping.Components;
 using Content.Shared.Maps;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -102,13 +103,27 @@ public partial class AtmosphereSystem
     }
 
     /// <summary>
+    /// Notifies atmosphere devices anchored to a tile after its gas mixture reference changes.
+    /// </summary>
+    private void NotifyDeviceTileChanged(
+        Entity<GridAtmosphereComponent, MapGridComponent> ent,
+        Vector2i tile)
+    {
+        var ev = new AtmosDeviceTileChangedEvent();
+        foreach (var uid in _mapSystem.GetAnchoredEntities(ent.Owner, ent.Comp2, tile))
+        {
+            RaiseLocalEvent(uid, ref ev);
+        }
+    }
+
+    /// <summary>
     ///     Pries a tile in a grid.
     /// </summary>
     /// <param name="mapGrid">The grid in question.</param>
     /// <param name="tile">The indices of the tile.</param>
-    private void PryTile(MapGridComponent mapGrid, Vector2i tile)
+    private void PryTile(Entity<MapGridComponent> mapGrid, Vector2i tile)
     {
-        if (!mapGrid.TryGetTileRef(tile, out var tileRef))
+        if (!_mapSystem.TryGetTileRef(mapGrid.Owner, mapGrid.Comp, tile, out var tileRef))
             return;
 
         _tile.PryTile(tileRef);

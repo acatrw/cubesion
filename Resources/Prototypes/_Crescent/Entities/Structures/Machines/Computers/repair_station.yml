@@ -1,0 +1,277 @@
+- type: entity
+  parent: BaseComputer
+  id: ComputerShipRepairStation
+  name: automated repair slip console
+  description: Surveys a docked hull against its structural blueprint, quotes the missing plating and framing at a small markup, then welds it all back on piece by piece.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Computer
+    board: ShipRepairStationComputerCircuitboard
+  - type: ContainerFill
+    containers:
+      board: [ ShipRepairStationComputerCircuitboard ]
+  - type: ShipRepairStation
+  # A yard fixture, not equipment. Three separate things have to be sealed, because any one of them left
+  # open is a way to walk off with the board and stand a repair slip up on a private ship:
+  #
+  #   * Anchorable flags None - no wrench. It never leaves the deck it was mapped onto, and an entity that
+  #     cannot be unanchored cannot be rotated or pulled either.
+  #   * The SealedComputer graph - one node, no edges, so the crowbar has nowhere to take it. The stock
+  #     Computer graph lets anyone pry the monitor off, cut the wires and empty the board out of the frame.
+  #   * A Destructible that only destroys. The inherited threshold swaps the console for a ComputerBroken
+  #     shell that is still holding the board and is one pry away from being loot; this one deletes the
+  #     console outright, and deleting a container deletes what is inside it, so a smashed slip leaves
+  #     nothing on the tile worth picking up.
+  - type: Anchorable
+    flags:
+    - None
+  - type: Construction
+    graph: SealedComputer
+    node: start
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: GlassBreak
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: Sprite
+    netsync: false
+    noRot: true
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: repair
+    - map: ["computerLayerKeys"]
+      state: tech_key
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#64dbe5" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: ActivatableUI
+    key: enum.ShipRepairStationUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.ShipRepairStationUiKey.Key:
+        type: Content.Client._Crescent.RepairStation.ShipRepairStationBoundUserInterface
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
+  - type: PointLight
+    radius: 1.5
+    energy: 1.6
+    color: "#43ccb5"
+    enabled: false
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true
+    offset: "0, 0.4"
+    castShadows: false
+
+# Administrative override slip.
+#
+# Nothing in the round builds, buys or maps one of these in - it is spawned by an admin, and only a
+# player holding the admin flag can open it or press anything on it. What it does differently:
+#
+#   * It works the deck it is standing on as well as whatever is in the clamps, so a station is
+#     repaired either by dropping the console onto it or by docking a ship that carries one to it.
+#   * It files blueprints. A station, or any hull that was mapped in rather than bought off a
+#     shipyard, has no structural file at all and no crew slip can ever do anything for it; this one
+#     records the hull as it stands, and from then on restores it to that. File it on a sound hull -
+#     a blueprint taken off a wreck restores the wreck.
+#   * It works a hull with no file anyway, on the half of the survey that needs none: the damage is
+#     beaten out of what is still standing, the spills are mopped, the wreckage is binned and the
+#     magazines and fuel tanks are filled.
+#   * It bills nobody, which it has to - an admin watching from a ghost has no account to charge.
+#   * It runs off no power bus, since the deck it lands on may have neither an APC nor a wire, and it
+#     wrenches up and down again like any other machine rather than being sealed to the deck.
+- type: entity
+  parent: ComputerShipRepairStation
+  id: ComputerShipRepairStationAdmin
+  name: drydock override console
+  suffix: Admin
+  description: An engineering console with no yard behind it and no bill at the end of it. It surveys any hull within reach - the deck under it included - against a structural blueprint it can file itself, and puts the hull back.
+  components:
+  - type: ShipRepairStation
+    adminOnly: true
+    free: true
+    allowSnapshot: true
+    serviceOwnGrid: true
+    repairUnregistered: true
+    priceMarkup: 1.0
+    secondsPerPart: 0.05
+    minRepairSeconds: 2
+    maxRepairSeconds: 120
+  - type: ApcPowerReceiver
+    needsPower: false
+  - type: Anchorable
+    flags:
+    - Anchorable
+    - Unanchorable
+  - type: Sprite
+    netsync: false
+    noRot: true
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: repair
+    - map: ["computerLayerKeys"]
+      state: syndie_key
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+  - type: PointLight
+    color: "#cc4343"
+
+# Faction repair slips.
+#
+# Same machine as the commercial slip above, sitting in a fleet yard instead of a trading post. Two things
+# differ, and both are deliberate:
+#
+#   * It is dearer. A commercial yard takes 15% over what the hull it reinstates is worth; a fleet yard bills
+#     the crewman who authorises the job at 65% over. Nobody is competing for the work, the yard answers to a
+#     quartermaster rather than a customer, and the commercial slip is meant to stay worth the trip out to it.
+#
+#   * It is slower. Twice the time on every part, a longer floor under a trivial job and a ceiling of a quarter
+#     hour rather than seven minutes, so a badly mauled hull genuinely sits in the clamps instead of being
+#     welded back together at a pace no yard could keep. A ship in a fleet slip is a ship out of the war.
+#
+# BaseFactionComputerShipRepairStation carries both, plus restrictAccess so only the owning faction may
+# authorise a job on it. Variants also tint their powered screens by faction: the sealing on the commercial
+# slip above is inherited, so none of these can be unbolted, pried apart or looted for their board either.
+- type: entity
+  parent: ComputerShipRepairStation
+  abstract: true
+  id: BaseFactionComputerShipRepairStation
+  name: fleet repair slip console
+  description: Surveys a docked hull against its structural blueprint, quotes the missing plating and framing at fleet rates, then welds it all back on piece by piece. It works to a naval standard, and takes a naval yard's time over it.
+  components:
+  - type: FactionMachine
+    restrictAccess: true
+  - type: ShipRepairStation
+    priceMarkup: 1.65
+    secondsPerPart: 0.8
+    minRepairSeconds: 20
+    maxRepairSeconds: 900
+
+- type: entity
+  parent: BaseFactionComputerShipRepairStation
+  id: ComputerShipRepairStationDSM
+  name: imperial repair slip console
+  suffix: DSM
+  components:
+  - type: FactionMachine
+    faction: DSM
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#bd7aff" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+
+- type: entity
+  parent: BaseFactionComputerShipRepairStation
+  id: ComputerShipRepairStationNCWL
+  name: union repair slip console
+  suffix: NCWL
+  components:
+  - type: FactionMachine
+    faction: NCWL
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff9944" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+
+- type: entity
+  parent: BaseFactionComputerShipRepairStation
+  id: ComputerShipRepairStationSHI
+  name: shinohara repair slip console
+  suffix: SHI
+  components:
+  - type: FactionMachine
+    faction: SHI
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#d4d4d4" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+
+# Every TFCF member organization resolves to TFSC in FactionMachineSystem, so this one slip serves the whole
+# umbrella: Families, Interdyne, Saws, Gorlex and Cyberdawn crews can all book a hull into it.
+- type: entity
+  parent: BaseFactionComputerShipRepairStation
+  id: ComputerShipRepairStationTFSC
+  name: TFCF repair slip console
+  suffix: TFCF
+  components:
+  - type: FactionMachine
+    faction: TFSC
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff5555" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+
+- type: entity
+  parent: BaseFactionComputerShipRepairStation
+  id: ComputerShipRepairStationCMM
+  name: minutemen repair slip console
+  suffix: CMM
+  components:
+  - type: FactionMachine
+    faction: CMM

@@ -55,7 +55,7 @@ crescent-rank-ncwl-new = Cadet
 crescent-rank-ncwl-doctor = Doktor
 
 # ncwl
-crescent-rank-ncwl-faction-leader = General Major
+crescent-rank-ncwl-faction-leader = Flagman
 crescent-rank-ncwl-home-leader = Kommissar
 crescent-rank-ncwl-mvd-officer = Colonel
 crescent-rank-ncwl-mvd-grunt = Komrade
@@ -73,9 +73,9 @@ crescent-rank-ncwl-conscript = Conscript
 
 # syn
 
-crescent-rank-synadmin = Ringleader
+crescent-rank-synadmin = Administrator
 crescent-rank-boss = Lieutenant
-crescent-rank-patriarch = Patriarch
+crescent-rank-patriarch = Cyberdawn Supervisor
 crescent-rank-operative = Operative
 crescent-rank-op = Cpl.
 crescent-rank-pfc = Pvt.

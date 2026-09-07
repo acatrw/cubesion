@@ -11,7 +11,7 @@
       map: ["enum.JukeboxVisualLayers.Base"]
   - type: Item
     sprite: _Crescent/Objects/Misc/boombox.rsi
-    size: Large
+    size: Normal
   - type: Clothing
     sprite: _Crescent/Objects/Misc/boombox.rsi
     quickEquip: false
@@ -19,6 +19,13 @@
     - Back
     - SuitStorage
   - type: Jukebox
+    # Keep the portable speaker quieter than the anchored jukebox, but give its music enough
+    # attenuation range to remain intelligible around ten tiles away.
+    volume: -13
+    range: 15
+    # The engine's wall-occlusion low-pass badly degrades full music tracks. Distance attenuation
+    # still keeps this portable speaker local without making it sound like radio static.
+    occlusion: false
   - type: Appearance
   - type: ActivatableUI
     key: enum.JukeboxUiKey.Key

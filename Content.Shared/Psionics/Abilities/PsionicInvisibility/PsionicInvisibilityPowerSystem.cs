@@ -69,7 +69,8 @@ public sealed class PsionicInvisibilityPowerSystem : EntitySystem
     {
         EnsureComp<PsionicallyInvisibleComponent>(uid);
         var stealth = EnsureComp<StealthComponent>(uid);
-        _stealth.SetVisibility(uid, 0.66f, stealth);
+        _stealth.SetVisibility(uid, SharedPsionicAbilitiesSystem.ConcealmentVisibility, stealth); // Eclipsion
+        _stealth.SetColorTint(uid, false, stealth); // Eclipsion - concealment shimmers, it does not recolour.
 
         if (_net.IsServer)
             _audio.PlayPvs(component.StartSound, uid);

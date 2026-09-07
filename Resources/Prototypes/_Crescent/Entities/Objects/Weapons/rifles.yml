@@ -124,12 +124,13 @@
   - type: Item
     size: Ginormous
   - type: StaticPrice
-    price: 2000
+    price: 2500
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Guns/nimrod.rsi
   - type: Clothing
     sprite: _Crescent/Objects/Weapons/Guns/nimrod.rsi
   - type: Gun
+    damageModifier: 1.25
     fireRate: 3
     projectileSpeed: 45
     selectedMode: SemiAuto
@@ -280,14 +281,14 @@
           tags:
             - CartridgeCaselessRifle
   - type: Gun
-    damageModifier: 1.35
+    damageModifier: 1.2
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto
     - Burst
     burstFireRate: 24
-    burstCooldown: 0.5
-    fireRate: 6
+    burstCooldown: 0.65
+    fireRate: 5
     shotsPerBurst: 2
     soundGunshot:
       path: /Audio/_Crescent/Weapons/Guns/supressed_2/supressed_gunshot_2.ogg
@@ -300,7 +301,7 @@
   - type: Appearance
   - type: ExtendDescription
     descriptionList:
-      - description: This rifle comes with a extended barrel. It deals 35% higher damage per shot.
+      - description: This rifle comes with an extended barrel. It deals 20% higher damage per shot.
         fontSize: 12
         color: "#ff4f00"
         requireDetailRange: false
@@ -333,7 +334,7 @@
         priority: 2
         whitelist:
           tags:
-            - MagazineCaselessRifleShort #Short mags, less fire rate. Still more cracked than all other rifles.
+            - MagazineCaselessRifleShort # Short magazines keep its sustained firepower in check.
       gun_chamber:
         name: Chamber
         startingItem: CartridgeCaselessRifle
@@ -345,7 +346,7 @@
     availableModes:
     - SemiAuto
     - FullAuto
-    fireRate: 7
+    fireRate: 6
     soundGunshot:
       path: /Audio/_Crescent/Weapons/Guns/supressed_2/supressed_gunshot_2.ogg
       params:
@@ -508,7 +509,7 @@
   - type: Clothing
     sprite: _Crescent/Objects/Weapons/Guns/takemura.rsi
   - type: Gun
-    fireRate: 7
+    fireRate: 6
     soundGunshot:
       path: /Audio/_Crescent/Weapons/Guns/rifle_1/rifle_gunshot_2.ogg
   - type: ChamberMagazineAmmoProvider
@@ -550,7 +551,7 @@
   name: IRM DA-8 Miller 5.56x45mm
   parent: [BaseWeaponRifle, StreeCredRedeemable]
   id: WeaponRifleMiller
-  description: A mil-grade assault rifle produced by Olywir Armaments, primarily for the Imperial Garrison and Imperial Naval Forces. Unlike other firearms made by Olywir the miller actually stayed under budget, even if by only a few thousand credits.
+  description: A military assault rifle produced by Olywier Charter Armaments for the local Imperial garrison and navy. The Miller somehow stayed under budget, if only by a few thousand credits.
   components:
   - type: Item
     shape:
@@ -660,7 +661,7 @@
       - WeaponRifleNCWLRezerv
 
 - type: entity
-  name: TFSC AKS-74U Krinkov 5.56x45mm
+  name: TFCF AKS-74U Krinkov 5.56x45mm
   parent: BaseWeaponRifle
   id: WeaponRifleKrinkov
   description: A shortened version of the AKS-74, this one has its foldable stock removed and ben rechambered to 5.56x45mm, commonly attributed to terrorist groups. Cheap and easily made.
@@ -741,7 +742,8 @@
   - type: Clothing
     sprite: _Crescent/Objects/Weapons/Guns/halyad.rsi
   - type: Gun
-    fireRate: 2.5 #Same as the barghest. Except Full auto instead of burst. A lot easier to fire.
+    fireRate: 2
+    damageModifier: 0.85
     projectileSpeed: 45
     soundGunshot:
       path: /Audio/_Crescent/Weapons/Guns/dmr_1/dmr_gunshot_2.ogg
@@ -749,6 +751,9 @@
     availableModes:
       - SemiAuto
       - FullAuto
+  - type: HeldSpeedModifier
+    walkModifier: 0.85
+    sprintModifier: 0.85
   - type: ItemSlots
     slots:
       gun_magazine:
@@ -900,10 +905,10 @@
       - WeaponRifleHunter
 
 - type: entity
-  name: TFSC AK-379M Mayflower 7.62x51mm
+  name: TFCF AK-379M Mayflower 7.62x51mm
   parent: BaseWeaponRifle
   id: WeaponRifleMayflower
-  description: A hefty battle carbine produced by the Coalition for the external independent market. Seen often in the hands of the Gorlex during harassment raids.
+  description: A hefty battle carbine produced by the TFCF for the independent market. Often seen in GSC hands during harassment raids.
   components:
   - type: Item
     shape:
@@ -1029,7 +1034,7 @@
       - WeaponSniperHristov
 
 - type: entity
-  name: TFSC SVD 12.7x99mm
+  name: TFCF SVD 12.7x99mm
   parent: BaseWeaponRifleDMR
   id: WeaponRifleSVDMarksman
   description: A large designated marksman rifle. Chambered in 12.7x99mm for long range engagements. Commonly in use by terrorist militia forces.
@@ -1451,4 +1456,4 @@
     zeroVisible: true
   - type: Appearance
   - type: StaticPrice
-    price: 2000
+    price: 5000

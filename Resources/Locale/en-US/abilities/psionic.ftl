@@ -23,7 +23,7 @@ accept-psionics-window-prompt-text-part = You rolled a psionic power!
                                          Do you still wish to be psionic?
 
 action-name-psionic-invisibility = Psionic Invisibility
-action-description-psionic-invisibility = Render yourself invisible to any entity that could potentially be psychic. Borgs, animals, and so on are not affected.
+action-description-psionic-invisibility = Bend light around yourself, leaving only a faint shimmer where you stand. A careful eye can still pick you out, and attacking or being hurt drops the veil.
 
 action-name-psionic-invisibility-off = Turn Off Psionic Invisibility
 action-description-psionic-invisibility-off = Return to visibility, and receive a stun.
@@ -63,6 +63,26 @@ action-name-pyrokinesis = Pyrokinesis
 action-description-pyrokinesis = Light a flammable target on fire.
 pyrokinesis-power-used = A wisp of flame engulfs {THE($target)}, igniting {OBJECT($target)}!
 
+action-name-psionic-flame-breath = Flame Breath
+action-description-psionic-flame-breath = Project a four-tile cone of persistent fire in the chosen direction.
+action-name-select-telekinetic-object = Select Telekinetic Object
+action-description-select-telekinetic-object = Select a nearby unanchored object weighing no more than 60 kilograms.
+action-name-move-telekinetic-object = Move Telekinetic Object
+action-description-move-telekinetic-object = Hurl the selected object toward the chosen location.
+telekinetic-manipulation-selected = You seize {THE($target)} with your mind.
+
+action-name-command-psionic-familiar-move = Command Imp: Move
+action-description-command-psionic-familiar-move = Order your summoned imp to move to the chosen location.
+action-name-command-psionic-familiar-attack = Command Imp: Attack
+action-description-command-psionic-familiar-attack = Order your summoned imp to attack the chosen target with fireballs.
+
+action-name-psionic-self-shield = Energy Aegis
+action-description-psionic-self-shield = Protect yourself from heat and explosions for 15 seconds.
+psionic-energy-shield-applied = A field of psionic energy surrounds {THE($target)}!
+
+action-name-kinetic-slam = Kinetic Slam
+action-description-kinetic-slam = Exhaust and throw a target away with concentrated kinetic force.
+
 action-name-psychokinesis = Psychokinesis
 action-description-psychokinesis = Bend the fabric of space to instantly move across it.
 
@@ -71,3 +91,22 @@ action-desc-rf-sensitivity = Toggle your ability to interpret radio waves on and
 
 action-name-assay = Assay
 action-description-assay = Probe an entity at close range to glean metaphorical information about any powers they may have
+
+action-name-psionic-stasis-field = Stasis Field
+action-description-psionic-stasis-field = Hang a pocket of slowed time in front of you for eight seconds. Anything moving through it crawls, and burning fuses crawl with it.
+action-name-psionic-armor-reweave = Reweave
+action-description-psionic-armor-reweave = Wind your worn armour back to the condition it was made in. Rarely, a piece comes apart instead.
+action-name-psionic-recurrence-pulse = Recurrence Pulse
+action-description-psionic-recurrence-pulse = Collapse your stasis fields and hurl everything they were holding back the way it came.
+
+psionic-recurrence-pulse-no-field = There is nothing of yours left to collapse.
+psionic-recurrence-pulse-released = The moment comes due, and {$count} thing(s) are thrown back.
+psionic-armor-reweave-nothing = Nothing you are wearing remembers being damaged.
+psionic-armor-reweave-restored = You wind {$count} piece(s) of your armour back to what they were.
+psionic-armor-reweave-unravelled = {$armor} loses the thread entirely and comes apart in your hands!
+
+action-name-psionic-aegis-dome = Aegis Dome
+action-description-psionic-aegis-dome = Raise a barrier that moves with you and shelters everyone under it. Incoming bullets and thrown objects stop at its edge, and it absorbs part of every other hit until it runs out of integrity and shatters.
+
+psionic-aegis-dome-raised = A dome of psionic force settles over the ground around you.
+psionic-aegis-dome-shattered = Your aegis dome takes one hit too many and comes apart!

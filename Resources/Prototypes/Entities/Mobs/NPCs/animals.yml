@@ -320,7 +320,6 @@
   parent: FoodEgg
   suffix: Fertilized, Chicken
   components:
-  - type: Timer
   - type: TimedSpawner
     prototypes:
     - MobChicken
@@ -648,7 +647,6 @@
   name: Mothroach egg
   description: Ew.
   components:
-  - type: Timer
   - type: TimedSpawner
     prototypes:
     - MobMothroach
@@ -760,13 +758,13 @@
       Male: SoundsHarpy
       Female: SoundsHarpy
       Unsexed: SoundsHarpy
+    wilhelmProbability: 0.001
   - type: GenericVisualizer
     visuals:
       enum.HarpyVisualLayers.Singing:
         singingLayer:
           False: { visible: false }
           True: { visible: true }
-    wilhelmProbability: 0.001
   - type: MobPrice
     price: 150
   - type: Tag
@@ -951,7 +949,6 @@
   parent: FoodEgg
   suffix: Fertilized, Duck
   components:
-    - type: Timer
     - type: TimedSpawner
       prototypes:
       - MobDuckMallard
@@ -1490,6 +1487,9 @@
   components:
   - type: Absorbable
   - type: CombatMode
+  - type: Telescope
+    divisor: 0.1
+    lerpAmount: 0.1
   # Shitmed Change Start
   - type: SurgeryTarget
   - type: Targeting

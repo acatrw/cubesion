@@ -60,8 +60,8 @@
     ignoreWeaponGrid: true
     damage:
       types:
-        Structural: 65
-        Piercing: 90
+        Structural: 55
+        Piercing: 75
   - type: TimedDespawn
     lifetime: 4
   - type: Sprite
@@ -117,7 +117,7 @@
         Piercing: 500
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 2500
     intensitySlope: 150
     totalIntensity: 2500
@@ -154,7 +154,7 @@
         Heat: 25
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 350
     intensitySlope: 55
     totalIntensity: 500
@@ -191,7 +191,7 @@
     color: Blue
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 4500
     intensitySlope: 500
     maxIntensity: 500
@@ -249,7 +249,7 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1000
     intensitySlope: 400
     totalIntensity: 15000
@@ -279,10 +279,11 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1000
     intensitySlope: 400
     totalIntensity: 15000
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 25
     acceleration: 25
@@ -350,10 +351,11 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 40000
     intensitySlope: 250
     maxIntensity: 2500
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 7 # slow turn rate
     acceleration: 5
@@ -426,11 +428,12 @@
     energyConsumption: 3000
     disableDuration: 14
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 10000
     intensitySlope: 250
     maxIntensity: 2500
     maxTileBreak: 5
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 5 # slow turn rate
     acceleration: 5
@@ -499,7 +502,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 800
     intensitySlope: 200
     totalIntensity: 1000
@@ -511,6 +514,7 @@
   - type: ProjectileIFF
     visualType: SquareReticle
     color: Red
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 15 # slow rotation so it isnt aimbot, still fairly accurate though
     acceleration: 120
@@ -571,7 +575,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 25000
     intensitySlope: 300
     maxIntensity: 750
@@ -611,7 +615,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 3000 #power is bumped up by tilebreak. i guess
     intensitySlope: 30
     maxIntensity: 100
@@ -653,7 +657,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 1250
     intensitySlope: 5
     maxIntensity: 20
@@ -695,7 +699,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 15000
     intensitySlope: 1000
     maxIntensity: 10000
@@ -730,7 +734,7 @@
     color: Blue
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 600
     intensitySlope: 350
     totalIntensity: 1250
@@ -867,7 +871,7 @@
   - type: ShipWeaponProjectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 60
     intensitySlope: 45
     totalIntensity: 60
@@ -941,7 +945,7 @@
   - type: ShipWeaponProjectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 300
     intensitySlope: 100
     totalIntensity: 500
@@ -982,7 +986,7 @@
         Structural: 600
         Radiation: 20
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 300
     intensitySlope: 150
     totalIntensity: 750
@@ -1000,6 +1004,7 @@
   - type: ProjectileIFF
     visualType: SolidCircle
     color: White
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 20 # slow rotation so it isnt aimbot, still fairly accurate though
     acceleration: 85
@@ -1059,7 +1064,7 @@
     color: Red
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 250
     intensitySlope: 250
     totalIntensity: 1000
@@ -1068,6 +1073,7 @@
     radius: 3.5
     color: orange
     energy: 0.5
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 15
     acceleration: 25
@@ -1122,7 +1128,7 @@
         Heat: 65
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 150
     intensitySlope: 50
     totalIntensity: 300
@@ -1161,7 +1167,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1500
     intensitySlope: 500
     totalIntensity: 1500
@@ -1195,11 +1201,12 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 20000
     intensitySlope: 700
     totalIntensity: 800
     maxTileBreak: 7
+  - type: ProximityFuseTarget
   - type: HeatSeeking
     rotationSpeed: 25
     acceleration: 5
@@ -1211,6 +1218,18 @@
     color: orange
     energy: 0.5
   - type: ProjectileIFF
+  - type: Damageable
+    damageContainer: StructuralInorganic
+    damageModifierSet: StructuralMetallic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 120
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+      - !type:ExplodeBehavior
 
 #derecho projectile
 
@@ -1236,7 +1255,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 300
     intensitySlope: 200
     totalIntensity: 2000
@@ -1270,7 +1289,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 400
     intensitySlope: 350
     totalIntensity: 1000
@@ -1349,7 +1368,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1200
     intensitySlope: 300
     totalIntensity: 30000
@@ -1383,7 +1402,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 0.1
     intensitySlope: 1
     totalIntensity: 0.5
@@ -1417,7 +1436,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 250
     intensitySlope: 200
     totalIntensity: 400
@@ -1521,7 +1540,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 0.1
     intensitySlope: 1
     totalIntensity: 2
@@ -1557,7 +1576,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1100
     intensitySlope: 100
     totalIntensity: 3500
@@ -1593,7 +1612,7 @@
       - state: base-projectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     maxIntensity: 1100
     intensitySlope: 750
     totalIntensity: 2000
@@ -1619,7 +1638,7 @@
       - state: grenade
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 1000
     intensitySlope: 100
     maxIntensity: 4500
@@ -1666,7 +1685,7 @@
   - type: ShipWeaponProjectile
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     totalIntensity: 4500
     intensitySlope: 100
     maxIntensity: 4500

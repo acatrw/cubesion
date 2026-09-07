@@ -67,7 +67,7 @@
   name: IRM AVR-H Imperator 15.2x169mm
   parent: [BaseWeaponRifleDMR, BaseGunWieldableDMR, StreeCredRedeemable]
   id: WeaponSniperImperator
-  description: A imperial anti-materiel rifle. Fires the large 15.2×169mm round.
+  description: An Imperial anti-materiel rifle. Fires the large 15.2×169mm round.
   components:
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Guns/imperator.rsi
@@ -194,10 +194,10 @@
       - WeaponSniperNCWLNovomosin
 
 - type: entity
-  name: TFSC AK-60 15.2x169mm
+  name: TFCF AK-60 15.2x169mm
   parent: [BaseWeaponRifleDMR, BaseGunWieldableDMR]
   id: WeaponSniperAK60
-  description: A unlicensed .60 version of a AK. Its a less simple than a AK-74 but pack a massive 15.2x169mm Pounch.
+  description: An unlicensed .60 version of an AK. Less simple than an AK-74, but it packs a massive 15.2x169mm punch.
   components:
   - type: Sprite
     sprite: _Crescent/Objects/Weapons/Guns/ak60.rsi
@@ -275,8 +275,8 @@
     sprite: _Crescent/Objects/Weapons/Guns/spear.rsi
   - type: GunRequiresWield
   - type: HeldSpeedModifier
-    walkModifier: 0.9
-    sprintModifier: 0.9
+    walkModifier: 0.8
+    sprintModifier: 0.8
   - type: UseDelay
     delay: 0.75 #No Quickscoping
   - type: UseDelayBlockShoot

@@ -80,7 +80,7 @@ namespace Content.Shared.Roles
         /// Nyano/DV: For e.g. prisoners, they'll never use their latejoin spawner.
         /// </summary>
         [DataField("alwaysUseSpawner")]
-        public bool AlwaysUseSpawner { get; } = false;
+        public bool AlwaysUseSpawner { get; private set; } = false;
 
         /// <summary>
         ///     Whether this job is a head.
@@ -130,6 +130,13 @@ namespace Content.Shared.Roles
         [DataField("jobEntity", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
         public string? JobEntity = null;
 
+        /// <summary>
+        /// Optional canonical humanoid identity applied only while spawning as this job.
+        /// The player's saved character profile is not modified.
+        /// </summary>
+        [DataField("characterOverride")]
+        public JobCharacterOverride? CharacterOverride { get; private set; }
+
         [DataField]
         public ProtoId<JobIconPrototype> Icon { get; private set; } = "JobIconUnknown";
 
@@ -154,6 +161,18 @@ namespace Content.Shared.Roles
         [DataField]
         public bool Whitelisted;
 
+        /// <summary>
+        /// Optional shared whitelist key. Every job declaring the same group is covered by a single whitelist
+        /// entry, so admins whitelist the group once instead of granting each job separately.
+        /// </summary>
+        [DataField]
+        public string? WhitelistGroup;
+
+        /// <summary>
+        /// The key this job's whitelist entry is stored under: its group if it has one, otherwise its own ID.
+        /// </summary>
+        public string WhitelistKey => WhitelistGroup ?? ID;
+
         [DataField]
         public bool SpawnLoadout = true;
 
@@ -168,7 +187,7 @@ namespace Content.Shared.Roles
         public List<ProtoId<GuideEntryPrototype>>? Guides;
 
         [DataField]
-        public readonly Dictionary<ProtoId<RankPrototype>, HashSet<CharacterRequirement>?>? Ranks;
+        public Dictionary<ProtoId<RankPrototype>, HashSet<CharacterRequirement>?>? Ranks;
 
         /// <summary>
         /// Optional chat styling amplification for command jobs.

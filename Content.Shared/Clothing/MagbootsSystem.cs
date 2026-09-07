@@ -44,7 +44,10 @@ public sealed class SharedMagbootsSystem : EntitySystem
         if (_container.TryGetContainingContainer((uid, null, null), out var container) &&
             _inventory.TryGetSlotEntity(container.Owner, comp.Slot, out var worn)
             && uid == worn)
+        {
             UpdateMagbootEffects(container.Owner, ent, args.Activated);
+            RaiseMagbootsStateChanged(container.Owner);
+        }
 
         if (comp.ChangeClothingVisuals)
         {
@@ -69,11 +72,42 @@ public sealed class SharedMagbootsSystem : EntitySystem
         args.Cancel();
     }
 
-    private void OnGotUnequipped(Entity<MagbootsComponent> ent, ref ClothingGotUnequippedEvent args) =>
+    private void OnGotUnequipped(Entity<MagbootsComponent> ent, ref ClothingGotUnequippedEvent args)
+    {
         UpdateMagbootEffects(args.Wearer, ent, false);
+        RaiseMagbootsStateChanged(args.Wearer);
+    }
 
-    private void OnGotEquipped(Entity<MagbootsComponent> ent, ref ClothingGotEquippedEvent args) =>
+    private void OnGotEquipped(Entity<MagbootsComponent> ent, ref ClothingGotEquippedEvent args)
+    {
         UpdateMagbootEffects(args.Wearer, ent, _toggle.IsActivated(ent.Owner));
+        RaiseMagbootsStateChanged(args.Wearer);
+    }
+
+    private void RaiseMagbootsStateChanged(EntityUid wearer)
+    {
+        RefreshMagbootsUser(wearer);
+
+        var ev = new MagbootsStateChangedEvent();
+        RaiseLocalEvent(wearer, ref ev);
+    }
+
+    private void RefreshMagbootsUser(EntityUid wearer)
+    {
+        var enumerator = _inventory.GetSlotEnumerator(wearer);
+        while (enumerator.NextItem(out var item, out var slot))
+        {
+            if (TryComp<MagbootsComponent>(item, out var magboots) &&
+                magboots.Active &&
+                magboots.Slot == slot.Name)
+            {
+                EnsureComp<MagbootsUserComponent>(wearer);
+                return;
+            }
+        }
+
+        RemComp<MagbootsUserComponent>(wearer);
+    }
 
     private void OnIsWeightless(Entity<MagbootsComponent> ent, ref InventoryRelayedEvent<IsWeightlessEvent> args) =>
         OnIsWeightless(ent, ref args.Args);
@@ -105,3 +139,6 @@ public sealed class SharedMagbootsSystem : EntitySystem
 }
 
 public sealed partial class ToggleMagbootsEvent : InstantActionEvent {}
+
+[ByRefEvent]
+public record struct MagbootsStateChangedEvent;

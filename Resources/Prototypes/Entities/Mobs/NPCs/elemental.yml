@@ -1,6 +1,7 @@
 - type: entity
   abstract: true
   id: MobElementalBase
+  parent: BaseMob
   components:
   - type: LagCompensation
   - type: Reactive
@@ -290,7 +291,6 @@
     solution: bloodstream
     transferAmount: 2
   - type: DamageStateVisuals
-    rotate: true
     states:
       Alive:
         Base: alive

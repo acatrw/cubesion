@@ -1,0 +1,38 @@
+- type: entity
+  parent: BaseMobFleshExpeditions
+  id: MobFleshGolemCorroded
+  name: desynchronized human
+  description: A catastrophic biological mismatch left by uncontrolled exposure to a severe Turning front.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: golem
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: golem
+      Critical:
+        Base: dead
+      Dead:
+        Base: dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: polymorph
+  id: TemporalDesync
+  configuration:
+    entity: MobFleshGolemCorroded
+    forced: true
+    transferName: false
+    transferHumanoidAppearance: false
+    inventory: Drop
+    revertOnDeath: true
+    revertOnCrit: true
+    copiedComponents:
+    - TemporalDesync
+    - StaticOverlay
+

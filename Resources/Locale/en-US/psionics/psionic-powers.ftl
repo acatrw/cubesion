@@ -35,6 +35,7 @@ pyrokinesis-power-initialization-feedback =
     fly beckons me to offer my service. When I reach out to shake his hand, the vision fades, and I find myself standing in the prime materium.
     I know His name now, it is the Secret of Fire. Merely by thinking of it, I can feel the heat of that place come to my hands.
 pyrokinesis-power-metapsionic-feedback = The Secret of Fire dwells within {CAPITALIZE($entity)}
+flame-breath-power-metapsionic-feedback = A furnace-like current coils around {CAPITALIZE($entity)}'s hands.
 
 # Metapsionic Pulse
 metapsionic-power-description = Send a mental pulse through the area to see if there are any psychics nearby.
@@ -83,7 +84,7 @@ telegnosis-power-metapsionic-feedback = {CAPITALIZE($entity)}'s soul travels acr
 
 # Psionic Invisibility
 psionic-invisibility-power-description =
-    Render yourself invisible to any entity that could potentially be psychic. Borgs, animals, and so on are not affected.
+    Bend light around yourself, leaving only a faint shimmer where you stand. A careful eye can still pick you out.
     This doesn't last forever, and its duration scales with your psychic amplification factor.
 psionic-invisibility-power-initialization-feedback =
     I suddenly find myself plunged into a world utterly without light, yet I can feel the rays of warmth cast upon me.
@@ -134,9 +135,9 @@ telekinetic-pulse-power-initialization-feedback =
 telekinetic-pulse-power-metapsionic-feedback = {CAPITALIZE($entity)} has the essence of pure kinesis flowing through him.
 
 # Pyrokinetic Flare
-action-name-pyrokinetic-flare = Pyrokinetic Flare
+action-name-pyrokinetic-flare = Fireball
 action-description-pyrokinetic-flare =
-    Generate a flash of firelight from Gehenna to blind your adversaries.
+    Pull a mote of Gehenna into the world and throw it. It bursts into flame where it lands.
 pyrokinetic-flare-power-description = { action-description-pyrokinetic-flare }
 pyrokinetic-flare-power-initialization-feedback =
     My gaze is briefly filled with a flash of immense light and head, and for a single moment I can see a glimpse of a realm
@@ -178,6 +179,9 @@ ethereal-pickup-fail = My hand sizzles as it passes through...
 
 # Psionic Familiar System
 psionic-familiar-cant-attack-master = I am bound by my Master, I cannot harm them.
+psionic-familiar-order-move = Your familiar breaks off and goes to hold the spot.
+psionic-familiar-order-recall = Your familiar drops what it was doing and returns to your side.
+psionic-familiar-order-attack = Your familiar turns on {THE($target)}.
 psionic-familiar-despawn-text = {CAPITALIZE($entity)} returns from whence it came!
 ghost-role-information-familiar-name = Psionic Familiar
 ghost-role-information-familiar-description = An interdimensional creature bound to the will of a Psion.
@@ -222,3 +226,5 @@ anomaly-rock-feedback = A vast old oak dwells high over a plane of stone, it tur
 anomaly-flora-feedback = Musical notes drift around you, playfully beckoning, they wish to feast
 anomaly-liquid-feedback = A realm of twisting currents. Its placidity is a lie. The eyes within stare hungrilly
 anomaly-shadow-feedback = At the end of time, when all suns have set forever, there amidst the void stands a monument to past sins.
+
+summon-equipment-no-empty-hand = You have no free hand to take it.

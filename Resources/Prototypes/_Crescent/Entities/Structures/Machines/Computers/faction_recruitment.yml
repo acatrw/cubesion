@@ -59,6 +59,7 @@
     # leadership roles must never be assignable from a console.
     roles:
     - FreeholderDSM
+    - OathboundDSM
     - LevymanDSM
     - ScribeDSM
     - SurgeonDSM
@@ -107,21 +108,56 @@
 - type: entity
   parent: BaseFactionRecruitmentConsole
   id: FactionRecruitmentConsoleTFSC
-  name: Coalition recruitment terminal
-  suffix: TFSC
+  name: TFCF recruitment terminal
+  suffix: TFCF
   components:
   - type: AccessReader
     access: [["SyndicateCommand"], ["SyndicateRingleader"]]
   - type: FactionRecruitmentConsole
     faction: TFSC
-    # Roles sourced from the Freeport (Stations/freeport.yml) spawn points, the Coalition's only station.
-    # Command (Ringleader, Lieutenant, Coordinator, Foreman, Intelligence Officer) is intentionally
+    # Roles sourced from shared Federation infrastructure at the Freeport (Stations/freeport.yml).
+    # Command (Administrator, Lieutenant, Interdyne Supervisor, Foreman, Cyberdawn Supervisor) is intentionally
     # omitted: leadership roles must never be assignable from a console.
     roles:
-    - TechnicianTFSC
     - InfanteerTFSC
-    - OperativeTFSC
     - ShipbreakerTFSC
     - CyberdawnTechTFSC
     - RipperdocTFSC
-    - TraumasecTFSC
+
+- type: entity
+  parent: BaseFactionRecruitmentConsole
+  id: FactionRecruitmentConsoleGS
+  name: Gliess recruitment terminal
+  suffix: GS
+  components:
+  - type: AccessReader
+    access: [["GliessSheriff", "GliessDockmaster"]]
+  - type: FactionRecruitmentConsole
+    faction: GS
+    # The sheriff, deputy and dockmaster share the command credentials used here. The two senior
+    # jobs are intentionally unavailable as assignments, leaving only the civilian and deputy roles.
+    roles:
+    - GliessianDockhand
+    - GliessianDeputy
+
+- type: entity
+  parent: BaseFactionRecruitmentConsole
+  id: FactionRecruitmentConsoleTAP
+  name: TAP recruitment terminal
+  suffix: TAP
+  components:
+  - type: AccessReader
+    # Only the Prophet carries all three family authority tags; individual family representatives
+    # cannot unilaterally enlist personnel for the Pact.
+    access: [["Arabet", "Alseik", "Thukker"]]
+  - type: FactionRecruitmentConsole
+    faction: TAP
+    # The Prophet is TAP's high command and is intentionally not assignable from the console.
+    roles:
+    - AcolyteTAP
+    - BeltrunnerTAP
+    - DraugrTAP
+    - HangarTechTAP
+    - ServileTAP
+    - TechminerTAP
+    - TinkererTAP

@@ -22,7 +22,7 @@ public sealed class DebrisFeaturePlacerSystem : BaseWorldSystem
     [Dependency] private readonly PoissonDiskSampler _sampler = default!;
     [Dependency] private readonly TransformSystem _xformSys = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedMapSystem _mapManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly Robust.Shared.Prototypes.IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly Robust.Shared.EntitySerialization.Systems.MapLoaderSystem _mapLoader = default!;
@@ -56,10 +56,12 @@ public sealed class DebrisFeaturePlacerSystem : BaseWorldSystem
     /// </summary>
     private void OnDebrisMove(EntityUid uid, OwnedDebrisComponent component, ref MoveEvent args)
     {
-        if (!HasComp<WorldChunkComponent>(component.OwningController))
+        if (!TryComp<WorldChunkComponent>(component.OwningController, out var ownerChunk))
             return; // Redundant logic, prolly needs it's own handler for your custom system.
 
-        var placer = Comp<DebrisFeaturePlacerControllerComponent>(component.OwningController);
+        if (!TryComp<DebrisFeaturePlacerControllerComponent>(component.OwningController, out var placer))
+            return;
+
         var xform = args.Component;
         var ownerXform = Transform(component.OwningController);
         if (xform.MapUid is null || ownerXform.MapUid is null)
@@ -73,8 +75,13 @@ public sealed class DebrisFeaturePlacerSystem : BaseWorldSystem
             return;
         }
 
+        // Re-index only when the debris crosses into another chunk.
+        var newCoords = GetChunkCoords(uid, xform);
+        if (newCoords == ownerChunk.Coordinates)
+            return;
+
         placer.OwnedDebris.Remove(component.LastKey);
-        var newChunk = GetOrCreateChunk(GetChunkCoords(uid), xform.MapUid!.Value);
+        var newChunk = GetOrCreateChunk(newCoords, xform.MapUid!.Value);
         if (newChunk is null || !TryComp<DebrisFeaturePlacerControllerComponent>(newChunk, out var newPlacer))
         {
             // Whelp.
@@ -82,7 +89,10 @@ public sealed class DebrisFeaturePlacerSystem : BaseWorldSystem
             return;
         }
 
-        newPlacer.OwnedDebris[_xformSys.GetWorldPosition(xform)] = uid; // Change our owner.
+        // Keep the component and its new owner on the same chunk key.
+        var newKey = _xformSys.GetWorldPosition(xform);
+        newPlacer.OwnedDebris[newKey] = uid;
+        component.LastKey = newKey;
         component.OwningController = newChunk.Value;
     }
 

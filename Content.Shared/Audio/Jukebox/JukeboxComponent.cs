@@ -16,6 +16,31 @@ public sealed partial class JukeboxComponent : Component
     public EntityUid? AudioStream;
 
     /// <summary>
+    /// Base playback volume in dB, before the listener's own boombox volume slider is applied.
+    /// Jukeboxes used to play at 0 dB, which is over ten times the gain the station's own ambient
+    /// music runs at (-12 dB plus the music slider), so a single boombox drowned out everything.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float Volume = -8f;
+
+    /// <summary>
+    /// Audible radius in tiles. Attenuation is linear from the listener out to this range, so this
+    /// also sets how steeply the track fades as you walk away: a smaller range is both quieter at a
+    /// distance and gone sooner. A hand-carried boombox wants a much tighter range than a jukebox
+    /// bolted to a bar wall.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float Range = 10f;
+
+    /// <summary>
+    /// Whether walls and other impassable fixtures apply the engine's low-pass occlusion filter
+    /// to this jukebox's music. This can be disabled for small speakers whose short audible range
+    /// already prevents them from carrying through a ship.
+    /// </summary>
+    [DataField]
+    public bool Occlusion = true;
+
+    /// <summary>
     /// Upcoming songs to play after the current one finishes, in order.
     /// The currently playing track is not included here.
     /// </summary>

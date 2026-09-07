@@ -11,6 +11,7 @@
     sound:
       path: /Audio/_EE/Supermatter/delamming.ogg
   - type: Sprite
+    snapCardinals: true
     noRot: true
     sprite: _Crescent/Structures/capturepoint.rsi
     layers:
@@ -24,7 +25,6 @@
         enum.PowerDeviceVisualLayers.Powered:
           True: { visible: true }
           False: { visible: false }
-    snapCardinals: true
   - type: Physics
     bodyType: Static
   - type: Transform
@@ -95,6 +95,7 @@
     sound:
       path: /Audio/_EE/Supermatter/delamming.ogg
   - type: Sprite
+    snapCardinals: true
     noRot: true
     sprite: _Crescent/Structures/capturepoint.rsi
     layers:
@@ -108,7 +109,6 @@
         enum.PowerDeviceVisualLayers.Powered:
           True: { visible: true }
           False: { visible: false }
-    snapCardinals: true
   - type: Physics
     bodyType: Static
   - type: Transform
@@ -159,7 +159,7 @@
   - type: AnimationPlayer
   - type: Appearance
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     intensitySlope: 2
     maxIntensity: 200
     tileBreakScale: 0.2 # until MLG makes grid pieces not spam the map, then keep this
@@ -183,6 +183,7 @@
     sound:
       path: /Audio/_EE/Supermatter/delamming.ogg
   - type: Sprite
+    snapCardinals: true
     noRot: true
     sprite: _Crescent/Structures/capturepoint.rsi
     layers:
@@ -196,7 +197,6 @@
         enum.PowerDeviceVisualLayers.Powered:
           True: { visible: true }
           False: { visible: false }
-    snapCardinals: true
   - type: Physics
     bodyType: Static
   - type: Transform
@@ -247,7 +247,7 @@
   - type: AnimationPlayer
   - type: Appearance
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun
     intensitySlope: 5
     maxIntensity: 50
     tileBreakScale: 0.2 # until MLG makes grid pieces not spam the map, then keep this 
@@ -271,6 +271,7 @@
     sound:
       path: /Audio/_EE/Supermatter/delamming.ogg
   - type: Sprite
+    snapCardinals: true
     noRot: true
     sprite: _Crescent/Structures/capturepoint.rsi
     layers:
@@ -284,7 +285,6 @@
         enum.PowerDeviceVisualLayers.Powered:
           True: { visible: true }
           False: { visible: false }
-    snapCardinals: true
   - type: Physics
     bodyType: Static
   - type: Transform

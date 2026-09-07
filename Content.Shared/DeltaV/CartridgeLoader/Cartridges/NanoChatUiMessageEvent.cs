@@ -56,11 +56,12 @@ public enum NanoChatUiMessageType : byte
     DeleteChat,
     ToggleMute,
     ToggleListNumber,
+    ToggleBlock, // Eclipsion - block/unblock the selected chat
 }
 
 // putting this here because i can
 [Serializable, NetSerializable, DataRecord]
-public struct NanoChatRecipient
+public partial struct NanoChatRecipient
 {
     /// <summary>
     ///     The recipient's unique NanoChat number.
@@ -99,7 +100,7 @@ public struct NanoChatRecipient
 }
 
 [Serializable, NetSerializable, DataRecord]
-public struct NanoChatMessage
+public partial struct NanoChatMessage
 {
     public const int MaxContentLength = 256;
 
@@ -124,6 +125,15 @@ public struct NanoChatMessage
     /// </summary>
     public bool DeliveryFailed;
 
+    // Eclipsion Start - blocking
+    /// <summary>
+    ///     Whether the recipient is refusing traffic from the sender. Distinct from
+    ///     <see cref="DeliveryFailed"/> so the sender is told they were blocked instead of being left to
+    ///     read it as a comms outage and keep retrying.
+    /// </summary>
+    public bool Blocked;
+    // Eclipsion End
+
     /// <summary>
     ///     Creates a new NanoChat message.
     /// </summary>
@@ -131,12 +141,13 @@ public struct NanoChatMessage
     /// <param name="content">The content of the message</param>
     /// <param name="senderId">The sender's NanoChat number</param>
     /// <param name="deliveryFailed">Whether delivery to the recipient failed</param>
-    public NanoChatMessage(TimeSpan timestamp, string content, uint senderId, bool deliveryFailed = false)
+    public NanoChatMessage(TimeSpan timestamp, string content, uint senderId, bool deliveryFailed = false, bool blocked = false)
     {
         Timestamp = timestamp;
         Content = content;
         SenderId = senderId;
         DeliveryFailed = deliveryFailed;
+        Blocked = blocked; // Eclipsion - blocking
     }
 }
 
@@ -145,7 +156,7 @@ public struct NanoChatMessage
 /// </summary>
 /// <remarks>Used by the LogProbe</remarks>
 [Serializable, NetSerializable, DataRecord]
-public readonly struct NanoChatData(
+public readonly partial struct NanoChatData(
     Dictionary<uint, NanoChatRecipient> recipients,
     Dictionary<uint, List<NanoChatMessage>> messages,
     uint? cardNumber,

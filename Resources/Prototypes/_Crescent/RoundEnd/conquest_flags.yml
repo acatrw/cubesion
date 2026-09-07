@@ -41,7 +41,8 @@
   name: DSM conquest banner
   components:
     - type: Sprite
-      color: "#E5B80B" # imperial gold
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: black-purple
     - type: ConquestFlag
       homeFaction: DSM
 
@@ -52,7 +53,8 @@
   name: NCWL conquest banner
   components:
     - type: Sprite
-      color: "#C81919" # communard red
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: brown-ncwl
     - type: ConquestFlag
       homeFaction: NCWL
 
@@ -70,8 +72,8 @@
 - type: entity
   parent: ConquestFlag
   id: ConquestFlagTFSC
-  suffix: TFSC
-  name: TFSC conquest banner
+  suffix: TFCF
+  name: TFCF conquest banner
   components:
     - type: Sprite
       color: "#4CAF50" # coalition green
@@ -80,11 +82,23 @@
 
 - type: entity
   parent: ConquestFlag
-  id: ConquestFlagCMM
-  suffix: CMM
-  name: CMM conquest banner
+  id: ConquestFlagGS
+  suffix: GS
+  name: GS conquest banner
   components:
     - type: Sprite
       color: "#3F6FB5" # minutemen blue
     - type: ConquestFlag
-      homeFaction: CMM
+      homeFaction: GS
+
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagTAP
+  suffix: TAP
+  name: TAP conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: green-gold
+    - type: ConquestFlag
+      homeFaction: TAP

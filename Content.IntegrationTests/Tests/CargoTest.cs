@@ -39,7 +39,7 @@ public sealed class CargoTest
 
         await server.WaitAssertion(() =>
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 foreach (var proto in protoManager.EnumeratePrototypes<CargoProductPrototype>())
                 {
@@ -52,7 +52,7 @@ public sealed class CargoTest
                     Assert.That(price, Is.AtMost(proto.Cost), $"Found arbitrage on {proto.ID} cargo product! Cost is {proto.Cost} but sell is {price}!");
                     entManager.DeleteEntity(ent);
                 }
-            });
+            }
         });
 
         await pair.CleanReturnAsync();
@@ -66,7 +66,7 @@ public sealed class CargoTest
         var testMap = await pair.CreateTestMap();
 
         var entManager = server.ResolveDependency<IEntityManager>();
-        var mapManager = server.ResolveDependency<IMapManager>();
+        var mapManager = server.System<SharedMapSystem>();
         var protoManager = server.ResolveDependency<IPrototypeManager>();
         var cargo = entManager.System<CargoSystem>();
 
@@ -76,7 +76,7 @@ public sealed class CargoTest
         {
             var mapId = testMap.MapId;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 foreach (var proto in protoManager.EnumeratePrototypes<CargoProductPrototype>())
                 {
@@ -90,7 +90,7 @@ public sealed class CargoTest
 
                     entManager.DeleteEntity(ent);
                 }
-            });
+            }
 
             mapManager.DeleteMap(mapId);
         });
@@ -107,7 +107,7 @@ public sealed class CargoTest
         var testMap = await pair.CreateTestMap();
 
         var entManager = server.ResolveDependency<IEntityManager>();
-        var mapManager = server.ResolveDependency<IMapManager>();
+        var mapManager = server.System<SharedMapSystem>();
         var protoManager = server.ResolveDependency<IPrototypeManager>();
 
         await server.WaitAssertion(() =>
@@ -140,7 +140,7 @@ public sealed class CargoTest
                 {
                     if (entManager.TryGetComponent<StaticPriceComponent>(ent, out var staticpricecomp))
                     {
-                        Assert.That(staticpricecomp.Price, Is.EqualTo(0),
+                        Assert.That(staticpricecomp.Price, Is.Zero,
                             $"The prototype {proto} has a StackPriceComponent and StaticPriceComponent whose values are not compatible with each other.");
                     }
                 }
@@ -149,7 +149,7 @@ public sealed class CargoTest
                 {
                     if (entManager.TryGetComponent<StaticPriceComponent>(ent, out var staticpricecomp))
                     {
-                        Assert.That(staticpricecomp.Price, Is.EqualTo(0),
+                        Assert.That(staticpricecomp.Price, Is.Zero,
                             $"The prototype {proto} has a StackComponent and StaticPriceComponent whose values are not compatible with each other.");
                     }
                 }
@@ -175,7 +175,7 @@ public sealed class CargoTest
         var testMap = await pair.CreateTestMap();
 
         var entManager = server.ResolveDependency<IEntityManager>();
-        var mapManager = server.ResolveDependency<IMapManager>();
+        var mapManager = server.System<SharedMapSystem>();
         var protoManager = server.ResolveDependency<IPrototypeManager>();
         var componentFactory = server.ResolveDependency<IComponentFactory>();
         var whitelist = entManager.System<EntityWhitelistSystem>();

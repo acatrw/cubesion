@@ -4,9 +4,13 @@
 - type: vessel
   id: Vasinya
   name: NCWL Vasinya
-  description: A light communard patrol corvette.
+  description: |
+    A light communard patrol corvette.
+    LOADOUT: 4x 35mm 'Scout' Autocannon, 1x 50mm 'Striker' Heavy Autocannon, 2x 200cc 'Starburst' Plasma Gatling
+    SHIELD: Absent
+    SPEED: 35 m/s
   price: 50000
-  category: Small
+  category: Medium
   group: None
   path: /Maps/_Crescent/Shuttles/NCWL/vasinya.yml
 
@@ -25,3 +29,4 @@
             !type:NanotrasenNameGenerator
             prefixCreator: '14'
         - type: VesselDesignation
+          designation: vessel-designation-frigate

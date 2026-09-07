@@ -49,6 +49,8 @@
   - WeaponRifleKrinkovCyberdawn
   - WeaponPistolViperWoodCyberdawn
   - WeaponPistolAnsemCyberdawn
+  - M14IncendiaryHandgrenade
+  - M18SmokeHandgrenade
 
 - type: technology
   id: CyberdawnT1Infiltration
@@ -160,7 +162,6 @@
   tier: 2
   cost: 10000
   recipeUnlocks:
-  - BallisticCycler1Craft
   - TubeLoader1Craft
   - LaserLocus1Craft
   - HardlightGenerator1Craft
@@ -320,3 +321,15 @@
   - ScramImplanter
   - SyndicateBombCyberdawn
   - StealthBoxCyberdawn
+
+- type: technology
+  id: CDTAssaultCyborgs
+  name: research-technology-cyberdawn-CDTAssaultcyborgs
+  icon:
+    sprite: Mobs/Silicon/chassis.rsi
+    state: synd_sec
+  discipline: Cyberdawn
+  tier: 3
+  cost: 15000
+  recipeUnlocks:
+  - ReinforcementFlatpackSyndicateCyborgAssault

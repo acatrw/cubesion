@@ -6,13 +6,30 @@ research-discipline-astronautics = Astronautics
 research-discipline-biochemical = Biochemical
 research-discipline-interdyne = Interdyne
 research-discipline-cyberdawn = Cyberdawn
-research-discipline-coalition = Coalition Technology
+research-discipline-coalition = TFCF Technology
 research-discipline-communard = Communard
 research-discipline-imperial = Imperial
 research-discipline-corporate = Shinohara
 research-discipline-minutemen = Minutemen
+research-discipline-pang-tai = Pang Tai Arms
 
 # Node Names
+
+# PANG TAI ARMS
+research-technology-pang-tai-sidearms = PTA Civilian Sidearms
+research-technology-pang-tai-light-smgs = PTA Light Submachine Guns
+research-technology-pang-tai-corvid = CORVID-X1 Armor
+research-technology-pang-tai-combat-shotguns = PTA Combat Shotguns
+research-technology-pang-tai-silent-weapons = PTA Integrally Suppressed Weapons
+research-technology-pang-tai-service-rifles = PTA Service Rifles
+research-technology-pang-tai-cheshyre = CHESHYRE Submachine Gun
+research-technology-pang-tai-karabin = MOD-23 KARABIN
+research-technology-pang-tai-korund = KORUND-X2 Armor
+research-technology-pang-tai-grenades = PTA Tactical Grenades
+research-technology-pang-tai-precision-weapons = PTA Precision Heavy Weapons
+research-technology-pang-tai-experimental-weapons = PTA Experimental Energy Weapons
+research-technology-pang-tai-launchers = PTA Launcher Systems
+research-technology-pang-tai-zhanshi = ZHANSHI-X3 Combat Hardsuit
 
 # ASTRONAUTICS
 research-technology-astronautics-basic-flight = Basic Avionics
@@ -21,6 +38,9 @@ research-technology-astronautics-basiceva = Basic EVA
 research-technology-astronautics-advancedeva = Specialized EVA
 research-technology-astronautics-shipyardconstruction = Rapid Vessel Construction Device
 research-technology-astronautics-modsuit = MODSuit
+research-technology-astronautics-fuel-storage = Reinforced Fuel Storage
+research-technology-astronautics-bulk-fuel-storage = Bulk Fuel Storage
+research-technology-astronautics-seep-extraction = Seep Extraction
 
 # MECHATRONICS
 research-technology-mechatronics-parts = Construction Parts
@@ -38,6 +58,8 @@ research-technology-electronics-translators = Translators
 research-technology-electronics-materials = Basic Components
 research-technology-electronics-defense = Civilian Defense Pistols
 research-technology-electronics-terminus = Ogre Shocktrooper Armaments
+research-technology-electronics-pouches = Modular Pouch Rigging
+research-technology-electronics-dampener = Noospheric Dampener Belt
 
 # MINUTEMEN
 research-technology-minutemen-hybrid-corvettes = minutemen hybrid corvettes
@@ -66,8 +88,8 @@ research-technology-interdyne-pryarms = TT-42 Pryarms
 # CYBERDAWN
 research-technology-cyberdawn-clothing = Cyberdawn Clothing
 research-technology-cyberdawn-reverse-engineering = Basic reclamation technology
-research-technology-cyberdawn-basicballistics = Basic Syndicate Ballistics
-research-technology-cyberdawn-advancedballistics = Advanced Syndicate Ballistics
+research-technology-cyberdawn-basicballistics = Basic Cyberdawn Ballistics
+research-technology-cyberdawn-advancedballistics = Advanced Cyberdawn Ballistics
 research-technology-cyberdawn-T1-Infiltration = Basic infiltration technology
 research-technology-cyberdawn-T2-Infiltration = Advanced infiltration technology
 research-technology-cyberdawn-T3-Infiltration = Experimental infiltration technology
@@ -84,6 +106,7 @@ research-technology-cyberdawn-CDTPhoronBlade = PhoronBlade
 research-technology-cyberdawn-CDTDualPhoronBlade = DualPhoronBlade
 research-technology-cyberdawn-CDTMedicalcyborgs = Medical cyborgs
 research-technology-cyberdawn-CDTSaboteurcyborgs = Saboteur cyborgs
+research-technology-cyberdawn-CDTAssaultcyborgs = Assault cyborgs
 research-technology-cyberdawn-CDTShipT1LPC = Basic stealth ship production
 
 
@@ -121,7 +144,6 @@ research-technology-imperial-craftcomps = Imperial Weapon Components
 research-technology-imperial-raider = Imperial Troop Transport
 research-technology-imperial-baserosterships = Standard Imperial Ships
 research-technology-imperial-baserosterinfantry = Standard Imperial Infantry Gear
-research-technology-imperial-clarizianpatterns = Clarizian Patterns
 research-technology-imperial-auxiliaryhulls = Imperial Auxiliary Hulls
 
 # NCWL

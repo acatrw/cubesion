@@ -3,15 +3,24 @@ rat-station-trade-market = Sold for {$finalAmount} cr ({$pct}% market value) —
 
 # --- Taxation console ---
 taxation-console-title = Trade Taxation Console
-taxation-console-treasury = Faction treasury: {$balance} cr
+taxation-console-treasury-label = FACTION TREASURY
+taxation-console-treasury = {$balance} cr
 taxation-console-access-granted = Authorized — you may adjust tax rates.
 taxation-console-access-view = View only — a faction card is required to change rates.
 taxation-console-access-denied = Access denied. A valid faction card is required.
 taxation-console-default-label = Default tax rate:
-taxation-console-goods-header = Trade goods
+taxation-console-goods-header = TRADE GOODS
 taxation-console-good-price = base {$price} cr
 taxation-console-set = Set
 taxation-console-clear = Reset
+taxation-console-filter-placeholder = Filter goods...
+taxation-console-col-good = GOOD
+taxation-console-col-price = BASE PRICE
+taxation-console-col-rate = RATE
+taxation-console-no-goods = No taxable goods registered.
+taxation-console-no-matches = No goods match that filter.
+taxation-console-denied-tooltip = You need a faction card with treasury access to change rates.
+taxation-console-no-override-tooltip = This good has no override to reset — it uses the default rate.
 
 # --- Faction treasury console ---
 treasury-console-title = Faction Treasury Vault
@@ -38,3 +47,14 @@ treasury-console-robbery-cut = The vault console loses power and the siphon dies
 treasury-console-alarm-sender = Treasury Vault Security
 treasury-console-alarm-unknown-station = an unknown holding
 treasury-console-alarm-announcement = Security alert: unauthorized hands are at the {$station} treasury vault. A robbery is in progress — all command and security personnel, respond at once.
+
+# Your own share of the vault, so "withdraw all" stops looking like it short-changed you.
+treasury-console-remaining = Your allowance: { $remaining } cr ({ $percent }% share)
+
+# Eclipsion - high-value ship purchase approval
+treasury-console-requests-header = Pending ship purchases
+treasury-console-requests-empty = Nothing awaiting approval.
+treasury-console-request-line = {$buyer} - {$vessel} - {$price} cr
+treasury-console-request-approved = Approved by {$approver}. Awaiting collection.
+treasury-console-request-approve = Approve
+treasury-console-request-deny = Deny

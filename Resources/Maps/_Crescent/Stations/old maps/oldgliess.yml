@@ -65563,8 +65563,6 @@ entities:
       pos: -5.5,-20.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
 - proto: ComputerTabletopCriminalRecords
   entities:
   - uid: 2106
@@ -69048,35 +69046,6 @@ entities:
     - type: Transform
       pos: -6.9791026,12.822545
       parent: 1
-- proto: HandheldGPSBasic
-  entities:
-  - uid: 2076
-    components:
-    - type: Transform
-      parent: 2073
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 2082
-    components:
-    - type: Transform
-      parent: 2079
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-      canCollide: False
-    - type: InsideEntityStorage
-  - uid: 2088
-    components:
-    - type: Transform
-      parent: 2085
-    - type: Physics
-      angularDamping: 0
-      linearDamping: 0
-      canCollide: False
-    - type: InsideEntityStorage
 - proto: HandheldHealthAnalyzer
   entities:
   - uid: 2675
@@ -74186,7 +74155,6 @@ entities:
           showEnts: False
           occludes: True
           ents:
-          - 2076
           - 2075
           - 2074
           - 2077
@@ -74206,7 +74174,6 @@ entities:
           - 2080
           - 2083
           - 2081
-          - 2082
   - uid: 2085
     components:
     - type: Transform
@@ -74221,7 +74188,6 @@ entities:
           - 2090
           - 2087
           - 2089
-          - 2088
           - 2086
 - proto: SurveillanceCameraGeneral
   entities:
@@ -74324,8 +74290,6 @@ entities:
       pos: 6.5,-2.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 3407
     components:
     - type: Transform
@@ -74346,8 +74310,6 @@ entities:
       pos: -11.5,3.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
 - proto: Table
   entities:
   - uid: 3410

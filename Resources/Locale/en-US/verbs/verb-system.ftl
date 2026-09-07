@@ -19,6 +19,7 @@ verb-categories-rotate = Rotate
 verb-categories-smite = Smite
 verb-categories-tricks = Tricks
 verb-categories-transfer = Set Transfer Amount
+verb-categories-transfer-direction = Set Transfer Direction
 verb-categories-split = Split
 verb-categories-instrument-style = Instrument Style
 verb-categories-channel-select = Channels
@@ -31,7 +32,6 @@ verb-categories-rename = Rename
 verb-categories-fax = Set Destination
 verb-categories-power-level = Power Level
 verb-categories-interaction = Interact
-verb-categories-blood-cult = Blood Cult
 
 verb-common-toggle-light = Toggle light
 verb-common-close = Close

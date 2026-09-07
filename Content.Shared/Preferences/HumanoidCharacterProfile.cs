@@ -7,6 +7,7 @@ using Content.Shared.Clothing.Loadouts.Systems;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Prototypes;
+using Content.Shared.Random; // Eclipsion
 using Content.Shared.Roles;
 using Content.Shared.Traits;
 using Robust.Shared.Configuration;
@@ -282,13 +283,27 @@ public sealed partial class HumanoidCharacterProfile : ICharacterProfile
         var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
         var random = IoCManager.Resolve<IRobustRandom>();
 
-        var species = random.Pick(
-                prototypeManager
-                    .EnumeratePrototypes<SpeciesPrototype>()
-                    .Where(x => ignoredSpecies == null ? x.RoundStart : x.RoundStart && !ignoredSpecies.Contains(x.ID))
-                    .ToArray()
-            )
-            .ID;
+        // Eclipsion - a species weighted 0 is playable but never handed out by a random roll. This pick is flat
+        // over every round-start species and never looked at the weights, so marking one 0 there did nothing:
+        // the moment Skeleton became round-start it started turning up as a share of every ghost role whose
+        // species blacklist was written before it existed. Only explicit zeroes are dropped, so the relative
+        // frequency of everything else is exactly what it was.
+        var configManager = IoCManager.Resolve<IConfigurationManager>();
+        prototypeManager.TryIndex<WeightedRandomSpeciesPrototype>(
+            configManager.GetCVar(CCVars.ICRandomSpeciesWeights),
+            out var weights);
+
+        var candidates = prototypeManager
+            .EnumeratePrototypes<SpeciesPrototype>()
+            .Where(x => x.RoundStart)
+            .Where(x => ignoredSpecies == null || !ignoredSpecies.Contains(x.ID))
+            .Where(x => weights == null || !weights.Weights.TryGetValue(x.ID, out var weight) || weight > 0)
+            .ToArray();
+
+        // A blacklist that leaves nothing behind is a broken prototype, not a reason to throw at spawn time.
+        var species = candidates.Length == 0
+            ? SharedHumanoidAppearanceSystem.DefaultSpecies
+            : random.Pick(candidates).ID;
 
         return RandomWithSpecies(species);
     }
@@ -500,6 +515,33 @@ public string Summary =>
 
         if (!validFaction)
             Faction = "";
+
+        // Faction-restricted species. This has to run after the check above, because an unrecognised
+        // faction is blanked to "" there and must not then be able to satisfy a restricted species.
+        if (speciesPrototype.Factions.Count > 0 && !speciesPrototype.Factions.Any(f => f.Id == Faction))
+        {
+            Species = SharedHumanoidAppearanceSystem.DefaultSpecies;
+            speciesPrototype = prototypeManager.Index<SpeciesPrototype>(Species);
+        }
+
+        // Subfaction is prototype-backed like Faction but never got validated, so old profiles still point at
+        // the legacy IPM/SAW/GSC/CD gameplay ids now represented by the shared TFCF diplomatic id. "" is the unset value.
+        if (Subfaction != "" && !prototypeManager.HasIndex<FactionPrototype>(Subfaction))
+            Subfaction = "";
+
+        // No prototypes back CharacterFlags, so there is nothing to validate ids against, only the shape.
+        // Nothing else prunes this list, so blanks and duplicates stay in the DB forever once they get in.
+        if (CharacterFlags.Count > 0)
+        {
+            var flags = CharacterFlags
+                .Where(f => !string.IsNullOrWhiteSpace(f))
+                .Select(f => f.Trim())
+                .Distinct()
+                .ToList();
+
+            if (!flags.SequenceEqual(CharacterFlags))
+                CharacterFlags = flags;
+        }
 
         // EE Contractor fields (Nationality/Employer/Lifepath) are prototype-backed but were never added
         // to validation. A removed/renamed prototype left them permanently invalid in the DB, surviving

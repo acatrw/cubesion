@@ -12,13 +12,13 @@ using Content.Shared.NPC.Systems;
 using Content.Shared.Damage.Systems;
 using Content.Server.Flash;
 using Content.Shared.Stunnable;
+using Robust.Shared.Timing;
 
 
 namespace Content.Server.Voidborn;
 
 public sealed class EtherealSystem : SharedEtherealSystem
 {
-    [Dependency] private readonly VisibilitySystem _visibilitySystem = default!;
     [Dependency] private readonly SharedStealthSystem _stealth = default!;
     [Dependency] private readonly EyeSystem _eye = default!;
     [Dependency] private readonly NpcFactionSystem _factions = default!;
@@ -27,6 +27,7 @@ public sealed class EtherealSystem : SharedEtherealSystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly StaminaSystem _staminaSystem = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -45,20 +46,34 @@ public sealed class EtherealSystem : SharedEtherealSystem
     private void OnStunned(EntityUid uid, EtherealComponent component, StunnedEvent args) =>
         RemComp(uid, component);
 
+    /// <summary>
+    /// Drops an entity out of the shadow state with the same flash and shadow the power itself uses,
+    /// so a phase that runs out of time looks like a phase that was ended on purpose.
+    /// </summary>
+    public void EndEthereal(EntityUid uid, EtherealComponent component)
+    {
+        SpawnAtPosition("VoidbornShadow", Transform(uid).Coordinates);
+        SpawnAtPosition("EffectFlashVoidbornDarkSwapOff", Transform(uid).Coordinates);
+        RemComp(uid, component);
+    }
+
     public override void OnStartup(EntityUid uid, EtherealComponent component, MapInitEvent args)
     {
         base.OnStartup(uid, component, args);
 
-        var visibility = EnsureComp<VisibilityComponent>(uid);
-        _visibilitySystem.RemoveLayer((uid, visibility), (int) VisibilityFlags.Normal, false);
-        _visibilitySystem.AddLayer((uid, visibility), (int) VisibilityFlags.Ethereal, false);
-        _visibilitySystem.RefreshVisibility(uid, visibility);
+        component.ExpiresAt = _timing.CurTime + component.Duration;
 
+        // Eclipsion - the shadow state carries no visibility layer, so a DarkSwapped psion is a shimmer everyone
+        // can spot if they look rather than an entity the client never hears about. PVS only sends an entity when
+        // the viewer's mask holds every bit the entity carries, and the engine forces bit 1 on regardless, so
+        // adding the Ethereal layer alone was enough to hide it from everybody without the ShowEthereal bit -
+        // dropping the Normal layer next to it never mattered. Hiding is StealthComponent's job below.
         if (TryComp<EyeComponent>(uid, out var eye))
             _eye.SetVisibilityMask(uid, eye.VisibilityMask | (int) (VisibilityFlags.Ethereal), eye);
 
         var stealth = EnsureComp<StealthComponent>(uid);
-        _stealth.SetVisibility(uid, 0.8f, stealth);
+        _stealth.SetVisibility(uid, SharedPsionicAbilitiesSystem.ConcealmentVisibility, stealth); // Eclipsion
+        _stealth.SetColorTint(uid, false, stealth); // Eclipsion - a shimmer, not a blue character.
 
         SuppressFactions(uid, component, true);
 
@@ -70,13 +85,7 @@ public sealed class EtherealSystem : SharedEtherealSystem
     {
         base.OnShutdown(uid, component, args);
 
-        if (TryComp<VisibilityComponent>(uid, out var visibility))
-        {
-            _visibilitySystem.AddLayer((uid, visibility), (int) VisibilityFlags.Normal, false);
-            _visibilitySystem.RemoveLayer((uid, visibility), (int) VisibilityFlags.Ethereal, false);
-            _visibilitySystem.RefreshVisibility(uid, visibility);
-        }
-
+        // Eclipsion - nothing to undo on the visibility layer; the shadow state never puts one on.
         if (TryComp<EyeComponent>(uid, out var eye))
             _eye.SetVisibilityMask(uid, (int) VisibilityFlags.Normal, eye);
 
@@ -132,9 +141,21 @@ public sealed class EtherealSystem : SharedEtherealSystem
     {
         base.Update(frameTime);
 
+        var now = _timing.CurTime;
+
         var query = EntityQueryEnumerator<EtherealComponent>();
         while (query.MoveNext(out var uid, out var component))
         {
+            // A round restart rewinds CurTime, which would otherwise strand an expiry in the future.
+            if (component.ExpiresAt > now + component.Duration)
+                component.ExpiresAt = now;
+
+            if (now >= component.ExpiresAt)
+            {
+                EndEthereal(uid, component);
+                continue;
+            }
+
             if (!component.Darken)
                 continue;
 

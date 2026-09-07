@@ -12,7 +12,6 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    zeroVisible: false
   - type: MagazineVisuals
     magState: mag
     steps: 3
@@ -125,6 +124,7 @@
       - CartridgeHeavyRifleSpeedloader
   - type: SpeedLoader
   - type: BallisticAmmoProvider
+    fillDelay: 0
     whitelist:
       tags:
         - CartridgeHeavyRifle
@@ -170,7 +170,6 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    zeroVisible: false
   - type: MagazineVisuals
     magState: mag
     steps: 3

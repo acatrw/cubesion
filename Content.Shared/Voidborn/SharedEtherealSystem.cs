@@ -39,6 +39,11 @@ public abstract class SharedEtherealSystem : EntitySystem
         SubscribeLocalEvent<EtherealComponent, ShotAttemptedEvent>(OnShootAttempt);
         SubscribeLocalEvent<EtherealComponent, OnMindbreakEvent>(OnMindbreak);
         SubscribeLocalEvent<EtherealComponent, MobStateChangedEvent>(OnMobStateChanged);
+
+        // Eclipsion - a phased psion is concealed, not absent. Nothing here blocks being attacked or
+        // interacted with from the outside: the shimmer is half-visible on purpose, and anyone who
+        // picks it out of the background is allowed to swing at it. The handlers above are one
+        // directional, and stop the ethereal reaching out into the material world.
     }
 
     public virtual void OnStartup(EntityUid uid, EtherealComponent component, MapInitEvent args)

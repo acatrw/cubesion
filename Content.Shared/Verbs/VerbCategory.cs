@@ -88,6 +88,9 @@ namespace Content.Shared.Verbs
         public static readonly VerbCategory SetTransferAmount =
             new("verb-categories-transfer", "/Textures/Interface/VerbIcons/spill.svg.192dpi.png");
 
+        public static readonly VerbCategory SetTransferDirection =
+            new("verb-categories-transfer-direction", "/Textures/Interface/VerbIcons/spill.svg.192dpi.png");
+
         public static readonly VerbCategory Split = new("verb-categories-split");
 
         public static readonly VerbCategory InstrumentStyle = new("verb-categories-instrument-style");
@@ -106,8 +109,6 @@ namespace Content.Shared.Verbs
 
         public static readonly VerbCategory Interaction = new("verb-categories-interaction");
 
-        public static readonly VerbCategory BloodSpells = new("verb-categories-blood-cult",
-            new SpriteSpecifier.Rsi(new ResPath("/Textures/WhiteDream/BloodCult/actions.rsi"), "blood_spells"));
         public static readonly VerbCategory PowerLevel = new("verb-categories-power-level");
 
         // Shitmed - Starlight Abductors

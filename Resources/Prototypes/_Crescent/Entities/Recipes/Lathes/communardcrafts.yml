@@ -120,7 +120,7 @@
   completetime: 2
   materials:
     Steel: 1000
-    Durathread: 300
+    Cloth: 150
 
 - type: latheRecipe
   id: ClothingHeadHelmetNCWLBasic
@@ -139,7 +139,7 @@
   materials:
     Steel: 800
     Tungsten: 400
-    Durathread: 200
+    Cloth: 100
 
 - type: latheRecipe
   id: ClothingHeadHelmetNCWLHeavy
@@ -166,8 +166,7 @@
   completetime: 2
   materials:
     Steel: 600
-    Cloth: 300
-    Durathread: 300
+    Cloth: 450
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLLogi
@@ -176,8 +175,7 @@
   completetime: 2
   materials:
     Steel: 600
-    Cloth: 300
-    Durathread: 300
+    Cloth: 450
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLCarapaceVrachev
@@ -186,8 +184,7 @@
   completetime: 2
   materials:
     Plastic: 600
-    Cloth: 300
-    Durathread: 300
+    Cloth: 450
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLMedi
@@ -196,8 +193,7 @@
   completetime: 2
   materials:
     Plastic: 600
-    Cloth: 300
-    Durathread: 300
+    Cloth: 450
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLCarapaceDoktor
@@ -207,8 +203,7 @@
   materials:
     Steel: 600
     Plastic: 200
-    Cloth: 300
-    Durathread: 300
+    Cloth: 450
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLCarapaceKapitan
@@ -218,7 +213,7 @@
   materials:
     Steel: 800
     Tungsten: 200
-    Durathread: 300
+    Cloth: 150
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLCarapace
@@ -228,7 +223,7 @@
   materials:
     Steel: 800
     Tungsten: 200
-    Durathread: 300
+    Cloth: 150
 
 - type: latheRecipe
   id: ClothingOuterArmorNCWLOpremeCarapace
@@ -292,11 +287,14 @@
   result: ClothingOuterHardsuitNCWLJuggernaut
   completetime: 2
   materials:
-    Steel: 3000
+    # Eclipsion Start - matched to the SHI juggernaut's cost; this used to print
+    # for 2000 less steel than an equivalent-tier suit.
+    Steel: 5000
     HardsuitElectronics: 1000
-    NanotrasenElectronics: 1000
-    Tungsten: 2500
+    NanotrasenMechatronics: 1000
+    Tungsten: 2000
     Durathread: 1500
+    # Eclipsion End
 
 # MARK: Weapons
 
@@ -315,9 +313,9 @@
   result: WeaponPistolT91
   completetime: 2
   materials:
-    Steel: 1000
+    Steel: 3500
     Tungsten: 300
-    BallisticCycler: 500
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponRevolverPython
@@ -334,9 +332,9 @@
   result: WeaponRifleFAL
   completetime: 2
   materials:
-    Steel: 1500
+    Steel: 4000
     Plasteel: 300
-    BallisticCycler: 500
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponRifleNCWLRezerv
@@ -354,9 +352,9 @@
   result: WeaponShotgunProletar
   completetime: 2
   materials:
-    Steel: 1500
+    Steel: 4000
     Plasteel: 300
-    BallisticCycler: 500
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponShotgunDoubleBarreledNCWL
@@ -374,9 +372,9 @@
   result: WeaponShotgunToz123
   completetime: 2
   materials:
-    Steel: 1500
+    Steel: 6500
     Plasteel: 500
-    BallisticCycler: 1000
+    BasicMechatronics: 2000
 
 - type: latheRecipe
   id: WeaponRifleNCWLBatanya
@@ -384,9 +382,9 @@
   result: WeaponRifleNCWLBatanya
   completetime: 2
   materials:
-    Steel: 1500
+    Steel: 6500
     Plasteel: 500
-    BallisticCycler: 1000
+    BasicMechatronics: 2000
 
 - type: latheRecipe
   id: WeaponSniperNCWLNovomosin
@@ -404,10 +402,10 @@
   result: WeaponSniperMolot
   completetime: 2
   materials:
-    Steel: 2000
+    Steel: 7000
     Plasteel: 1000
     Tungsten: 500
-    BallisticCycler: 1000
+    BasicMechatronics: 2000
 
 - type: latheRecipe
   id: WeaponSubMachineGunMilitant
@@ -415,10 +413,10 @@
   result: WeaponSubMachineGunMilitant
   completetime: 2
   materials:
-    Steel: 1500
+    Steel: 4000
     Silver: 300
     Plastic: 500
-    BallisticCycler: 500
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponSubMachineGunBloodhound
@@ -426,8 +424,8 @@
   result: WeaponSubMachineGunBloodhound
   completetime: 2
   materials:
-    Steel: 1500
-    BallisticCycler: 500
+    Steel: 4000
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponSubMachineGunNCWLWatchdog
@@ -435,9 +433,9 @@
   result: WeaponSubMachineGunNCWLWatchdog
   completetime: 2
   materials:
-    Steel: 1000
+    Steel: 3500
     Plastic: 300
-    BallisticCycler: 500
+    BasicMechatronics: 1000
 
 - type: latheRecipe
   id: WeaponLauncherGM94
@@ -456,10 +454,10 @@
   result: WeaponLightMachineGunConscript
   completetime: 2
   materials:
-    Steel: 3500
+    Steel: 8500
     Tungsten: 1000
     TubeLoader: 500
-    BallisticCycler: 1000
+    BasicMechatronics: 2000
 
 # MARK: Ship LPCs
 
@@ -660,15 +658,6 @@
     Tungsten: 3500 #added 10 due to it being NCWL's best mech.
 
 # MARK:Components
-
-- type: latheRecipe
-  id:  BallisticCyclerNCWL
-  category: Ammo
-  result: BallisticCycler1
-  completetime: 1.5
-  materials:
-    BasicMechatronics: 1000
-    Steel: 2500
 
 - type: latheRecipe
   id:  TubeLoaderNCWL
