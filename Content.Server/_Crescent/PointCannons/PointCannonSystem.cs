@@ -83,6 +83,7 @@ public sealed class PointCannonSystem : EntitySystem
     private EntityQuery<HardpointAnchorableOnlyComponent> _anchorQuery;
     private EntityQuery<ApcPowerReceiverComponent> _powerQuery;
     private EntityQuery<HardpointFixedMountComponent> _fixedMountQuery;
+    private EntityQuery<HardpointComponent> _hardpointQuery;
     private EntityQuery<PhysicsComponent> _physicsQuery;
     private EntityQuery<CannonFireCooldownComponent> _cooldownQuery;
     private EntityQuery<GridCannonCacheComponent> _gridCacheQuery;
@@ -122,6 +123,7 @@ public sealed class PointCannonSystem : EntitySystem
         _anchorQuery = GetEntityQuery<HardpointAnchorableOnlyComponent>();
         _powerQuery = GetEntityQuery<ApcPowerReceiverComponent>();
         _fixedMountQuery = GetEntityQuery<HardpointFixedMountComponent>();
+        _hardpointQuery = GetEntityQuery<HardpointComponent>();
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
         _cooldownQuery = GetEntityQuery<CannonFireCooldownComponent>();
         _gridCacheQuery = GetEntityQuery<GridCannonCacheComponent>();
@@ -140,6 +142,19 @@ public sealed class PointCannonSystem : EntitySystem
     private void OnCannonRemoved(EntityUid uid, PointCannonComponent comp, ComponentRemove args)
     {
         InvalidateGridCache(uid);
+    }
+
+    /// <summary>
+    /// Marks a grid's cannon list stale and re-derives every active console's links from it. The
+    /// automated repair slip calls this once a hull is back together: a gun it reinstated announced
+    /// itself while it was still sitting unmounted, so the links drawn then missed it.
+    /// </summary>
+    public void InvalidateGridCannons(EntityUid gridUid)
+    {
+        if (_gridCacheQuery.TryGetComponent(gridUid, out var cache))
+            cache.Dirty = true;
+
+        QueueGridConsoleRelink(gridUid);
     }
 
     private void InvalidateGridCache(EntityUid cannonUid)
@@ -720,7 +735,7 @@ public sealed class PointCannonSystem : EntitySystem
                 }
             }
 
-            if (TryFireCannon(cannonUid, coordinates))
+            if (TryFireCannon(cannonUid, coordinates, console: uid))
             {
                 if (cooldown != null)
                     cooldown.NextFire = now + TimeSpan.FromSeconds(cooldown.FireCooldown);
@@ -765,7 +780,8 @@ public sealed class PointCannonSystem : EntitySystem
         Vector2 pos,
         TransformComponent? form = null,
         GunComponent? gun = null,
-        PointCannonComponent? cannon = null)
+        PointCannonComponent? cannon = null,
+        EntityUid? console = null)
     {
         if (form == null && !_xformQuery.TryGetComponent(uid, out form))
             return false;
@@ -811,8 +827,52 @@ public sealed class PointCannonSystem : EntitySystem
             entPos = new EntityCoordinates(form.MapUid.Value, pos);
         }
 
+        EntityManager.System<ShipWeaponTargetingSystem>().SetConsole(uid, console);
         _gunSys.AttemptShoot(uid, uid, gun, entPos);
         return true;
+    }
+
+    /// <summary>
+    /// Angular slack allowed when judging whether a welded gun's axis lines up with a target. Shared with the
+    /// ship AI's arc solver so a hull that turns to a bearing on account of a fixed gun then actually shoots
+    /// with it. This is a firing arc, not the gun's spread cone - never substitute <c>GunComponent.MaxAngle</c>,
+    /// which is the accuracy cap and has nothing to do with where the mount points.
+    /// </summary>
+    public static readonly Angle FixedMountAimTolerance = Angle.FromDegrees(2);
+
+    /// <summary>
+    /// Whether a mounted cannon can physically bear on a world position. Traversing hardpoints can always turn;
+    /// fixed mounts only qualify when their welded axis is already close enough to the target bearing.
+    /// </summary>
+    public bool CanAimAt(
+        EntityUid uid,
+        Vector2 position,
+        TransformComponent? form = null)
+    {
+        if (form == null && !_xformQuery.TryGetComponent(uid, out form))
+            return false;
+        if (!_anchorQuery.TryGetComponent(uid, out var anchor) || anchor.anchoredTo is not { } hardpoint)
+            return false;
+
+        // A mount that no longer exists is not a traversing one. Reading "no HardpointFixedMount" as "it can
+        // turn" meant a gun whose hardpoint had been destroyed under it reported that it could bear on anything.
+        if (!_hardpointQuery.HasComponent(hardpoint))
+            return false;
+
+        if (!_fixedMountQuery.HasComponent(hardpoint))
+            return true;
+
+        var delta = position - _formSys.GetWorldPosition(form);
+        if (delta.LengthSquared() < 0.01f)
+            return false;
+
+        // A welded gun shoots down its own local -Y, which is precisely the world rotation TryFireCannon turns a
+        // traversing mount to before firing: SetWorldRotation(uid, Angle.FromWorldVec(pos - cannonPos)). So the
+        // mount's world rotation and the bearing to the target are already in the same frame and compare
+        // directly. Offsetting either one by a quarter turn puts every fixed gun 90 degrees off its real axis.
+        var axis = _formSys.GetWorldRotation(form);
+        var target = Angle.FromWorldVec(delta);
+        return Math.Abs(Angle.ShortestDistance(axis, target).Theta) <= FixedMountAimTolerance.Theta;
     }
 
     /// <summary>
@@ -825,7 +885,9 @@ public sealed class PointCannonSystem : EntitySystem
     {
         hardpoint = default;
 
-        if (!_anchorQuery.TryGetComponent(cannonUid, out var anchorComp) || anchorComp.anchoredTo is not { } mount)
+        if (!_anchorQuery.TryGetComponent(cannonUid, out var anchorComp) ||
+            anchorComp.anchoredTo is not { } mount ||
+            !_hardpoint.IsMounted((cannonUid, anchorComp)))
             return false;
 
         // The hardpoint must not reintroduce a power requirement while ship-weapon power is opted out.

@@ -221,8 +221,8 @@
       id: blinking
       interpolate: Nearest
       maxDuration: 1.0
-      minValue: 0.1
-      maxValue: 2.0
+      startValue: 0.1
+      endValue: 2.0
       isLooped: true
   - type: ToggleableLightVisuals
   - type: PointLight
@@ -259,8 +259,6 @@
     - TauCetiBasic
     - RobotTalk
   - type: PsionicInsulation
-  - type: TwistedConstructionTarget
-    replacementProto: ConstructShell
 
 - type: entity
   abstract: true

@@ -46,14 +46,14 @@ public sealed partial class CCVars
     ///     Whether monstermos tile equalization is enabled.
     /// </summary>
     public static readonly CVarDef<bool> MonstermosEqualization =
-        CVarDef.Create("atmos.monstermos_equalization", false, CVar.SERVERONLY);
+        CVarDef.Create("atmos.monstermos_equalization", true, CVar.SERVERONLY);
 
     /// <summary>
     ///     Whether monstermos explosive depressurization is enabled.
     ///     Needs <see cref="MonstermosEqualization"/> to be enabled to work.
     /// </summary>
     public static readonly CVarDef<bool> MonstermosDepressurization =
-        CVarDef.Create("atmos.monstermos_depressurization", false, CVar.SERVERONLY);
+        CVarDef.Create("atmos.monstermos_depressurization", true, CVar.SERVERONLY);
 
     /// <summary>
     ///     Whether monstermos explosive depressurization will rip tiles..
@@ -75,9 +75,12 @@ public sealed partial class CCVars
     /// <summary>
     ///     Whether explosive depressurization will cause the grid to gain an impulse.
     ///     Needs <see cref="MonstermosEqualization"/> and <see cref="MonstermosDepressurization"/> to be enabled to work.
+    ///     Eclipsion: disabled. Every grid here is a piloted vessel, so venting a breached
+    ///     compartment shoving the whole hull sideways (and spinning it) is never wanted -
+    ///     derelict wrecks drifted off station the moment they blew their stored air.
     /// </summary>
     public static readonly CVarDef<bool> AtmosGridImpulse =
-        CVarDef.Create("atmos.grid_impulse", true, CVar.SERVERONLY);
+        CVarDef.Create("atmos.grid_impulse", false, CVar.SERVERONLY);
 
     /// <summary>
     ///     Minimum amount of air allowed on a spaced tile before it is reset to 0 immediately in kPa
@@ -132,7 +135,7 @@ public sealed partial class CCVars
     ///     Atmos tickrate in TPS. Atmos processing will happen every 1/TPS seconds.
     /// </summary>
     public static readonly CVarDef<float> AtmosTickRate =
-        CVarDef.Create("atmos.tickrate", 10f, CVar.SERVERONLY);
+        CVarDef.Create("atmos.tickrate", 15f, CVar.SERVERONLY);
 
     /// <summary>
     ///     Scale factor for how fast things happen in our atmosphere
@@ -141,7 +144,7 @@ public sealed partial class CCVars
     ///     in-game.
     /// </summary>
     public static readonly CVarDef<float> AtmosSpeedup =
-        CVarDef.Create("atmos.speedup", 4f, CVar.SERVERONLY);
+        CVarDef.Create("atmos.speedup", 8f, CVar.SERVERONLY);
 
     /// <summary>
     ///     Like atmos.speedup, but only for gas and reaction heat values. 64x means

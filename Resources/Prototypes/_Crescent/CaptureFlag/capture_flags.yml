@@ -20,3 +20,43 @@
       dominationEnabled: true
       dominationHoldTime: 900
 
+# Freeplay territory flag. Give every mapped instance its own stable regionId and put it on the grid whose radar
+# identity should change. CaptureRegionDevice marks the consoles and anti-boarder turrets that transfer with it.
+- type: entity
+  parent: CaptureFlag
+  id: PersistentCaptureRegionFlag
+  name: territorial claim standard
+  description: Work the standard by hand to claim this installation for your faction across future shifts.
+  components:
+    - type: CaptureFlag
+      # Maximum distance from the standard during the manual capture do-after.
+      radius: 2
+      captureTime: 22.5
+      neutralizeTime: 22.5
+      dominationEnabled: false
+    - type: PersistentCaptureRegion
+      # Map instances must override this. Runtime validation rejects the placeholder and duplicate live IDs.
+      regionId: REPLACE_WITH_UNIQUE_REGION_ID
+      stockRewardEnabled: true
+      stockRewardInterval: 600
+      stockRewardMagnitude: 0.001
+      stockRewardDuration: 4
+      teamStates:
+        DSM: black-purple
+        NCWL: brown-ncwl
+        SHI: charcoal-russet
+        TFSC: burgundy-gold
+
+# Map these instead of a faction-specific anti-boarder turret in a capturable region. The territory system supplies
+# its faction when the map loads and whenever the flag changes hands.
+- type: entity
+  parent: BaseWeaponTurretAutoPD
+  id: WeaponTurretAutoPDCapturable
+  name: territorial 7.62x51mm anti-boarder turret
+  suffix: Capturable territory PDT
+  components:
+    # Empty on purpose. The turret shoots nobody until a faction takes the region, and
+    # PersistentCaptureRegionSystem stamps the owner in on capture and on every map load.
+    - type: NpcFactionMember
+    - type: CaptureRegionDevice
+      updateName: true

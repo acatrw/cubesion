@@ -99,8 +99,8 @@
         id: blinking
         interpolate: Nearest
         maxDuration: 1.0
-        minValue: 0.1
-        maxValue: 2.0
+        startValue: 0.1
+        endValue: 2.0
         isLooped: true
   - type: PowerCellSlot
     cellSlotId: cell_slot
@@ -193,6 +193,20 @@
     unequipSound: /Audio/Mecha/mechmove03.ogg
     quickEquip: false
     slots: [ HEAD ]
+  - type: HardsuitHelmetHatSlot
+  - type: ItemSlots
+    slots:
+      hardsuit_helmet_hat:
+        name: hardsuit-helmet-hat-slot-name
+        whitelist:
+          requireAll: true
+          components:
+          - Clothing
+          - Item
+        blacklist:
+          components:
+          - Armor
+          - PressureProtection
   - type: PressureProtection
     highPressureMultiplier: 0.3
     lowPressureMultiplier: 1000
@@ -304,8 +318,8 @@
         id: blinking
         interpolate: Nearest
         maxDuration: 1.0
-        minValue: 0.1
-        maxValue: 2.0
+        startValue: 0.1
+        endValue: 2.0
         isLooped: true
   - type: PowerCellSlot
     cellSlotId: cell_slot
@@ -424,8 +438,8 @@
         id: blinking
         interpolate: Nearest
         maxDuration: 1.0
-        minValue: 0.1
-        maxValue: 2.0
+        startValue: 0.1
+        endValue: 2.0
         isLooped: true
   - type: Battery
     maxCharge: 600 #lights drain 3/s but recharge of 2 makes this 1/s. Therefore 600 is 10 minutes of light.

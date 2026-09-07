@@ -41,9 +41,9 @@ public sealed partial class PassportWindow : DefaultWindow
         SpeciesEdit.Text = state.Species;
         SexEdit.Text = state.Sex;
         HeightEdit.Text = state.HeightCm.ToString();
-        SkinColorEdit.Text = state.SkinColor;
-        EyeColorEdit.Text = state.EyeColor;
         NationalityEdit.Text = state.Nationality;
+        EmployerEdit.Text = state.Employer;
+        LifepathEdit.Text = state.Lifepath;
         ReligionEdit.Text = state.Religion;
         PassportIdEdit.Text = state.PassportId;
         IssueYearEdit.Text = state.IssueYear.ToString();
@@ -105,9 +105,9 @@ public sealed partial class PassportWindow : DefaultWindow
             SpeciesEdit.Text,
             SexEdit.Text,
             heightCm,
-            SkinColorEdit.Text,
-            EyeColorEdit.Text,
             NationalityEdit.Text,
+            EmployerEdit.Text,
+            LifepathEdit.Text,
             ReligionEdit.Text,
             PassportIdEdit.Text,
             issueYear,

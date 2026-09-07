@@ -40,6 +40,7 @@ shuttle-console-map-beacons = Show beacons
 shuttle-console-no-signal = No signal
 
 shuttle-console-map-objects = Sector objects
+shuttle-console-map-sector-crescent = Sector Crescent
 
 # DOCK
 shuttle-console-docked = Docked objects
@@ -48,6 +49,9 @@ shuttle-console-view = View
 shuttle-console-undock = Undock
 shuttle-console-dock = Dock
 shuttle-console-docks-label = Docks
+shuttle-console-dock-entry = Dock {$index}
+shuttle-console-dock-status-docked = Docked: {$name}
+shuttle-console-dock-status-undocked = Undocked
 
 shuttle-console-undock-fail = Undocking failed
 shuttle-console-dock-fail = Docking failed

@@ -989,7 +989,7 @@ Entries:
       type: Fix
     - message: Saturation launchers stop shooting themselves down. Rockets fired from the same ship pass through one another instead of detonating on the shot in front, which made the 48mm Shortbow and the 30mm Pila destroy most of their own salvo at the muzzle.
       type: Fix
-    - message: Magboots and jetpacks now cut each other out. Turning the magnets on kills the thrusters and lighting the thrusters releases the magnets, so magboots no longer sit there doing nothing because a jetpack you forgot about is keeping you weightless.
+    - message: Magboots and jetpacks can now stay enabled together. While the magnets are attached to a grid the jetpack waits without producing thrust or consuming fuel, then automatically resumes as soon as its wearer moves into open space. Active magboots also limit their wearer to walking speed, even under gravity.
       type: Fix
     - message: Shields no longer risk taking the server down when they stop a shot. Deflected rounds are cleaned up a moment after the impact rather than in the middle of the physics step, and the round still stops dead the instant it touches the shield.
       type: Fix
@@ -1101,4 +1101,245 @@ Entries:
       type: Tweak
   id: 6083
   time: '2026-08-23T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Added persistent freeplay territory. A territorial claim standard mapped onto an installation makes it capturable by DSM, NCWL, TFCF or Shinohara, and the owner survives round restarts and server restarts. Taking one renames the installation on radar with the holder's prefix, recolours its contact, hands its point-defence console to that faction alone, and flips its anti-boarder turrets to shoot for the new owner. Losing the ground gives all of it back. Examine the standard to see who holds it and how far along a capture is.
+      type: Add
+    - message: A territory's point-defence console now guards itself when nobody is at it, firing on hulls its faction has declared war on and standing down the moment an operator opens the console. Its reach is the console's own radar range, so unattended it shoots at exactly what a crewman sitting at it could have seen and clicked.
+      type: Add
+    - message: Added the territory admin command for listing persistent regions and overriding who holds them, so a region stuck under a faction nobody is playing no longer needs the save file edited by hand.
+      type: Add
+    - message: Fixed automatic territory batteries judging every welded gun a quarter turn off its real axis, so fixed mounts held fire on targets they were pointed straight at and shot at ones they could never hit.
+      type: Fix
+    - message: Automatic territory batteries no longer radio a perimeter warning at every non-allied ship in range while configured to never fire on them.
+      type: Fix
+  id: 6084
+  time: '2026-09-02T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Added the automated repair slip console. It surveys whatever is docked to its own station against that ship's structural blueprint, quotes the missing plating and framing at fifteen percent over what the parts are worth, and on authorisation welds the hull back together part by part with RCD flashes rather than snapping it whole. The console shows the percentage done, an estimated finish time and a running count of parts reinstated, and refunds the unspent share of the fee if the ship undocks or the job is aborted.
+      type: Add
+    - message: The repair slip now also beats the damage out of structures that survived, clears the girder a broken wall leaves behind before welding the new one so the tile no longer ends up holding both, mops up spilled blood and chemicals, and refills ship guns and generators that are running low. Each of those is quoted as its own line on the console.
+      type: Add
+    - message: The repair slip rebuilds the whole hull rather than only its walls. Windows, grilles, airlocks, thrusters, gyroscopes, guns, shield emitters, consoles, lights, cables and pipes are all quoted and reinstated. Lockers, vending machines, loose cargo and bodies are deliberately left out, since rebuilding those would hand out their contents for free. The hand-held repair device keeps the narrow scope it always had.
+      type: Add
+    - message: Removed the faction treasury variant of the repair slip console. Repairs are paid from the authorising crewman's own account.
+      type: Remove
+  id: 6085
+  time: '2026-09-03T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The repair slip now lays decking back down instead of leaving the bare plating under it. A dark tile blown off its plating read as intact because something was still standing there, so a ship came out of the slip whole but grey underfoot wherever its floor had been. Tiles a crewman swapped for a different one himself are still left alone.
+      type: Fix
+    - message: The repair slip now sweeps up the wreckage a battered hull sheds - steel and plasteel sheets, metal rods, loose floor tiles, glass shards, cut cable coils and blasted scrap - so a rebuilt ship is no longer handed back knee deep in the remains of the old one. Anything in a crate, a locker or a pocket is untouched, and the sweep is quoted as its own line on the console.
+      type: Add
+    - message: A destroyed machine frame, a broken pipe stub and a smashed wall map are now cleared off the tile before the slip rebuilds what stood there, the same way a broken wall's girder already was.
+      type: Fix
+  id: 6086
+  time: '2026-09-03T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The repair slip now repaints the deck markings a wrecked compartment lost, so a rebuilt hull comes back with its stripes, hazard blocks and department colours rather than as bare plating. Blood and soot are left for the crew to mop, and paint over a hole the blueprint leaves open is not quoted for.
+      type: Add
+    - message: A shuttle console built or rebuilt after its ship was keyed now accepts the ship's ID. The keys are handed out once when a hull is created, and a console welded back on in place of one that was shot out never received them, so it refused every ID swiped at it and sat locked forever.
+      type: Fix
+    - message: The repair slip's ship picker is labelled ship rather than berth, and the spills and wreckage lines are quoted together as one cleaning line.
+      type: Tweak
+  id: 6087
+  time: '2026-09-03T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The repair slip now sweeps up the bulbs, boards, stock parts and cells that a smashed fixture or machine drops on the deck, alongside the sheets and shards it already binned.
+      type: Add
+    - message: A hull comes out of the slip with its air made good again. Once the welding is finished, every compartment the yard sealed back up is filled to a room's worth of atmosphere, and a mapper's cold room or vox berth is refilled with what belongs in it rather than with ordinary air. Filling spreads out of each welded breach and stops at the first wall or shut door, so a fire the crew is fighting, a hold vented on purpose or a leak sealed off behind a door on the other side of the ship is left exactly as they have it.
+      type: Add
+    - message: The slip now quotes a structure's fitted contents rather than only its shell. An airlock is a frame around an electronics board, and pricing ignores what is inside a thing, so rebuilding one used to hand the board over for nothing.
+      type: Fix
+    - message: Gas pipes are repaired again. They count as items as well as structures, and the rule keeping loose cargo off the slip's books was catching them too.
+      type: Fix
+    - message: An airlock the slip rebuilds is cut the ship's own keys again instead of falling back to the access its prototype ships with, which had it opening for the wrong people.
+      type: Fix
+    - message: Guns and generators running on ammunition or fuel that carries no market price are refilled again. The slip judged whether a thing needed topping up by what the top-up cost, so anything free to fill was quoted and then left empty. Unpriced rounds and fuel are now charged at a flat rate.
+      type: Fix
+    - message: A gun or generator unbolted and carried off between the survey and the work is no longer repaired or refilled from across the ship.
+      type: Fix
+  id: 6088
+  time: '2026-09-03T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: A repair slip that loses power stops welding. The job holds where it was, with its bar and its estimate standing still, and picks up again when the bus comes back rather than tearing through the backlog it missed.
+      type: Fix
+    - message: Aborting a repair now refunds what is left undone rather than a share of the number of jobs left in the list. The yard works the expensive framing first and the mopping last, so a customer who stopped the job once his guns and plating were back used to get most of his money back with them.
+      type: Fix
+    - message: A room the slip closes back up by putting its wall, window or airlock back gets its air made good, the same as one sealed by relaying the deck. A compartment that is still holding a breathable pressure is passed over, so an internal wall going back in does not blow the air away either side of it.
+      type: Fix
+    - message: The slip no longer paves over a hole the crew patched themselves while the job was running, nor a different tile they laid there on purpose.
+      type: Fix
+  id: 6089
+  time: '2026-09-03T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Shield emitters, reactors and ship guns are now quoted above what they are worth in parts, since fitting one is a crane job and an alignment rather than a welding job. Emitters, AME sets and boriatic generators are charged half again, and a gun scales with the mount it needs - half again on a light mount, three quarters more on a medium one, and double in the artillery bracket. The same premium applies to beating the damage out of one that survived, so a battered turret costs what a battered turret costs.
+      type: Tweak
+  id: 6090
+  time: '2026-09-04T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Someone who has an arm or a leg torn off by a blast now sometimes screams for it. It is a coin flip rather than a certainty, so it stays a shock instead of becoming the sound every explosion makes.
+      type: Add
+  id: 6091
+  time: '2026-09-04T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Added a dormant oracle. She uses the same statue as the one you already know, but she makes no demands, speaks to nobody and cannot be prayed to - her fountain simply starts full of lotophagoi oil and slowly fills itself back up forever, for anyone willing to drink from it.
+      type: Add
+  id: 6092
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The psychedelic screen effect from lotophagoi oil and ousiana dust no longer ramps straight to full strength and sits there. It now scales with how much you actually took and eases off as it wears out, and ousiana leaves you rather less drunk on top of it.
+      type: Tweak
+  id: 6093
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Right click and escape now back out of the mapping editor's entity, tile and decal erasers instead of leaving them running until you press their button a second time.
+      type: Fix
+    - message: The decal eraser now takes a ctrl click box selection, the same way the entity and tile erasers already did.
+      type: Add
+  id: 6094
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Telecomm servers are now one per faction, spawning with that faction's encryption keys already inside. The upstream department servers (cargo, engineering, medical, science, security, service, command) and the Nanotrasen ship servers are gone; old grids load onto the civilian server automatically.
+      type: Tweak
+  id: 6095
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Nova Balreska's two red maiden statues are now the monument to the first worker, the League's own answer to the Oracle. It names an item every ten minutes and pays the same research disks and bluespace the Oracle does, but its basin always fills with lotophagoi oil rather than rolling ichor, wine, blood or some arbitrary chemical. Psions on the station finally have a supply line up the power tree that does not depend on finding a jug.
+      type: Add
+  id: 6096
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Active magboots no longer hold their wearer to walking speed. You can sprint in magnetized boots again, at the usual stamina cost, minus whatever slowdown that particular pair carries. Sprinting still falls back to walking when there is no traction at all.
+      type: Tweak
+  id: 6097
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: A field SRD now sits in every EngiVend next to the RCDs, and prints from the pristine microforge under the same shipyard construction node the RCD unlocks. It holds 30 charges instead of 300, welds three times slower, regains one charge every 40 seconds and only projects its ghost blueprint 4 tiles out. Enough to close a breach or stand a few walls back up mid-flight, not enough to rebuild a hull without a drydock.
+      type: Add
+  id: 6098
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Mech hardpoints have caught up with the small arms pass. Most exosuit weapons lose 15% of their damage, the weakest ones (Lumen autolaser, Verdict plasma repeater, Pyeheo 27mm autocannon and the LvR-200 blade) lose 10%, and the three that already took the ammunition nerf second-hand (Rapture machinegun, Monsoon minigun, Ogawa autoshotgun) lose a further 5% instead. Mech-mounted grenade, rocket and HEAT launchers now fire their own weaker exosuit shells, so the man-portable launchers keep the numbers they had.
+      type: Tweak
+  id: 6099
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Admins have a drydock override console to spawn. It surveys any hull within reach - the deck it is standing on, or anything docked to that deck - and puts it back together free of charge. It can also file a structural blueprint for a hull that never had one, which is every station and every ship that was mapped in rather than bought, and until one is filed it still beats out damage, mops up, clears wreckage and refills magazines and fuel tanks. Nothing in the round builds or buys one, and only an admin can open it.
+      type: Add
+  id: 6100
+  time: '2026-09-05T00:00:00.0000000+00:00'
+  url: null
+- author: Taleryn
+  changes:
+    - message: Derelict wrecks have been cleared of the leftovers of their own construction. A third of every entity in the ship graveyard was an invisible atmos-fix marker doing nothing, and another few hundred were duplicate cables, pipes and rocks stacked on the same tile. 11400 of them are gone, so the wreck fields cost a fraction of what they used to load and run.
+      type: Tweak
+  id: 6101
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Four wrecks were pointing at radar icons that no longer exist, which drew a red error box on the shuttle console and wrote a client log line for every one of them. They carry battleship, destroyer and industrial marks again, and a console that meets an icon it cannot find now falls back to a plain contact dot instead.
+      type: Fix
+  id: 6102
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Suit storage units no longer throw a sprite error every time one is drawn. The unit's own frame was never registered as a layer, so the visualiser had nothing to write the open and shut states to.
+      type: Fix
+  id: 6103
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Every ship weapon now has a quarter less structural health before it breaks, from the smallest point defence mount up to the largest artillery turret. Guns sat behind so much health that they almost never came off a hull in a fight; knocking out an enemy's armament is meant to be a real outcome of shooting at it. Relative toughness between mounts is unchanged, so a heavy turret is still far harder to strip than a light one.
+      type: Tweak
+  id: 6104
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: Added the tiny air vent, a portable vent printed at the microforge that runs off a bottle instead of a pipe net. Wrench it to the floor, drop a bottle into the cradle, and it fills the room until the air is back to one atmosphere. Unwrench it and it goes back in your bag. It comes with its own air vent cartridge, a pressure bottle charged from any gas canister and worth roughly nine tiles of vacuum; an ordinary hand tank fits the cradle too but carries barely a tenth of what one tile of floor needs, so it is for topping off rather than filling anything.
+      type: Add
+  id: 6105
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The automated repair slip console has been redrawn. The survey now reads as a machine readout rather than a list of figures - the lines are grouped into structure, finish and stores, each one carries a bar drawn against the worst line on the slip, and anything the survey found nothing of goes grey. The status now colours the panel it sits in and shows a word in the masthead, the quote and your balance sit in their own panel that turns red when the account will not cover it, and the blueprint button has moved up beside the ship it applies to.
+      type: Tweak
+  id: 6106
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The five hidden derelicts no longer sit at the same coordinates every round. Each one is now dropped at a fresh random point anywhere inside the sector disc, out to 8500 in every direction, and each roll has to keep 2000 clear of the faction stations, Gliess Santo, the belts, the two fixed points of interest and the other derelicts. There is no memorised loot route left to rush at round start; finding a wreck means actually sweeping for it.
+      type: Tweak
+  id: 6107
+  time: '2026-09-06T00:00:00.0000000+00:00'
+  url: null
+
+- author: Taleryn
+  changes:
+    - message: The five derelicts now show up on radar as a contact named Derelict instead of being hidden outright. Every one of them carries the same anonymous label, so a contact tells you something is out there without telling you which hull it is or whether it has already been stripped - the real name only appears once you board it. Hidden wrecks drew nothing at all until a ship was almost touching them, which made their new random positions worth very little, since nobody sweeps the whole sector on the off chance.
+      type: Tweak
+  id: 6108
+  time: '2026-09-06T00:00:00.0000000+00:00'
   url: null

@@ -1,5 +1,6 @@
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
+using Content.Server.Atmos.Monitor.Components;
 using Content.Server.Atmos.Monitor.Systems;
 using Content.Server.Popups;
 using Content.Server.Power.Components;
@@ -37,6 +38,7 @@ namespace Content.Server.Doors.Systems
             base.Initialize();
 
             SubscribeLocalEvent<FirelockComponent, BeforeDoorOpenedEvent>(OnBeforeDoorOpened);
+            SubscribeLocalEvent<FirelockComponent, DoorOpeningEvent>(OnDoorOpening);
             SubscribeLocalEvent<FirelockComponent, GetPryTimeModifierEvent>(OnDoorGetPryTimeModifier);
             SubscribeLocalEvent<FirelockComponent, DoorStateChangedEvent>(OnUpdateState);
 
@@ -70,9 +72,19 @@ namespace Content.Server.Doors.Systems
             var appearanceQuery = GetEntityQuery<AppearanceComponent>();
             var xformQuery = GetEntityQuery<TransformComponent>();
 
-            var query = EntityQueryEnumerator<FirelockComponent, DoorComponent>();
-            while (query.MoveNext(out var uid, out var firelock, out var door))
+            var query = EntityQueryEnumerator<FirelockComponent, DoorComponent, AtmosAlarmableComponent>();
+            while (query.MoveNext(out var uid, out var firelock, out var door, out var alarmable))
             {
+                // Alarm packets can arrive while a door is busy. Retry while danger remains active.
+                if (firelock.AlarmAutoClose
+                    && !firelock.PlayerHeldOpen
+                    && door.State == DoorState.Open
+                    && this.IsPowered(uid, EntityManager)
+                    && alarmable.LastAlarmState == AtmosAlarmType.Danger)
+                {
+                    EmergencyPressureStop(uid, firelock, door);
+                }
+
                 // only bother to check pressure on doors that are some variation of closed.
                 if (door.State != DoorState.Closed
                     && door.State != DoorState.Welded
@@ -85,7 +97,7 @@ namespace Content.Server.Doors.Systems
                     && xformQuery.TryGetComponent(uid, out var xform)
                     && appearanceQuery.TryGetComponent(uid, out var appearance))
                 {
-                    var (fire, pressure) = CheckPressureAndFire(uid, firelock, xform, airtight, airtightQuery);
+                    var (pressure, fire) = CheckPressureAndFire(uid, firelock, xform, airtight, airtightQuery);
                     _appearance.SetData(uid, DoorVisuals.ClosedLights, fire || pressure, appearance);
                 }
             }
@@ -114,7 +126,7 @@ namespace Content.Server.Doors.Systems
             if (!Resolve(uid, ref firelock, ref airtight, ref appearance, ref xform, false) || !query.Resolve(uid, ref airtight, false))
                 return;
 
-            var (fire, pressure) = CheckPressureAndFire(uid, firelock, xform, airtight, query);
+            var (pressure, fire) = CheckPressureAndFire(uid, firelock, xform, airtight, query);
             _appearance.SetData(uid, DoorVisuals.ClosedLights, fire || pressure, appearance);
         }
         #endregion
@@ -122,6 +134,11 @@ namespace Content.Server.Doors.Systems
         public bool EmergencyPressureStop(EntityUid uid, FirelockComponent? firelock = null, DoorComponent? door = null)
         {
             if (!Resolve(uid, ref firelock, ref door))
+                return false;
+
+            // A player deliberately opening a firelock overrides every automatic closing path, including the
+            // pressure checks performed directly by AtmosphereSystem. It stays open until somebody closes it.
+            if (firelock.PlayerHeldOpen)
                 return false;
 
             if (door.State == DoorState.Open)
@@ -140,7 +157,16 @@ namespace Content.Server.Doors.Systems
             var overrideAccess = (args.User != null) && _accessReaderSystem.IsAllowed(args.User.Value, uid);
 
             if (!this.IsPowered(uid, EntityManager) || (!overrideAccess && IsHoldingPressureOrFire(uid, component)))
+            {
                 args.Cancel();
+                return;
+            }
+        }
+
+        private void OnDoorOpening(EntityUid uid, FirelockComponent component, DoorOpeningEvent args)
+        {
+            if (args.User != null)
+                component.PlayerHeldOpen = true;
         }
 
         private void OnDoorGetPryTimeModifier(EntityUid uid, FirelockComponent component, ref GetPryTimeModifierEvent args)
@@ -164,6 +190,9 @@ namespace Content.Server.Doors.Systems
 
         private void OnUpdateState(EntityUid uid, FirelockComponent component, DoorStateChangedEvent args)
         {
+            if (args.State == DoorState.Closed)
+                component.PlayerHeldOpen = false;
+
             var ev = new BeforeDoorAutoCloseEvent();
             RaiseLocalEvent(uid, ev);
             UpdateVisuals(uid, component, args);
@@ -177,6 +206,12 @@ namespace Content.Server.Doors.Systems
 
         private void OnBeforeDoorAutoclose(EntityUid uid, FirelockComponent component, BeforeDoorAutoCloseEvent args)
         {
+            if (component.PlayerHeldOpen)
+            {
+                args.Cancel();
+                return;
+            }
+
             if (!this.IsPowered(uid, EntityManager))
                 args.Cancel();
 
@@ -196,14 +231,15 @@ namespace Content.Server.Doors.Systems
             if (!TryComp<DoorComponent>(uid, out var doorComponent))
                 return;
 
-            if (args.AlarmType == AtmosAlarmType.Normal || args.AlarmType == AtmosAlarmType.Warning)
+            if (args.AlarmType == AtmosAlarmType.Normal)
             {
                 if (doorComponent.State == DoorState.Closed)
                     _doorSystem.TryOpen(uid);
             }
             else if (args.AlarmType == AtmosAlarmType.Danger)
             {
-                EmergencyPressureStop(uid, component, doorComponent);
+                if (!component.PlayerHeldOpen)
+                    EmergencyPressureStop(uid, component, doorComponent);
             }
         }
 

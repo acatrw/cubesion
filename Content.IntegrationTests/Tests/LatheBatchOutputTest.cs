@@ -73,7 +73,7 @@ public sealed class LatheBatchOutputTest
 
         // Mid-run it should be sitting on everything it has made so far.
         await server.WaitRunTicks(5);
-        Assert.That(CountStack(entMan), Is.Zero, "Batch lathe dropped output before the run was over");
+        Assert.That(CountStack(entMan, StackType), Is.Zero, "Batch lathe dropped output before the run was over");
 
         // One item per tick, plus slack.
         await server.WaitRunTicks(Sheets + 10);
@@ -83,7 +83,7 @@ public sealed class LatheBatchOutputTest
         {
             Assert.That(lathe.Queue, Is.Empty, "Queue never drained");
             Assert.That(lathe.PendingOutput, Is.Empty, "Output was tallied but never handed over");
-            Assert.That(CountStack(entMan), Is.EqualTo(Sheets), "Wrong amount came out of the lathe");
+            Assert.That(CountStack(entMan, StackType), Is.EqualTo(Sheets), "Wrong amount came out of the lathe");
         });
 
         await pair.CleanReturnAsync();
@@ -130,7 +130,7 @@ public sealed class LatheBatchOutputTest
 
         // Long enough to have made some, nowhere near long enough to finish.
         await server.WaitRunTicks(5);
-        Assert.That(CountStack(entMan), Is.Zero);
+        Assert.That(CountStack(entMan, StackType), Is.Zero);
 
         await server.WaitPost(() =>
         {
@@ -144,7 +144,7 @@ public sealed class LatheBatchOutputTest
         Assert.Multiple(() =>
         {
             Assert.That(lathe.PendingOutput, Is.Empty, "Lathe kept a half-finished run after losing power");
-            Assert.That(CountStack(entMan), Is.GreaterThan(0), "Nothing came out of a lathe that had been running");
+            Assert.That(CountStack(entMan, StackType), Is.GreaterThan(0), "Nothing came out of a lathe that had been running");
             Assert.That(lathe.Queue, Is.Not.Empty, "The rest of the order should still be queued");
         });
 
@@ -154,13 +154,13 @@ public sealed class LatheBatchOutputTest
     /// <summary>
     /// Total number of sheets lying around, however many entities they are spread over.
     /// </summary>
-    private static int CountStack(IEntityManager entMan)
+    private static int CountStack(IEntityManager entMan, string stackType)
     {
         var total = 0;
         var query = entMan.EntityQueryEnumerator<StackComponent>();
         while (query.MoveNext(out _, out var stack))
         {
-            if (stack.StackTypeId == StackType)
+            if (stack.StackTypeId == stackType)
                 total += stack.Count;
         }
 

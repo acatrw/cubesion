@@ -1,0 +1,23 @@
+- type: entity
+  id: ActionHardsuitInjectSlotOne
+  name: Use injector (slot 1)
+  description: Injects you with the contents loaded into hardsuit injector slot 1.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: InstantAction
+    itemIconStyle: BigItem
+    useDelay: 0.5
+    event: !type:HardsuitInjectActionEvent
+      slot: hardsuit-injector-slot-1
+
+- type: entity
+  id: ActionHardsuitInjectSlotTwo
+  name: Use injector (slot 2)
+  description: Injects you with the contents loaded into hardsuit injector slot 2.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: InstantAction
+    itemIconStyle: BigItem
+    useDelay: 0.5
+    event: !type:HardsuitInjectActionEvent
+      slot: hardsuit-injector-slot-2

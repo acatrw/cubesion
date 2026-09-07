@@ -133,9 +133,17 @@ public sealed partial class AmeControllerComponent : SharedAmeControllerComponen
     public TimeSpan FinalWarningTime = TimeSpan.FromSeconds(10f);
 
     /// <summary>
-    /// When set, the reactor has passed the point of no return and will explode at this time.
+    /// When set, the reactor will explode at this time if the active overload is not stopped.
     /// Runtime-only state (not persisted in prototypes).
     /// </summary>
     [ViewVariables]
     public TimeSpan? ExplosionTime;
+
+    /// <summary>
+    /// How much core integrity is recovered per update while the reactor is not being overloaded.
+    /// Full recovery from a barely-survived overload takes a few minutes of safe running.
+    /// </summary>
+    [DataField]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public int CoreRepairAmount = 5;
 }

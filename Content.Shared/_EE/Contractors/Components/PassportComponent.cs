@@ -15,7 +15,7 @@ namespace Content.Shared._EE.Contractors.Components;
 public sealed partial class PassportComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public bool IsClosed;
+    public bool IsClosed = true;
 
     [DataField, AutoNetworkedField]
     public string FullName = string.Empty;
@@ -47,13 +47,13 @@ public sealed partial class PassportComponent : Component
     public int HeightCm;
 
     [DataField, AutoNetworkedField]
-    public string SkinColor = string.Empty;
-
-    [DataField, AutoNetworkedField]
-    public string EyeColor = string.Empty;
-
-    [DataField, AutoNetworkedField]
     public string Nationality = string.Empty;
+
+    [DataField, AutoNetworkedField]
+    public string Employer = string.Empty;
+
+    [DataField, AutoNetworkedField]
+    public string Lifepath = string.Empty;
 
     /// <summary>
     /// Reserved now so a future religion system can populate it without another passport data
@@ -122,13 +122,13 @@ public sealed partial class PassportRecord
     public int HeightCm;
 
     [DataField]
-    public string SkinColor = string.Empty;
-
-    [DataField]
-    public string EyeColor = string.Empty;
-
-    [DataField]
     public string Nationality = string.Empty;
+
+    [DataField]
+    public string Employer = string.Empty;
+
+    [DataField]
+    public string Lifepath = string.Empty;
 
     [DataField]
     public string PassportId = string.Empty;
@@ -161,9 +161,9 @@ public sealed class PassportBoundUserInterfaceState(
     string species,
     string sex,
     int heightCm,
-    string skinColor,
-    string eyeColor,
     string nationality,
+    string employer,
+    string lifepath,
     string religion,
     string passportId,
     int issueYear,
@@ -175,9 +175,9 @@ public sealed class PassportBoundUserInterfaceState(
     public string Species { get; } = species;
     public string Sex { get; } = sex;
     public int HeightCm { get; } = heightCm;
-    public string SkinColor { get; } = skinColor;
-    public string EyeColor { get; } = eyeColor;
     public string Nationality { get; } = nationality;
+    public string Employer { get; } = employer;
+    public string Lifepath { get; } = lifepath;
     public string Religion { get; } = religion;
     public string PassportId { get; } = passportId;
     public int IssueYear { get; } = issueYear;
@@ -192,9 +192,9 @@ public sealed class PassportSaveMessage(
     string species,
     string sex,
     int heightCm,
-    string skinColor,
-    string eyeColor,
     string nationality,
+    string employer,
+    string lifepath,
     string religion,
     string passportId,
     int issueYear,
@@ -206,9 +206,9 @@ public sealed class PassportSaveMessage(
     public string Species { get; } = species;
     public string Sex { get; } = sex;
     public int HeightCm { get; } = heightCm;
-    public string SkinColor { get; } = skinColor;
-    public string EyeColor { get; } = eyeColor;
     public string Nationality { get; } = nationality;
+    public string Employer { get; } = employer;
+    public string Lifepath { get; } = lifepath;
     public string Religion { get; } = religion;
     public string PassportId { get; } = passportId;
     public int IssueYear { get; } = issueYear;
