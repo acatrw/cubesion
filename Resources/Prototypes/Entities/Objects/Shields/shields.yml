@@ -424,10 +424,6 @@
         path: /Audio/Weapons/ebladeon.ogg
       soundDeactivate:
         path: /Audio/Weapons/ebladeoff.ogg
-      soundFailToActivate:
-        path: /Audio/Machines/button.ogg
-        params:
-          variation: 0.250
     - type: ItemToggleActiveSound
       activeSound:
         path: /Audio/Weapons/ebladehum.ogg
@@ -520,14 +516,6 @@
       difficulty: 2
       recipes:
         - EnergyShield
-    - type: Battery
-      maxCharge: 35
-      startingCharge: 35
-    - type: BatterySelfRecharger
-      autoRechargeRate: 2
-    - type: RechargeableBlocking
-      dischargedRechargeRate: 2
-      chargedRechargeRate: 3
 
 - type: entity
   name: broken energy shield

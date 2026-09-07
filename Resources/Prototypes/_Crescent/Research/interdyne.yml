@@ -72,7 +72,6 @@
   recipeUnlocks:
   - InterdyneInterface
   - InterdyneSkilldeck
-  - InterdyneHackDoor
 
 #Tier 2
 - type: technology
