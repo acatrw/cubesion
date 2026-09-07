@@ -114,13 +114,13 @@
       PortZarya:
         gameMapID: PortZarya
         posX: 0
-        posY: -4000
+        posY: -5000
         IFFColor: Orange
         IFFFaction: NCWL
       AuroraImperialis:
         gameMapID: AuroraImperialis
-        posX: 4000
-        posY: 4000
+        posX: 0
+        posY: 5000
         IFFColor: "#C677A5"
         IFFFaction: DSM
       Tatsumoto:
@@ -260,13 +260,13 @@
       PortZarya:
         gameMapID: PortZarya
         posX: 0
-        posY: -4000
+        posY: -5000
         IFFColor: Orange
         IFFFaction: NCWL
       AuroraImperialis:
         gameMapID: AuroraImperialis
-        posX: 4000
-        posY: 4000
+        posX: 0
+        posY: 5000
         IFFColor: "#C677A5"
         IFFFaction: DSM
       GliessSanto:
@@ -392,14 +392,14 @@
     gameMapsByID:
       Tatsumoto:
         gameMapID: Tatsumoto
-        posX: -4000
+        posX: -5000
         posY: 0
         IFFColor: White
         IFFFaction: SHI
       Freeport:
         gameMapID: Freeport
-        posX: 4000
-        posY: 4000
+        posX: 5000
+        posY: 0
         IFFColor: IndianRed
         IFFFaction: TFSC
       GliessSanto:
@@ -525,7 +525,7 @@
     gameMapsByID:
       Freeport:
         gameMapID: Freeport
-        posX: -4000
+        posX: 5000
         posY: 0
         IFFColor: IndianRed
         IFFFaction: TFSC
@@ -665,8 +665,8 @@
   - type: AdventureRule
     worldgenConfig: RatWorld
     gameMapsByID:
-      PortBalreskaHyperwar:
-        gameMapID: PortBalreskaHyperwar
+      PortZaryaHyperwar:
+        gameMapID: PortZaryaHyperwar
         posX: 0
         posY: -5000
         IFFColor: Orange
