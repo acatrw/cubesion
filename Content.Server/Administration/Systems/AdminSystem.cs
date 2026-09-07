@@ -183,8 +183,7 @@ namespace Content.Server.Administration.Systems
         {
             // If disconnected then the player won't have a connected entity to get character name from.
             // The disconnected state gets sent by OnPlayerStatusChanged.
-            if (ev.Player.Status == SessionStatus.Disconnected
-                || !_playerManager.TryGetPlayerData(ev.Player.UserId, out _))
+            if (ev.Player.Status == SessionStatus.Disconnected)
                 return;
 
             UpdatePlayerList(ev.Player);
