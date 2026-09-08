@@ -24,7 +24,9 @@ public sealed class HardpointSystem : SharedHardpointSystem
     /// <inheritdoc/>
     public override void Initialize()
     {
-        SubscribeLocalEvent<HardpointComponent, HardpointCannonDeanchoredEvent>(OnCannonDeanchor);
+        // Subscribed on the CANNON, not the hardpoint: a hardpoint destroyed along with the tile under it is
+        // gone by the time its gun needs unlinking, and an event raised on a deleted entity reaches nobody.
+        SubscribeLocalEvent<HardpointAnchorableOnlyComponent, HardpointCannonDeanchoredEvent>(OnCannonDeanchor);
         SubscribeLocalEvent<HardpointFixedMountComponent, SignalReceivedEvent>(OnSignalReceived);
     }
     private void OnSignalReceived(EntityUid uid, HardpointFixedMountComponent component, ref SignalReceivedEvent args)
@@ -45,6 +47,9 @@ public sealed class HardpointSystem : SharedHardpointSystem
                 return;
         }
 
+        if (args.Port == component.Trigger || args.Port == component.Toggle)
+            EntityManager.System<ShipWeaponTargetingSystem>().SetConsole(hard.anchoring.Value, args.Trigger);
+
         if (args.Port == component.Trigger)
             _gun.AttemptShoot(hard.anchoring.Value, gun);
 
@@ -55,7 +60,7 @@ public sealed class HardpointSystem : SharedHardpointSystem
         }
     }
 
-    public void OnCannonDeanchor(EntityUid uid, HardpointComponent comp, ref HardpointCannonDeanchoredEvent args)
+    public void OnCannonDeanchor(EntityUid uid, HardpointAnchorableOnlyComponent comp, ref HardpointCannonDeanchoredEvent args)
     {
         StopContinuousFire(args.CannonUid);
 

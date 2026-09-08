@@ -280968,8 +280968,6 @@ entities:
       pos: 15.5,-8.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 4948
     components:
     - type: Transform
@@ -281036,8 +281034,6 @@ entities:
       pos: 14.5,-8.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 4961
     components:
     - type: Transform
@@ -292907,8 +292903,6 @@ entities:
       pos: 33.5,31.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 46
     - type: AtmosPipeColor
@@ -300950,7 +300944,7 @@ entities:
     - type: DeviceLinkSink
       links:
       - 7625
-- proto: shuttle_manipulator
+- proto: HolographStation
   entities:
   - uid: 7613
     components:
@@ -303226,7 +303220,7 @@ entities:
     - type: Transform
       pos: 13.5,18.5
       parent: 1
-- proto: StatueVenusRed
+- proto: OracleCommunard
   entities:
   - uid: 7847
     components:
@@ -303662,7 +303656,7 @@ entities:
       parent: 1
     - type: TechShareReceiver
       consoleName: ЛРНП
-- proto: TelecomServerFilledNovaBalreska
+- proto: TelecomServerNCWL
   entities:
   - uid: 7895
     components:

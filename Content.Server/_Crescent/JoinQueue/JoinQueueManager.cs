@@ -168,6 +168,18 @@ public sealed class JoinQueueManager
     /// <param name="s">Player session that will be sent to game</param>
     private void SendToGame(ICommonSession s)
     {
-        Timer.Spawn(0, () => _playerManager.JoinGame(s));
+        Timer.Spawn(0, () =>
+        {
+            // _Crescent: the player can drop while we were waiting (either during the privileged-join db
+            // lookup or during this tick). Joining a dead session into the game leaves per-user state behind
+            // that never gets cleaned up, which locked that player out of every later reconnect.
+            if (s.Status != SessionStatus.Connected)
+            {
+                _sawmill.Info($"Not joining {s} into the game, session is {s.Status}");
+                return;
+            }
+
+            _playerManager.JoinGame(s);
+        });
     }
 }

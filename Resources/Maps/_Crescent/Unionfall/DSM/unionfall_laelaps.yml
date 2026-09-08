@@ -4042,7 +4042,7 @@ entities:
     - type: VesselIcon
       iffIcon:
         sprite: _Crescent/ShipIcons/ifficons.rsi
-        state: frigate
+        state: cruiser
     - type: BecomesStation
       id: Laelaps
     - type: VesselDesignation
@@ -7583,8 +7583,6 @@ entities:
       pos: 4.5,13.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
   - uid: 612
     components:
     - type: Transform

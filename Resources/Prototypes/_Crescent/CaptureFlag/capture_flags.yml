@@ -26,12 +26,13 @@
   parent: CaptureFlag
   id: PersistentCaptureRegionFlag
   name: territorial claim standard
-  description: Hold the surrounding ground to claim this installation for your faction across future shifts.
+  description: Work the standard by hand to claim this installation for your faction across future shifts.
   components:
     - type: CaptureFlag
-      radius: 3
-      captureTime: 60
-      neutralizeTime: 60
+      # Maximum distance from the standard during the manual capture do-after.
+      radius: 2
+      captureTime: 22.5
+      neutralizeTime: 22.5
       dominationEnabled: false
     - type: PersistentCaptureRegion
       # Map instances must override this. Runtime validation rejects the placeholder and duplicate live IDs.
@@ -54,6 +55,8 @@
   name: territorial 7.62x51mm anti-boarder turret
   suffix: Capturable territory PDT
   components:
+    # Empty on purpose. The turret shoots nobody until a faction takes the region, and
+    # PersistentCaptureRegionSystem stamps the owner in on capture and on every map load.
     - type: NpcFactionMember
     - type: CaptureRegionDevice
-
+      updateName: true

@@ -1,8 +1,8 @@
 using System.Linq;
 using Content.Server.GameTicking;
 using Content.Server.Popups;
-using Content.Shared.CaptureFlag;
 using Content.Shared._Crescent.HullrotFaction;
+using Content.Shared.CaptureFlag;
 using Content.Shared._Crescent.Territory;
 using Content.Shared.GameTicking;
 using Robust.Shared.Localization;
@@ -61,8 +61,12 @@ public sealed class CaptureFlagSystem : EntitySystem
 
     private void UpdateFlag(EntityUid uid, CaptureFlagComponent flag, TransformComponent xform, float frameTime)
     {
+        // Persistent territory is captured by explicitly interacting with its standard. It must not accumulate
+        // progress merely because faction members happen to stand nearby.
+        if (HasComp<PersistentCaptureRegionComponent>(uid))
+            return;
+
         var mapPos = _xform.ToMapCoordinates(xform.Coordinates);
-        var persistentRegion = CompOrNull<PersistentCaptureRegionComponent>(uid);
         _nearby.Clear();
         _lookup.GetEntitiesInRange(mapPos.MapId, mapPos.Position, flag.Radius, _nearby, LookupFlags.Dynamic | LookupFlags.Sundries);
 
@@ -73,11 +77,6 @@ public sealed class CaptureFlagSystem : EntitySystem
         {
             var team = TryGetTeam(ent);
             if (team is null)
-                continue;
-
-            // Persistent territory is intentionally limited to the four major powers. Ordinary capture flags retain
-            // their existing open-ended team handling.
-            if (persistentRegion != null && !PersistentTerritoryFactions.IsSupported(team))
                 continue;
 
             if (singleTeam is null)
@@ -110,6 +109,9 @@ public sealed class CaptureFlagSystem : EntitySystem
                     flag.ProgressSeconds = 0f;
             }
 
+            if (flag.ProgressSeconds <= 0f)
+                flag.ProgressTeam = null;
+
             if (oldActiveTeam != flag.ActiveTeam || oldStage != flag.Stage || oldProgress != flag.ProgressSeconds)
                 Dirty(uid, flag);
 
@@ -117,6 +119,17 @@ public sealed class CaptureFlagSystem : EntitySystem
         }
 
         flag.ActiveTeam = singleTeam;
+
+        // Partial progress belongs to the faction that earned it. Without this reset, another faction can walk in
+        // after the first leaves and finish its capture or neutralization progress.
+        if (flag.ProgressSeconds > 0f &&
+            flag.ProgressTeam != null &&
+            !string.Equals(flag.ProgressTeam, singleTeam, StringComparison.Ordinal))
+        {
+            flag.ProgressSeconds = 0f;
+        }
+
+        flag.ProgressTeam = singleTeam;
 
         var needNeutralize = flag.OwnerTeam != null &&
                              !string.Equals(flag.OwnerTeam, singleTeam, StringComparison.Ordinal);
@@ -130,6 +143,7 @@ public sealed class CaptureFlagSystem : EntitySystem
             {
                 flag.OwnerTeam = null;
                 flag.ProgressSeconds = 0f;
+                flag.ProgressTeam = singleTeam;
                 flag.Stage = CaptureFlagStage.Capturing;
                 Dirty(uid, flag);
                 return;
@@ -144,6 +158,7 @@ public sealed class CaptureFlagSystem : EntitySystem
             if (flag.ProgressSeconds != 0f || flag.Stage != CaptureFlagStage.Idle)
             {
                 flag.ProgressSeconds = 0f;
+                flag.ProgressTeam = null;
                 flag.Stage = CaptureFlagStage.Idle;
                 Dirty(uid, flag);
             }
@@ -157,6 +172,7 @@ public sealed class CaptureFlagSystem : EntitySystem
         {
             flag.OwnerTeam = singleTeam;
             flag.ProgressSeconds = 0f;
+            flag.ProgressTeam = null;
             flag.Stage = CaptureFlagStage.Idle;
             RaiseLocalEvent(new CaptureFlagWonEvent(singleTeam));
 
@@ -238,4 +254,3 @@ public sealed class CaptureFlagSystem : EntitySystem
         Timer.Spawn(TimeSpan.FromMinutes(1), _ticker.RestartRound);
     }
 }
-

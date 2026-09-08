@@ -94116,7 +94116,7 @@ entities:
     - type: Transform
       pos: -16.5,8.5
       parent: 1
-- proto: shuttle_manipulator
+- proto: HolographStation
   entities:
   - uid: 5791
     components:
@@ -95768,7 +95768,7 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 1.5,23.5
       parent: 1
-- proto: TelecomServerFilledNovaBalreska
+- proto: TelecomServerNCWL
   entities:
   - uid: 5980
     components:
