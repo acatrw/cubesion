@@ -111,8 +111,8 @@
     respawnTimeMinutes: 5
   - type: AdventureRule
     gameMapsByID:
-      PortBalreska:
-        gameMapID: PortBalreska
+      PortZarya:
+        gameMapID: PortZarya
         posX: 0
         posY: -5000
         IFFColor: Orange
@@ -257,8 +257,8 @@
     respawnTimeMinutes: 5
   - type: AdventureRule
     gameMapsByID:
-      PortBalreska:
-        gameMapID: PortBalreska
+      PortZarya:
+        gameMapID: PortZarya
         posX: 0
         posY: -5000
         IFFColor: Orange
@@ -665,8 +665,8 @@
   - type: AdventureRule
     worldgenConfig: RatWorld
     gameMapsByID:
-      PortBalreskaHyperwar:
-        gameMapID: PortBalreskaHyperwar
+      PortZaryaHyperwar:
+        gameMapID: PortZaryaHyperwar
         posX: 0
         posY: -5000
         IFFColor: Orange

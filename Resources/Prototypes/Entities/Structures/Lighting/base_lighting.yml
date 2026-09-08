@@ -33,10 +33,6 @@
     state: base
   - type: EtherealLight
   - type: PointLight
-    color: "#FFE4CE" # 5000K color temp
-    energy: 0.8
-    radius: 10
-    softness: 1
     offset: "0, -0.5"
   - type: Damageable
     damageContainer: Inorganic
@@ -88,6 +84,10 @@
     state: empty
   - type: PointLight
     enabled: false
+    color: "#FFC99D" # 3800K color temp
+    energy: 0.6
+    radius: 8
+    softness: 1
   - type: PoweredLight
     bulb: Tube
     damage:
@@ -342,6 +342,10 @@
     state: base
   - type: PointLight
     enabled: true
+    color: "#FFB475" # 3100K color temp
+    energy: 0.7
+    radius: 6
+    softness: 1.1
   - type: PoweredLight
     hasLampOnSpawn: LightBulb
     damage:

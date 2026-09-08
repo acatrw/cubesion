@@ -177,6 +177,8 @@ faction-station-fall-aurora = TURNING BREACH — DSM Aurora Imperialis has been 
 
 faction-station-fall-balreska = TURNING BREACH — NCWL Nova Balreska has been overrun. Flesh is spreading through the foundries and sections of the station are beginning to disappear. The station remains as an infested ruin. The Communards are defeated.
 
+faction-station-fall-zarya = TURNING BREACH — NCWL Port Zarya has been overrun. Flesh is spreading through the foundries and sections of the station are beginning to disappear. The station remains as an infested ruin. The Communards are defeated.
+
 faction-station-fall-tatsumoto = TURNING BREACH — SHI Tatsumoto has been overrun. Aberrant growth is spreading through the shipyard and sections of the station are beginning to disappear. The station remains as an infested ruin. Shinohara is defeated.
 
 faction-station-fall-jackal = TURNING BREACH — GSC Jackal has been overrun. Aberrant flesh is consuming the hull and sections of the station are beginning to disappear. The station remains as an infested ruin. The TFCF is defeated.
