@@ -11,12 +11,15 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
-      state: shuttle
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: targeting
     - map: ["computerLayerKeys"]
       state: generic_keys
   - type: Computer
     board: TargetingConsoleCircuitboard
   - type: TargetingConsole
+  - type: PointLight
+    color: "#f46b60"
   - type: ActivatableUI
     key: enum.TargetingConsoleUiKey.Key
   - type: UserInterface
@@ -44,8 +47,8 @@
       sprite: _NF/Structures/Machines/computer_tabletop.rsi
       state: generic_keyboard_tabletop
     - map: ["computerLayerScreen"]
-      sprite: Structures/Machines/computers.rsi
-      state: shuttle
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: targeting
     - map: ["computerLayerKeys"]
       sprite: Structures/Machines/computers.rsi
       state: generic_keys

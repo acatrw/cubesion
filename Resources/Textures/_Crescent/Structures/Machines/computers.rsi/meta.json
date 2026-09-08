@@ -1,15 +1,225 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "Repair, overwatch, treasury and payroll screen glyphs by Taleryn for Hullrot:Eclipsion, drawn to the existing computer screen layout. Repair and overwatch use a neutral palette tinted by the powered-screen visualizer; treasury and payroll use a shared blue background. Overwatch blink and treasury highlight animation frames packed as six-frame loops.",
+  "copyright": "Original screen designs by Taleryn for Hullrot:Eclipsion, drawn to the existing computer screen layout: repair, overwatch, treasury, payroll, command, shuttle, taxation and targeting. Repair, overwatch, command and targeting use a neutral grayscale palette so the powered-screen visualizer tints them per faction; treasury, payroll and taxation share a blue background. Command is a pair of rank chevrons beside dispatch text scrolling downward one line per frame; shuttle is a drifting starfield with a ship silhouette running through it; targeting is a sweeping reticle over a contact plot. Overwatch blink, treasury highlight, taxation, command, shuttle and targeting are packed as four-direction, six-frame loops, and the repair wrench is rotated across twelve frames projected onto the same four-direction screen footprint.",
   "size": {
     "x": 32,
     "y": 32
   },
   "states": [
     {
+      "name": "shuttle",
+      "directions": 4,
+      "delays": [
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.18
+        ]
+      ]
+    },
+    {
+      "name": "targeting",
+      "directions": 4,
+      "delays": [
+        [
+          0.55,
+          0.14,
+          0.14,
+          0.18,
+          0.45,
+          0.18
+        ],
+        [
+          0.55,
+          0.14,
+          0.14,
+          0.18,
+          0.45,
+          0.18
+        ],
+        [
+          0.55,
+          0.14,
+          0.14,
+          0.18,
+          0.45,
+          0.18
+        ],
+        [
+          0.55,
+          0.14,
+          0.14,
+          0.18,
+          0.45,
+          0.18
+        ]
+      ]
+    },
+    {
+      "name": "command",
+      "directions": 4,
+      "delays": [
+        [
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22
+        ],
+        [
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22
+        ],
+        [
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22
+        ],
+        [
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22,
+          0.22
+        ]
+      ]
+    },
+    {
+      "name": "taxation",
+      "directions": 4,
+      "delays": [
+        [
+          0.55,
+          0.2,
+          0.55,
+          0.2,
+          0.55,
+          0.2
+        ],
+        [
+          0.55,
+          0.2,
+          0.55,
+          0.2,
+          0.55,
+          0.2
+        ],
+        [
+          0.55,
+          0.2,
+          0.55,
+          0.2,
+          0.55,
+          0.2
+        ],
+        [
+          0.55,
+          0.2,
+          0.55,
+          0.2,
+          0.55,
+          0.2
+        ]
+      ]
+    },
+    {
       "name": "repair",
-      "directions": 4
+      "directions": 4,
+      "delays": [
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ],
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ],
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ],
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ]
+      ]
     },
     {
       "name": "overwatch",

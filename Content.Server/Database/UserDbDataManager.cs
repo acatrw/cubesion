@@ -36,27 +36,45 @@ public sealed class UserDbDataManager : IPostInjectInit
     {
         _sawmill.Verbose($"Initiating load for user {session}");
 
-        DebugTools.Assert(!_users.ContainsKey(session.UserId), "We should not have any cached data on client connect.");
+        // _Crescent: a session can be joined into the game after it already dropped (see JoinQueueManager),
+        // which leaves cached data behind that nothing will ever remove. Throwing on the insert below meant
+        // that user could never join again until the server was restarted, so discard the stale entry instead.
+        if (_users.Remove(session.UserId, out var stale))
+        {
+            _sawmill.Warning($"User {session} still had cached data on connect, discarding it.");
+            CleanupUserData(stale);
+        }
 
         var cts = new CancellationTokenSource();
         var task = Load(session, cts.Token);
-        var data = new UserData(cts, task);
+        var data = new UserData(session, cts, task);
 
         _users.Add(session.UserId, data);
     }
 
     public void ClientDisconnected(ICommonSession session)
     {
-        _users.Remove(session.UserId, out var data);
-        if (data == null)
-            throw new InvalidOperationException("Did not have cached data in ClientDisconnect!");
+        // _Crescent: this used to throw, which aborted the rest of the disconnect handling (both the game
+        // ticker's and, on builds without EXCEPTION_TOLERANCE, the engine's) and left ghost sessions around
+        // that blocked the player from reconnecting. It happens whenever a player drops before being joined
+        // into the game, so just log it.
+        if (!_users.Remove(session.UserId, out var data))
+        {
+            _sawmill.Warning($"Did not have cached data in ClientDisconnect for {session}!");
+            return;
+        }
 
+        CleanupUserData(data);
+    }
+
+    private void CleanupUserData(UserData data)
+    {
         data.Cancel.Cancel();
         data.Cancel.Dispose();
 
         foreach (var onDisconnect in _onPlayerDisconnect)
         {
-            onDisconnect(session);
+            onDisconnect(data.Session);
         }
     }
 
@@ -146,7 +164,7 @@ public sealed class UserDbDataManager : IPostInjectInit
         _onPlayerDisconnect.Add(action);
     }
 
-    private sealed record UserData(CancellationTokenSource Cancel, Task Task);
+    private sealed record UserData(ICommonSession Session, CancellationTokenSource Cancel, Task Task);
 
     public delegate Task OnLoadPlayer(ICommonSession player, CancellationToken cancel);
 
