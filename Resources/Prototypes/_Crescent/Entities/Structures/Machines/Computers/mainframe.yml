@@ -88,7 +88,8 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
-      state: generic
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: command
     - map: ["computerLayerKeys"]
       state: tech_key
   - type: LitOnPowered
@@ -108,6 +109,21 @@
   components:
   - type: OverwatchConsole
     faction: DSM
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#bd7aff" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#bd7aff"
   - type: AccessReader
     access: [["Empire"]]
 
@@ -118,6 +134,21 @@
   components:
   - type: OverwatchConsole
     faction: NCWL
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff9944" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#ff9944"
   - type: AccessReader
     access: [["NCWLGeneral"]]
 
@@ -128,6 +159,21 @@
   components:
   - type: OverwatchConsole
     faction: SHI
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#d4d4d4" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#d4d4d4"
   - type: AccessReader
     access: [["Shinohara"]]
 
@@ -138,6 +184,21 @@
   components:
   - type: OverwatchConsole
     faction: TAP
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#72cf8c" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#72cf8c"
   - type: AccessReader
     access: [["Families"]]
 
@@ -148,6 +209,21 @@
   components:
   - type: OverwatchConsole
     faction: TFSC
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#ff5555" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#ff5555"
   # SyndicateBasic is the legacy access tag every TFCF job carries, matching the other factions' base tags.
   - type: AccessReader
     access: [["SyndicateBasic"]]
@@ -163,6 +239,21 @@
   components:
   - type: OverwatchConsole
     faction: SRM
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#9ba8b8" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#9ba8b8"
   - type: AccessReader
     access: [["Hunter"]]
 
@@ -173,6 +264,21 @@
   components:
   - type: OverwatchConsole
     faction: GS
+  - type: GenericVisualizer
+    visuals:
+      enum.ComputerVisuals.Powered:
+        computerLayerScreen:
+          True: { visible: true, shader: unshaded, color: "#78b7ff" }
+          False: { visible: false }
+        computerLayerKeys:
+          True: { visible: true, shader: unshaded }
+          False: { visible: true, shader: shaded }
+      enum.WiresVisuals.MaintenancePanelState:
+        enum.WiresVisualLayers.MaintenancePanel:
+          True: { visible: false }
+          False: { visible: true }
+  - type: PointLight
+    color: "#78b7ff"
   - type: AccessReader
     # Gliess has no shared base access tag; its sheriff, deputy, and dockmaster share these credentials.
     access: [["GliessSheriff", "GliessDockmaster"]]
