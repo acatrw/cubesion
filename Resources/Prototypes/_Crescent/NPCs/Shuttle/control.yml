@@ -133,6 +133,30 @@
     - WaspDrone
     iffColor: Orange # NCWL
 
+#CDT
+- type: entity
+  parent: ComputerDroneControl
+  id: ComputerDroneControlCDTt2
+  suffix: CDT
+  components:
+  - type: DroneCarrier
+    spawnableDrones:
+    - HornetDrone
+    - WaspDrone
+    iffColor: Red #CDT
+
+- type: entity
+  parent: ComputerDroneControl
+  id: ComputerDroneControlCDTt3
+  suffix: CDT
+  components:
+  - type: DroneCarrier
+    spawnableDrones:
+    - HornetDrone
+    - WaspDrone
+    iffColor: Red #CDT
+
+
 - type: deviceFrequency
   id: DroneControl
   name: device-frequency-prototype-name-drone-control
