@@ -1,8 +1,8 @@
 - type: entity
-  id: shuttle_manipulator
+  id: HolographStation
   parent: BaseStructure
-  name: station holograph
-  description: A three-dimensional hologram projection of a space station.
+  name: station hologram projector
+  description: A pedestal projector casting a three-dimensional hologram of an orbital station.
   components:
   - type: Sprite
     sprite: DeltaV/Structures/Decoration/shuttle_manipulator.rsi
@@ -13,3 +13,29 @@
     color: "#26DEB3"
   - type: Damageable
     damageContainer: Inorganic
+
+- type: entity
+  id: HolographPlanet
+  parent: HolographStation
+  name: planet hologram projector
+  description: A hologram of a white world that will not hold still. It slips between the survey it was recorded from and the split, burning ruin a Turning front left of it.
+  components:
+  - type: Sprite
+    state: holograph_planet
+  - type: PointLight
+    radius: 1.6
+    energy: 2
+    color: "#C6D6FF"
+
+- type: entity
+  id: HolographStarSystem
+  parent: HolographStation
+  name: star system hologram projector
+  description: A hologram of a violet star, its asteroid belt, and the broken worlds still keeping orbit around it.
+  components:
+  - type: Sprite
+    state: holograph_star_system
+  - type: PointLight
+    radius: 1.6
+    energy: 2
+    color: "#8A3BE0"

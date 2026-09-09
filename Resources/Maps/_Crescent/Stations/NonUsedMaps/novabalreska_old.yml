@@ -94116,7 +94116,7 @@ entities:
     - type: Transform
       pos: -16.5,8.5
       parent: 1
-- proto: shuttle_manipulator
+- proto: HolographStation
   entities:
   - uid: 5791
     components:

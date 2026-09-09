@@ -30,6 +30,7 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
       state: shuttle
     - map: ["computerLayerKeys"]
       state: generic_keys
@@ -80,7 +81,7 @@
       sprite: _NF/Structures/Machines/computer_tabletop.rsi
       state: generic_keyboard_tabletop
     - map: ["computerLayerScreen"]
-      sprite: Structures/Machines/computers.rsi
+      sprite: _Crescent/Structures/Machines/computers.rsi
       state: shuttle
     - map: ["computerLayerKeys"]
       sprite: Structures/Machines/computers.rsi

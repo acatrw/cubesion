@@ -127,6 +127,8 @@ faction-conquest-summary-station-fallen = [color=red]{ $station }[/color] ({ $fa
 
 faction-victory-cmm = CMM VICTORY — LOCAL ARTICLES PREVAIL. Public patrols and station law hold against every outside claimant.
 
+faction-victory-gs = GLIESS VICTORY. The Sheriff's forces have secured Gliess Santo and its independence from the sector's rival powers.
+
 faction-victory-dsm = DSM VICTORY — THE CHARTER HOLDS. Count Olywier's seal governs the frontier, and notice of the victory travels to Crown institutions in Domain.
 
 faction-victory-ncwl = NCWL VICTORY — THE FRONT ADVANCES. The winning party's program goes to Chengridz and Kane for ratification while the Workers' Union secures the gains.
@@ -174,6 +176,8 @@ faction-station-capture-cancelled = CONTAINMENT RESTORED — { $station } ({ $fa
 faction-station-fall-aurora = TURNING BREACH — DSM Aurora Imperialis has been overrun. Flesh is spreading through the hull and sections of the station are beginning to disappear. The station remains as an infested ruin. The Imperials are defeated.
 
 faction-station-fall-balreska = TURNING BREACH — NCWL Nova Balreska has been overrun. Flesh is spreading through the foundries and sections of the station are beginning to disappear. The station remains as an infested ruin. The Communards are defeated.
+
+faction-station-fall-zarya = TURNING BREACH — NCWL Port Zarya has been overrun. Flesh is spreading through the foundries and sections of the station are beginning to disappear. The station remains as an infested ruin. The Communards are defeated.
 
 faction-station-fall-tatsumoto = TURNING BREACH — SHI Tatsumoto has been overrun. Aberrant growth is spreading through the shipyard and sections of the station are beginning to disappear. The station remains as an infested ruin. Shinohara is defeated.
 

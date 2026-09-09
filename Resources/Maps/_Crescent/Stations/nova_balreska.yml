@@ -300944,7 +300944,7 @@ entities:
     - type: DeviceLinkSink
       links:
       - 7625
-- proto: shuttle_manipulator
+- proto: HolographStation
   entities:
   - uid: 7613
     components:
