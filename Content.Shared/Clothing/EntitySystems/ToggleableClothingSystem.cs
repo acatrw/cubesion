@@ -271,6 +271,8 @@ public sealed class ToggleableClothingSystem : EntitySystem
 
         // Death told me to do this- if you need to figure out why each of these are here, idk, figure it out.
         if (_timing.ApplyingState
+            || TerminatingOrDeleted(attached.Owner)
+            || TerminatingOrDeleted(comp.AttachedUid)
             || comp.LifeStage > ComponentLifeStage.Running
             || !TryComp(comp.AttachedUid, out ToggleableClothingComponent? toggleableComp)
             || toggleableComp.LifeStage > ComponentLifeStage.Running

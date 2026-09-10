@@ -2329,7 +2329,7 @@ entities:
     - type: Physics
       canCollide: False
     - type: InsideEntityStorage
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 281
     components:

@@ -162,6 +162,38 @@ namespace Content.IntegrationTests.Tests
                     }
                 }
 
+                // Some vendors, such as Onion, sell their refill boxes directly instead of
+                // shipping them through cargo. Only count inventories used by a real vendor.
+                foreach (var proto in prototypeManager.EnumeratePrototypes<EntityPrototype>())
+                {
+                    if (proto.Abstract || pair.IsTestPrototype(proto)
+                        || !proto.TryGetComponent<VendingMachineComponent>(out var vendor, compFact))
+                        continue;
+
+                    var inventory = prototypeManager.Index<VendingMachineInventoryPrototype>(vendor.PackPrototypeId);
+                    CheckInventory(inventory.StartingInventory);
+                    if (inventory.ContrabandInventory != null)
+                        CheckInventory(inventory.ContrabandInventory);
+                    if (inventory.EmaggedInventory != null)
+                        CheckInventory(inventory.EmaggedInventory);
+                }
+
+                void CheckInventory(Dictionary<string, uint> inventory)
+                {
+                    foreach (var (product, count) in inventory)
+                    {
+                        if (count == 0)
+                            continue;
+
+                        restocks.Remove(product);
+                        if (!restockStores.Remove(product, out var contents))
+                            continue;
+
+                        foreach (var entry in contents)
+                            restocks.Remove(entry);
+                    }
+                }
+
                 Assert.Multiple(() =>
                 {
                     Assert.That(restockStores, Has.Count.EqualTo(0),

@@ -44,11 +44,14 @@ public sealed class ShipWeaponTargetingTest
 
         await server.WaitAssertion(() =>
         {
+            // Supply a firing weapon outside the target grid so IgnoreWeaponGrid does not hide it.
+            var weapon = em.SpawnEntity(null, new MapCoordinates(new Vector2(-10, -10), map.MapId));
             void Shoot(bool targetTiles, int damage)
             {
                 var start = transforms.ToMapCoordinates(new EntityCoordinates(map.Grid, -2f, 0.5f));
                 var bullet = em.SpawnEntity("BulletMachineGunVulcan", start);
                 var projectile = em.GetComponent<ProjectileComponent>(bullet);
+                projectile.Weapon = weapon;
                 projectile.Damage = new DamageSpecifier { DamageDict = { ["Structural"] = damage } };
                 var phase = em.EnsureComponent<ProjectilePhasePreventComponent>(bullet);
                 phase.TargetTiles = targetTiles;
@@ -66,6 +69,8 @@ public sealed class ShipWeaponTargetingTest
             Assert.That(em.GetComponent<DamageableComponent>(rear).TotalDamage.Float(), Is.Zero);
 
             em.DeleteEntity(front);
+            // The first round's fixture remains until queued deletions run. It must not
+            // consume the next round's sweep before that round reaches the remaining wall.
             Shoot(false, 30);
             var rearDamage = em.GetComponent<DamageableComponent>(rear).TotalDamage;
             Assert.That(rearDamage.Float(), Is.GreaterThan(0), "Wall mode should pass over exposed flooring.");
@@ -125,9 +130,14 @@ public sealed class ShipWeaponTargetingTest
             var wallRound = Shoot();
             selection.Mode = ShipWeaponTargetingMode.TilesAndWalls;
             var tileRound = Shoot();
+            var exhumerRound = em.SpawnEntity("BulletKineticShuttle", map.GridCoords);
+            em.EnsureComponent<ProjectilePhasePreventComponent>(exhumerRound).TargetTiles = true;
+            em.EventBus.RaiseLocalEvent(gun, new AmmoShotEvent { FiredProjectiles = new() { exhumerRound } });
             selection.Mode = ShipWeaponTargetingMode.Walls;
             Assert.That(em.TryGetComponent<ProjectilePhasePreventComponent>(wallRound, out var wallPhase) && wallPhase.TargetTiles, Is.False);
             Assert.That(em.GetComponent<ProjectilePhasePreventComponent>(tileRound).TargetTiles, Is.True);
+            Assert.That(em.GetComponent<ProjectilePhasePreventComponent>(exhumerRound).TargetTiles, Is.False,
+                "Exhumer mining rounds must never target floor tiles.");
         });
         await pair.CleanReturnAsync();
     }

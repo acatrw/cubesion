@@ -162,7 +162,7 @@ public sealed partial class StockTradingUiFragment : BoxContainer
 
             _sharesLabel = new Label
             {
-                Text = Loc.GetString("stock-trading-owned-shares"),
+                Text = Loc.GetString("stock-trading-owned-shares", ("shares", 0)),
                 MinWidth = 100,
             };
 

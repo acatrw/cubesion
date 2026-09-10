@@ -1,0 +1,28 @@
+- type: entity
+  parent: VendingMachineCoffee
+  id: VendingMachineCoffeeShinohara
+  name: Shinohara corporate coffee machine
+  description: A spotless corporate hot-drinks machine. Its tiny cat mascot silently judges your caffeine intake.
+  components:
+  - type: VendingMachine
+    pack: ShinoharaHotDrinksMachineInventory
+  - type: Sprite
+    noRot: true
+    sprite: _Crescent/Structures/shinohara_coffee.rsi
+    layers:
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.Base"]
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
+      shader: unshaded
+    - state: "screen"
+      map: ["enum.VendingMachineVisualLayers.Screen"]
+      shader: unshaded
+    - state: panel
+      map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  - type: PointLight
+    radius: 2
+    energy: 1.3
+    color: "#d8dde2"
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true

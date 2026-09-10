@@ -963,7 +963,7 @@ entities:
     - type: PointCannon
       obstructedRanges:
       - 4.749566290405906 rad: 3.1565520351193257 rad
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 205
     components:

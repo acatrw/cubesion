@@ -262,6 +262,65 @@ public sealed class RepairSlipMapTest
     }
 
     /// <summary>
+    /// Valuable removable ship systems must keep the identity recorded in the snapshot. Otherwise a
+    /// player can unanchor one, carry it off-grid and ask the slip to manufacture another copy.
+    /// </summary>
+    [Test]
+    public async Task ValuableRemovedPartsAreDuplicationProtected()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+
+        var entManager = server.ResolveDependency<IEntityManager>();
+        var mapSystem = entManager.System<SharedMapSystem>();
+        var drydock = entManager.System<Content.Server._Crescent.RepairStation.ShipDrydockSnapshotSystem>();
+
+        var mapId = MapId.Nullspace;
+
+        await server.WaitAssertion(() =>
+        {
+            var map = mapSystem.CreateMap(out mapId);
+            var coords = new EntityCoordinates(map, System.Numerics.Vector2.Zero);
+
+            Assert.Multiple(() =>
+            {
+                foreach (var protectedPart in new[]
+                         {
+                             "ShieldEmitter",
+                             "ComputerShuttle",
+                             "ComputerTargeting",
+                             "ComputerRadar",
+                             "WeaponTurretVulcan",
+                             "AAAHardpointSmallBallistic",
+                             "WeaponTurretAutoPDDSM",
+                         })
+                {
+                    var uid = entManager.SpawnEntity(protectedPart, coords);
+                    var part = new DrydockPart
+                    {
+                        Proto = protectedPart,
+                        Original = uid,
+                        ReplacementRequiresDestruction = drydock.ReplacementRequiresDestruction(uid),
+                    };
+
+                    Assert.That(part.ReplacementRequiresDestruction, Is.True,
+                        $"{protectedPart} must not be replaceable while its snapshotted entity survives.");
+                    Assert.That(drydock.OriginalPreventsReplacement(part), Is.True,
+                        $"{protectedPart} must still block replacement while it is alive off-grid.");
+                }
+
+                var ordinaryHullPart = entManager.SpawnEntity("Thruster", coords);
+                Assert.That(drydock.ReplacementRequiresDestruction(ordinaryHullPart), Is.False,
+                    "Ordinary hull fittings should retain the existing off-grid repair behaviour.");
+            });
+        });
+
+        await server.WaitPost(() => mapSystem.DeleteMap(mapId));
+        await server.WaitRunTicks(1);
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
     /// Plating and framing are welding, but a shield emitter, a reactor or a gun comes off a crane and
     /// gets aligned, and the yard bills for that. This pins the ladder the scope file lays out, in
     /// particular that a gun's grade comes off the hardpoint it needs rather than off its name.

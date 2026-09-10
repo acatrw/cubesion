@@ -182,8 +182,10 @@ namespace Content.Server.Administration.Systems
         private void OnPlayerDetached(PlayerDetachedEvent ev)
         {
             // If disconnected then the player won't have a connected entity to get character name from.
-            // The disconnected state gets sent by OnPlayerStatusChanged.
-            if (ev.Player.Status == SessionStatus.Disconnected)
+            // The disconnected state gets sent by OnPlayerStatusChanged. During shutdown, this event can also
+            // arrive after the player data has already been removed, so there is nothing safe to update from.
+            if (ev.Player.Status == SessionStatus.Disconnected
+                || !_playerManager.TryGetPlayerData(ev.Player.UserId, out _))
                 return;
 
             UpdatePlayerList(ev.Player);

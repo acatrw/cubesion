@@ -302540,7 +302540,7 @@ entities:
     - type: Transform
       pos: -3.5,1.5
       parent: 1
-- proto: SpawnPointNCWLCoordinator
+- proto: SpawnPointNCWLIndustryTaskmaster
   entities:
   - uid: 7732
     components:
@@ -302613,6 +302613,8 @@ entities:
     - type: Transform
       pos: -3.5,-0.5
       parent: 1
+- proto: SpawnPointNCWLMVDOfficer
+  entities:
   - uid: 7745
     components:
     - type: Transform
@@ -302650,6 +302652,8 @@ entities:
     - type: Transform
       pos: -9.5,-11.5
       parent: 1
+- proto: SpawnPointNCWLMVDGrunt
+  entities:
   - uid: 7752
     components:
     - type: Transform

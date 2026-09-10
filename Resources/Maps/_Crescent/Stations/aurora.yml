@@ -163863,7 +163863,7 @@ entities:
     - type: Transform
       parent: 1
       pos: 8.5,-58.5
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 12370
     components:

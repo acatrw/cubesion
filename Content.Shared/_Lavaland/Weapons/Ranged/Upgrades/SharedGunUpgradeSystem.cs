@@ -31,7 +31,9 @@ public abstract partial class SharedGunUpgradeSystem : EntitySystem
         SubscribeLocalEvent<UpgradeableGunComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<UpgradeableGunComponent, ItemSlotInsertAttemptEvent>(OnItemSlotInsertAttemptEvent);
         SubscribeLocalEvent<UpgradeableGunComponent, ExaminedEvent>(OnExamine);
-        SubscribeLocalEvent<UpgradeableGunComponent, MapInitEvent>(OnMapInit);
+        // Gun initialization relays modifier events through the upgrade slots.
+        // Create those slots before SharedGunSystem performs its initial refresh.
+        SubscribeLocalEvent<UpgradeableGunComponent, MapInitEvent>(OnMapInit, before: [typeof(SharedGunSystem)]);
         SubscribeLocalEvent<UpgradeableGunComponent, GunRefreshModifiersEvent>(RelayEvent);
         SubscribeLocalEvent<UpgradeableGunComponent, GunShotEvent>(RelayEvent);
         SubscribeLocalEvent<UpgradeableGunComponent, ProjectileShotEvent>(RelayEvent);

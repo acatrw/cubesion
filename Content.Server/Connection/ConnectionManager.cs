@@ -261,7 +261,7 @@ namespace Content.Server.Connection
                 {
                     return (ConnectionDenyReason.Panic,
                         Loc.GetString("panic-bunker-account-denied-reason",
-                            ("reason", Loc.GetString("panic-bunker-account-reason-overall", ("minutes", minOverallHours)))), null);
+                            ("reason", Loc.GetString("panic-bunker-account-reason-overall", ("hours", minOverallHours)))), null); // Eclipsion - the line prints $hours
                 }
 
                 if (!validAccountAge || !haveMinOverallTime && !bypassAllowed)

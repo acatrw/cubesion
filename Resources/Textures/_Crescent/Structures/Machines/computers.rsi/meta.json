@@ -1,7 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "Original screen designs by Taleryn for Hullrot:Eclipsion, drawn to the existing computer screen layout: repair, overwatch, treasury, payroll, command, shuttle, taxation and targeting. Repair, overwatch, command and targeting use a neutral grayscale palette so the powered-screen visualizer tints them per faction; treasury, payroll and taxation share a blue background. Command is a pair of rank chevrons beside dispatch text scrolling downward one line per frame; shuttle is a drifting starfield with a ship silhouette running through it; targeting is a sweeping reticle over a contact plot. Overwatch blink, treasury highlight, taxation, command, shuttle and targeting are packed as four-direction, six-frame loops, and the repair wrench is rotated across twelve frames projected onto the same four-direction screen footprint.",
+  "copyright": "Original screen designs by Taleryn for Hullrot:Eclipsion, drawn to the existing computer screen layout: repair, overwatch, treasury, payroll, command, shuttle, taxation and targeting. Repair, overwatch, command and targeting use a neutral grayscale palette so the powered-screen visualizer tints them per faction; treasury, payroll and taxation share a blue background. Command is a pair of rank chevrons beside dispatch text scrolling downward one line per frame; shuttle is a drifting starfield with a ship silhouette running through it; targeting is a sweeping reticle over a contact plot. tech_share_receiver is an original cyan data-transfer display for Hullrot:Eclipsion, based on the targeting screen footprint. Overwatch blink, treasury highlight, taxation, command, shuttle, targeting and tech_share_receiver are packed as four-direction, six-frame loops, and the repair wrench is rotated across twelve frames projected onto the same four-direction screen footprint.",
   "size": {
     "x": 32,
     "y": 32
@@ -300,6 +300,44 @@
     {
       "name": "payroll",
       "directions": 4
+    },
+    {
+      "name": "tech_share_receiver",
+      "directions": 4,
+      "delays": [
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.3,
+          0.42
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.3,
+          0.42
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.3,
+          0.42
+        ],
+        [
+          0.18,
+          0.18,
+          0.18,
+          0.18,
+          0.3,
+          0.42
+        ]
+      ]
     }
   ]
 }

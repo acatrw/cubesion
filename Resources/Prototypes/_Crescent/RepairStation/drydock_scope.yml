@@ -52,6 +52,22 @@
     - PlasmaGlassShard
     - UraniumGlassShard
     - ClockworkGlassShard
+  # These removable, high-value systems retain their identity wherever they are taken. The slip may
+  # replace one only after the exact entity filed in the ship's snapshot has actually been destroyed;
+  # merely unanchoring it, carrying it into space or fitting it to another grid is not hull damage.
+  replacementRequiresDestruction:
+    components:
+    - ShipShieldEmitter
+    - ShuttleConsole
+    - TargetingConsole
+    - RadarConsole
+    # Cover both current and future ship-weapon implementations. Most current guns match several of
+    # these; the overlap is intentional so a weapon cannot escape protection by changing base type.
+    - SpaceArtillery
+    - HardpointAnchorableOnly
+    - Hardpoint
+    - PointCannon
+    - Gun
   # What the yard charges over the plain material value of a part. Most of a hull is plating and
   # framing that a welder puts back, and that stays at par. Shield emitters, reactors and guns are
   # not welding jobs - they come off the crane, get aligned and get tested - so they carry a premium,

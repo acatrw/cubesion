@@ -214,7 +214,7 @@ namespace Content.Shared.Storage.EntitySystems
             if (stash.SecretPartName != "")
                 return Loc.GetString(stash.SecretPartName);
 
-            var entityName = Loc.GetString("comp-secret-stash-secret-part-name", ("this", uid));
+            var entityName = Loc.GetString("comp-secret-stash-secret-part-name", ("item", uid));
 
             return entityName;
         }

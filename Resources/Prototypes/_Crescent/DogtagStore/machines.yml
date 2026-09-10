@@ -216,9 +216,6 @@
     - state: "icon"
       map: ["enum.VendingMachineVisualLayers.Base"]
     - state: "icon"
-      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
-      shader: unshaded
-    - state: "icon"
       map: ["enum.WiresVisualLayers.MaintenancePanel"]
     snapCardinals: false
   - type: Physics
@@ -314,9 +311,6 @@
     layers:
     - state: "icon"
       map: ["enum.VendingMachineVisualLayers.Base"]
-    - state: "icon"
-      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
-      shader: unshaded
     - state: "icon"
       map: ["enum.WiresVisualLayers.MaintenancePanel"]
     snapCardinals: false

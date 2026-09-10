@@ -23,7 +23,7 @@ namespace Content.Server.Administration.Commands
             }
             else if (args.Length == 1)
             {
-                shell.WriteLine(Loc.GetString("shell-timespan-minutes-must-be-correct"));
+                shell.WriteLine(Loc.GetString("shell-timespan-minutes-must-be-correct", ("span", args[0]))); // Eclipsion - the line prints $span
             }
             else
             {

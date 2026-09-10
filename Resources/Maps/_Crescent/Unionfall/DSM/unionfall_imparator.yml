@@ -1687,7 +1687,7 @@ entities:
           occludes: True
     - type: ChamberMagazineAmmoProvider
       boltClosed: True
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 108
     components:

@@ -369,7 +369,7 @@ entities:
       parent: 28
     - type: Physics
       canCollide: False
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 60
     components:

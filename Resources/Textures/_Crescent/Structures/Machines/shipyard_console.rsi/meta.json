@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Original shipyard console screen design by Taleryn for Hullrot:Eclipsion, drawn to the existing Crescent computer screen footprint and packed as a four-direction, six-frame loop.",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "screen",
+      "directions": 4,
+      "delays": [
+        [1.6, 0.6, 1.0, 0.6, 0.6, 1.8],
+        [1.6, 0.6, 1.0, 0.6, 0.6, 1.8],
+        [1.6, 0.6, 1.0, 0.6, 0.6, 1.8],
+        [1.6, 0.6, 1.0, 0.6, 0.6, 1.8]
+      ]
+    }
+  ]
+}

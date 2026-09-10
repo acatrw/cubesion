@@ -28,7 +28,7 @@ panic-bunker-account-denied-reason = This server is in panic bunker mode, often 
 panic-bunker-account-reason-account = Your Space Station 14 account is too new. It must be older than {$hours} hours
 panic-bunker-account-reason-overall = Your overall playtime on the server must be greater than {$hours} hours.
 
-whitelist-playtime = You do not have enough playtime to join this server. You need at least {$hours} minutes of playtime to join this server.
+whitelist-playtime = You do not have enough playtime to join this server. You need at least {$minutes} minutes of playtime to join this server.
 whitelist-player-count = This server is currently not accepting players. Please try again later.
 whitelist-notes = You currently have too many admin notes to join this server. You can check your notes by typing /adminremarks in chat.
 whitelist-manual = You are not whitelisted on this server.

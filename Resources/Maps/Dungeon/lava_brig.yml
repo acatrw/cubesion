@@ -9561,7 +9561,7 @@ entities:
       parent: 588
     - type: ApcPowerReceiver
       powerLoad: 0
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 1707
     components:

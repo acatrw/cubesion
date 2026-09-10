@@ -59,7 +59,7 @@ namespace Content.Server.ArachnidChaos
                         return;
 
                     _popupSystem.PopupEntity(Loc.GetString("spider-biting", ("UsernameName", args.User), ("targetName", args.Target)), args.User);
-                    _popupSystem.PopupEntity(Loc.GetString("spider-biting"), args.User, args.User);
+                    _popupSystem.PopupEntity(Loc.GetString("spider-biting", ("UsernameName", args.User), ("targetName", args.Target)), args.User, args.User);
 
                     var doAfterEventArgs = new DoAfterArgs(EntityManager, args.User, 3f, new ArachnidChaosDoAfterEvent(), uid, target: args.Target, used: uid)
                     {

@@ -12,6 +12,8 @@ public sealed partial class SoundOnTriggerComponent : Component
     [DataField("removeOnTrigger")]
     public bool RemoveOnTrigger = true;
 
+    // Eclipsion - the file lives under Grenades/Supermatter/; the flat path resolved to nothing, so any
+    // SoundOnTrigger that did not override this default played silence and logged a missing-resource error.
     [DataField("sound")]
-    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Effects/Grenades/supermatter_start.ogg");
+    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/Effects/Grenades/Supermatter/supermatter_start.ogg");
 }

@@ -119,7 +119,11 @@ public sealed class HeatSeekingSystem : EntitySystem
             }
 
             Angle angleOffset = angle - _transform.GetWorldRotation(xform);
-            float weight = distance / comp.DefaultSeekingRange - dif / 3;
+            // Distance is a penalty, not a bonus. Added straight it made the seeker climb past the ship
+            // in front of it for whatever sat at the far edge of its range; inverted, a contact at the
+            // muzzle scores 1 and one at maximum range scores 0, so the spread the rest of the terms are
+            // tuned against is unchanged.
+            float weight = 1f - distance / comp.DefaultSeekingRange - dif / 3;
             if (comp.TargetEntity == tUid)
                 weight += 5f;
             weight += tComp.HeatSignature;

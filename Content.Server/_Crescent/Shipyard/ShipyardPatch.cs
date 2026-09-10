@@ -209,7 +209,10 @@ public sealed partial class ShipyardSystem : SharedShipyardSystem
         }
         ;
 
-        _shuttleIndex += _mapping.GetAllMapGrids(ShipyardMap.Value).First().LocalAABB.Width + ShuttleSpawnBuffer;
+        // Advance past the hull that was just loaded, not past whatever grid the shipyard map happens
+        // to enumerate first. Two purchases in flight at once left the index short of the wider ship and
+        // spawned the next one on top of it.
+        _shuttleIndex += grid.Value.Comp.LocalAABB.Width + ShuttleSpawnBuffer;
 
         shuttleGrid = grid.Value.Owner;
         return true;

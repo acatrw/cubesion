@@ -165,7 +165,12 @@ public sealed class ProjectilePhasePreventerSystem : EntitySystem
             {
                 var hitEntity = hit.HitEntity;
 
-                if (hitEntity == owner)
+                if (hitEntity == owner || TerminatingOrDeleted(hitEntity))
+                    continue;
+
+                // A round that already hit something can remain until the deletion queue runs.
+                // It must not absorb other rounds fired during that same tick.
+                if (TryComp<ProjectileComponent>(hitEntity, out var spentRound) && spentRound.DamagedEntity)
                     continue;
 
                 if (projectile.IgnoreShooter && projectile.Shooter == hitEntity)
@@ -217,16 +222,31 @@ public sealed class ProjectilePhasePreventerSystem : EntitySystem
                 if (targetFixtures.Fixtures.Count == 0)
                     continue;
 
-                KeyValuePair<string, Fixture> targetFixturePair = default;
-                foreach (var kv in targetFixtures.Fixtures) { targetFixturePair = kv; break; }
+                // Ray queries also return sensors and soft projectile fixtures. They must not
+                // stop the sweep before a real wall farther along the shot's path. A target can
+                // also have several fixtures, so its first fixture is not necessarily hittable.
+                Fixture? targetFixture = null;
+                var targetFixtureKey = string.Empty;
+                foreach (var (key, fixture) in targetFixtures.Fixtures)
+                {
+                    if (!fixture.Hard || (fixture.CollisionLayer & ray.CollisionMask) == 0)
+                        continue;
+
+                    targetFixture = fixture;
+                    targetFixtureKey = key;
+                    break;
+                }
+
+                if (targetFixture == null)
+                    continue;
 
                 var bulletEvent = new HullrotBulletHitEvent
                 {
                     selfEntity = owner,
                     hitEntity = hitEntity,
                     selfFixtureKey = bulletFixtureKey,
-                    targetFixture = targetFixturePair.Value,
-                    targetFixtureKey = targetFixturePair.Key,
+                    targetFixture = targetFixture,
+                    targetFixtureKey = targetFixtureKey,
                     selfPhys = bulletPhysics
                 };
 
