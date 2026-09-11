@@ -1,4 +1,3 @@
-using System.Linq;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Temperature.Components;
@@ -29,25 +28,36 @@ public sealed class SharedTemperatureSystem : EntitySystem
 
     private void OnTemperatureChanged(Entity<TemperatureSpeedComponent> ent, ref OnTemperatureChangeEvent args)
     {
-        foreach (var (threshold, modifier) in ent.Comp.Thresholds)
+        // Derived from the current temperature rather than from which threshold was just crossed: warming up
+        // across a threshold used to apply THAT threshold's slowdown (a lizard going 294K -> 296K kept 0.6 until
+        // it passed 301K), and a jump over several thresholds took whichever came first in the dictionary.
+        var modifier = GetSpeedModifier(ent.Comp, args.CurrentTemperature);
+        if (modifier == ent.Comp.CurrentSpeedModifier)
+            return;
+
+        ent.Comp.NextSlowdownUpdate = _timing.CurTime + SlowdownApplicationDelay;
+        ent.Comp.CurrentSpeedModifier = modifier;
+        Dirty(ent);
+    }
+
+    /// <summary>
+    /// The modifier of the coldest threshold the temperature is below, or null when it is above all of them.
+    /// </summary>
+    private static float? GetSpeedModifier(TemperatureSpeedComponent comp, float temperature)
+    {
+        float? modifier = null;
+        var coldest = float.MaxValue;
+
+        foreach (var (threshold, value) in comp.Thresholds)
         {
-            if (args.CurrentTemperature < threshold && args.LastTemperature > threshold ||
-                args.CurrentTemperature > threshold && args.LastTemperature < threshold)
-            {
-                ent.Comp.NextSlowdownUpdate = _timing.CurTime + SlowdownApplicationDelay;
-                ent.Comp.CurrentSpeedModifier = modifier;
-                Dirty(ent);
-                break;
-            }
+            if (temperature >= threshold || threshold >= coldest)
+                continue;
+
+            coldest = threshold;
+            modifier = value;
         }
 
-        var maxThreshold = ent.Comp.Thresholds.Max(p => p.Key);
-        if (args.CurrentTemperature > maxThreshold && args.LastTemperature < maxThreshold)
-        {
-            ent.Comp.NextSlowdownUpdate = _timing.CurTime + SlowdownApplicationDelay;
-            ent.Comp.CurrentSpeedModifier = null;
-            Dirty(ent);
-        }
+        return modifier;
     }
 
     private void OnRefreshMovementSpeedModifiers(Entity<TemperatureSpeedComponent> ent, ref RefreshMovementSpeedModifiersEvent args)

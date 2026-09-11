@@ -124,6 +124,7 @@
     - TauCetiBasic
     - RobotTalk
   - type: PsionicInsulation
+  - type: AntiBoarderIgnored # Eclipsion - anti-boarder PD leaves service bots alone
 
 - type: entity
   parent: MobSiliconBase

@@ -1,4 +1,5 @@
-flatpack-unpack-no-room = No room to unpack!
+flatpack-unpack-no-room-self = No room to unpack, you're standing in the way!
+flatpack-unpack-no-room-blocker = No room to unpack, {THE($blocker)} is in the way!
 flatpack-examine = Use a [color=yellow]multitool[/color] to unpack this.
 flatpack-entity-name = {$name} flatpack
 flatpack-entity-description = A flatpack used for constructing {INDEFINITE($name)} {$name}.

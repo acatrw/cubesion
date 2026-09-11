@@ -666,7 +666,7 @@
   description:  Parts used to build a shuttle console. Activate with a multitool to deploy.
   components:
   - type: Flatpack
-    entity: BaseComputerShuttle
+    entity: C_ComputerShuttle
   - type: Sprite
     layers:
     - state: ame-part

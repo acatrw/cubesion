@@ -57,7 +57,8 @@ public sealed partial class ThermalRegulatorComponent : Component
     public float NormalBodyTemperature;
 
     /// <summary>
-    /// Deviation from normal temperature for body to start thermal regulation
+    /// Comfortable deviation from normal temperature. Does NOT gate sweating/shivering (those always run);
+    /// only read by systems that want a "running warm" band, e.g. silicon overheating.
     /// </summary>
     [DataField]
     public float ThermalRegulationTemperatureThreshold;

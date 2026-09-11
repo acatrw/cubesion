@@ -1276,3 +1276,12 @@ Entries:
     id: 6109
     time: '2026-09-08T14:45:57.0000000+00:00'
     url: https://github.com/eclipsion-team/eclipsion/pull/52
+  - author: Taleryn
+    changes:
+      - message: Bodies hold their normal temperature again. Sweating and shivering only kicked in once you were 25 degrees off normal, so in ordinary station air everyone sat around 28C instead of 37C - Unathi, who start slowing down at 28C, walked around with a cold alert and slowed down in any slightly chilly room. The same flaw is what cooked people in sealed hardsuits.
+        type: Fix
+      - message: Temperature slowdown now matches your current temperature. Warming back up used to leave you at the slower speed of the band you had just climbed out of.
+        type: Fix
+    id: 6110
+    time: '2026-09-11T00:00:00.0000000+00:00'
+    url: null

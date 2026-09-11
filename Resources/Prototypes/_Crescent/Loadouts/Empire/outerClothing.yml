@@ -27,6 +27,11 @@
   requirements:
     - !type:CharacterItemGroupRequirement
       group: LoadoutOuter
+    - !type:CharacterDepartmentRequirement
+      departments:
+        - DSM
+        - UnionfallDSM
+        - DSM-W
     - !type:CharacterTraitRequirement
       traits:
         - LatentPsychic

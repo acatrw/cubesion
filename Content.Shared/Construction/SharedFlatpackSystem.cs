@@ -4,6 +4,7 @@ using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
+using Content.Shared.Item;
 using Content.Shared.Materials;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Systems;
@@ -84,9 +85,19 @@ public abstract class SharedFlatpackSystem : EntitySystem
             if (!intersectBody.Hard || !intersectBody.CanCollide)
                 continue;
 
+            // Eclipsion Start - loose items (other flatpacks, dropped tools) just end up under the machine
+            if (HasComp<ItemComponent>(intersect))
+                continue;
+
             // this popup is on the server because the mispredicts on the intersection is crazy
             if (_net.IsServer)
-                _popup.PopupEntity(Loc.GetString("flatpack-unpack-no-room"), uid, args.User);
+            {
+                var msg = intersect == args.User
+                    ? Loc.GetString("flatpack-unpack-no-room-self")
+                    : Loc.GetString("flatpack-unpack-no-room-blocker", ("blocker", intersect));
+                _popup.PopupEntity(msg, uid, args.User);
+            }
+            // Eclipsion End
             return;
         }
 
