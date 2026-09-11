@@ -68,7 +68,8 @@ namespace Content.Client.Stylesheets
             var textureCloseButton = resCache.GetTexture("/Textures/Interface/Nano/cross.svg.png");
 
             // Button styles.
-            var buttonTex = resCache.GetTexture("/Textures/Interface/Nano/button.svg.96dpi.png");
+            // Eclipsion - bevelled chamfer button; same 24px footprint and corner orientation as button.svg.96dpi.png.
+            var buttonTex = resCache.GetTexture("/Textures/_Crescent/Interface/Eclipsion/Nano/button.png");
             BaseButton = new StyleBoxTexture
             {
                 Texture = buttonTex,
@@ -179,7 +180,7 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(TextureButton.StylePropertyTexture, textureCloseButton),
-                        new StyleProperty(Control.StylePropertyModulateSelf, StyleNano.NanoGold),
+                        new StyleProperty(Control.StylePropertyModulateSelf, StyleNano.EclipsionTextDim), // Eclipsion - was NanoGold
                     }),
                 // Window close button hover.
                 new StyleRule(

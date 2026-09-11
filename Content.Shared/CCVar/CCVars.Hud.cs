@@ -35,4 +35,11 @@ public sealed partial class CCVars
     public static readonly CVarDef<bool> HudActionBarVertical =
         CVarDef.Create("hud.action_bar_vertical", true, CVar.CLIENTONLY | CVar.ARCHIVE);
 
+    /// <summary>
+    ///     Eclipsion - tints the UI accent (window titles, pressed buttons, active hand) with the
+    ///     local player's faction colour. Off keeps the neutral accent regardless of faction.
+    /// </summary>
+    public static readonly CVarDef<bool> HudFactionAccent =
+        CVarDef.Create("hud.faction_accent", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+
 }

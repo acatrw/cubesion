@@ -1,0 +1,9 @@
+- files: ["button.png"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Original bevelled chamfer button for Hullrot:Eclipsion, drawn to the footprint of button.svg.96dpi.png so the OpenLeft/OpenRight atlases still line up"
+  source: "Hullrot Development Team"
+
+- files: ["window_background.png", "window_background_bordered.png", "window_header.png", "tooltip.png", "lineedit.png", "tabcontainer_panel.png", "transparent_window_background_bordered.png", "light_panel_background_bordered.png", "black_panel_dark_thin_border.png"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Space Station 14 Nano panel textures, recoloured to the Eclipsion gunmetal palette for Hullrot:Eclipsion (geometry unchanged)"
+  source: "https://github.com/space-wizards/space-station-14"

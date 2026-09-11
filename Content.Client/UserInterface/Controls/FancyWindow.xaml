@@ -16,7 +16,8 @@
                                VerticalAlignment="Center" />
             </BoxContainer>
         </Control>
-        <PanelContainer StyleClasses="LowDivider" />
+        <!-- Eclipsion - faction accent rule under the title bar, was LowDivider -->
+        <PanelContainer StyleClasses="WindowAccentDivider" />
         <Control Access="Public" Name="ContentsContainer" Margin="0 2" RectClipContent="True" VerticalExpand="true" />
     </BoxContainer>
 </controls:FancyWindow>

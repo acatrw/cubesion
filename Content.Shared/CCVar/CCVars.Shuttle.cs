@@ -275,5 +275,13 @@ public sealed partial class CCVars
     public static readonly CVarDef<float> ImpactInertiaScaling =
         CVarDef.Create("shuttle.impact.inertia_scaling", 0.5f, CVar.SERVERONLY);
 
+    /// <summary>
+    /// Flat multiplier on collision kinetic energy - scales tile breaking, entity damage and impact radius together.
+    /// Each contact already resolves twice, which is the classic ramming feel at 1. Raising it digs bigger holes
+    /// per hit, so rammers also slice further before stalling.
+    /// </summary>
+    public static readonly CVarDef<float> ImpactEnergyMultiplier =
+        CVarDef.Create("shuttle.impact.energy_multiplier", 1f, CVar.SERVERONLY);
+
     #endregion
 }

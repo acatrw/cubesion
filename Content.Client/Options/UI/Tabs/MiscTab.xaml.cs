@@ -77,6 +77,7 @@ namespace Content.Client.Options.UI.Tabs
 
             HudThemeOption.OnItemSelected += OnHudThemeChanged;
             ActionBarVerticalCheckBox.OnToggled += OnCheckBoxToggled;
+            FactionAccentCheckBox.OnToggled += OnCheckBoxToggled; // Eclipsion - faction accent
             DiscordRich.OnToggled += OnCheckBoxToggled;
             ShowOocPatronColor.OnToggled += OnCheckBoxToggled;
             ShowLoocAboveHeadCheckBox.OnToggled += OnCheckBoxToggled;
@@ -98,6 +99,7 @@ namespace Content.Client.Options.UI.Tabs
 
             HudThemeOption.SelectId(_hudThemeIdToIndex.GetValueOrDefault(_cfg.GetCVar(CVars.InterfaceTheme), 0));
             ActionBarVerticalCheckBox.Pressed = _cfg.GetCVar(CCVars.HudActionBarVertical);
+            FactionAccentCheckBox.Pressed = _cfg.GetCVar(CCVars.HudFactionAccent); // Eclipsion - faction accent
             DiscordRich.Pressed = _cfg.GetCVar(CVars.DiscordEnabled);
             ShowOocPatronColor.Pressed = _cfg.GetCVar(CCVars.ShowOocPatronColor);
             ShowLoocAboveHeadCheckBox.Pressed = _cfg.GetCVar(CCVars.LoocAboveHeadShow);
@@ -152,6 +154,7 @@ namespace Content.Client.Options.UI.Tabs
             }
 
             _cfg.SetCVar(CCVars.HudActionBarVertical, ActionBarVerticalCheckBox.Pressed);
+            _cfg.SetCVar(CCVars.HudFactionAccent, FactionAccentCheckBox.Pressed); // Eclipsion - faction accent
             _cfg.SetCVar(CVars.DiscordEnabled, DiscordRich.Pressed);
             _cfg.SetCVar(CCVars.HudHeldItemShow, ShowHeldItemCheckBox.Pressed);
             _cfg.SetCVar(CCVars.CombatModeIndicatorsPointShow, ShowCombatModeIndicatorsCheckBox.Pressed);
@@ -186,6 +189,7 @@ namespace Content.Client.Options.UI.Tabs
             var isHudThemeSame = HudThemeOption.SelectedId == _hudThemeIdToIndex.GetValueOrDefault(_cfg.GetCVar(CVars.InterfaceTheme), 0);
             var isLayoutSame = HudLayoutOption.SelectedMetadata is string opt && opt == _cfg.GetCVar(CCVars.UILayout);
             var isActionBarVerticalSame = ActionBarVerticalCheckBox.Pressed == _cfg.GetCVar(CCVars.HudActionBarVertical);
+            var isFactionAccentSame = FactionAccentCheckBox.Pressed == _cfg.GetCVar(CCVars.HudFactionAccent); // Eclipsion - faction accent
             var isDiscordSame = DiscordRich.Pressed == _cfg.GetCVar(CVars.DiscordEnabled);
             var isShowHeldItemSame = ShowHeldItemCheckBox.Pressed == _cfg.GetCVar(CCVars.HudHeldItemShow);
             var isCombatModeIndicatorsSame = ShowCombatModeIndicatorsCheckBox.Pressed == _cfg.GetCVar(CCVars.CombatModeIndicatorsPointShow);
@@ -209,6 +213,7 @@ namespace Content.Client.Options.UI.Tabs
             ApplyButton.Disabled = isHudThemeSame &&
                                    isLayoutSame &&
                                    isActionBarVerticalSame &&
+                                   isFactionAccentSame && // Eclipsion - faction accent
                                    isDiscordSame &&
                                    isShowHeldItemSame &&
                                    isCombatModeIndicatorsSame &&

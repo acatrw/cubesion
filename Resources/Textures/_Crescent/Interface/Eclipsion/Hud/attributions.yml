@@ -1,0 +1,9 @@
+- files: ["SlotBackground.png", "slot_highlight.png"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Original gunmetal slot frame and accent-tinted highlight for Hullrot:Eclipsion"
+  source: "Hullrot Development Team"
+
+- files: ["item_status_left.png", "item_status_right.png", "item_status_left_highlight.png", "item_status_right_highlight.png", "template_small.png"]
+  license: "CC-BY-NC-SA-3.0"
+  copyright: "Default HUD theme textures (goonstation commit e77d85d9c1d93aa32da7702737ceeac2b56738ac, modified by PixelTK), recoloured to the Eclipsion gunmetal palette for Hullrot:Eclipsion"
+  source: "https://github.com/goonstation/goonstation"

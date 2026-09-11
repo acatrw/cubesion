@@ -300944,7 +300944,7 @@ entities:
     - type: DeviceLinkSink
       links:
       - 7625
-- proto: HolographStation
+- proto: HolographStarSystem
   entities:
   - uid: 7613
     components:

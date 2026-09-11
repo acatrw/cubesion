@@ -1,7 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "Based on the Baystation coffee vending machine at commit https://github.com/Baystation12/Baystation12/commit/bddd2b27f6103e46dadb6d251c7c1832e012a84d; recolored and modified for Shinohara Heavy Industries by Taleryn for Hullrot:Eclipsion",
+  "copyright": "Originally based on the Baystation coffee vending machine at commit https://github.com/Baystation12/Baystation12/commit/bddd2b27f6103e46dadb6d251c7c1832e012a84d; recolored and modified for Shinohara Heavy Industries by Taleryn for Hullrot:Eclipsion. Cabinet redesigned by Taleryn; emissive, dispensing, damage and service layers rebuilt. Original flame pixels retained in coffee-hellfire.",
   "size": {
     "x": 32,
     "y": 32

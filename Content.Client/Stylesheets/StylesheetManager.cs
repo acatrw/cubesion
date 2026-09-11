@@ -12,12 +12,26 @@ namespace Content.Client.Stylesheets
         public Stylesheet SheetNano { get; private set; } = default!;
         public Stylesheet SheetSpace { get; private set; } = default!;
 
+        public Color Accent { get; private set; } = StyleNano.AccentNeutral; // Eclipsion - faction accent
+
         public void Initialize()
         {
-            SheetNano = new StyleNano(_resourceCache).Stylesheet;
+            SheetNano = new StyleNano(_resourceCache, Accent).Stylesheet;
             SheetSpace = new StyleSpace(_resourceCache).Stylesheet;
 
             _userInterfaceManager.Stylesheet = SheetNano;
         }
+
+        // Eclipsion Start - faction accent
+        public void SetAccent(Color accent)
+        {
+            if (accent == Accent)
+                return;
+
+            Accent = accent;
+            SheetNano = new StyleNano(_resourceCache, accent).Stylesheet;
+            _userInterfaceManager.Stylesheet = SheetNano;
+        }
+        // Eclipsion End
     }
 }

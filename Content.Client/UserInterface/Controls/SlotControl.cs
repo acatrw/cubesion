@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Client._Crescent.UserInterface;
 using Content.Client.Cooldown;
 using Content.Client.UserInterface.Systems.Inventory.Controls;
 using Robust.Client.UserInterface;
@@ -192,6 +193,7 @@ namespace Content.Client.UserInterface.Controls
 
             HighlightTexturePath = "slot_highlight";
             BlockedTexturePath = "blocked";
+            HudAccentTint.Apply(HighlightRect, Theme); // Eclipsion - faction accent
         }
 
         public void ClearHover()
@@ -256,6 +258,7 @@ namespace Content.Client.UserInterface.Controls
 
             StorageButton.TextureNormal = Theme.ResolveTextureOrNull(_storageTexturePath)?.Texture;
             HighlightRect.Texture = Theme.ResolveTextureOrNull(_highlightTexturePath)?.Texture;
+            HudAccentTint.Apply(HighlightRect, Theme); // Eclipsion - faction accent
             UpdateButtonTexture();
         }
 

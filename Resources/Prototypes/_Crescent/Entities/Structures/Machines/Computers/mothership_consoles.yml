@@ -186,6 +186,8 @@
   parent: BaseMothershipComputer
   name: NCWL shipyard
   components:
+  - type: ShipyardScreen
+    faction: NCWL
   - type: ShipyardListing
     iffColor: Orange
     shuttles:
@@ -201,6 +203,8 @@
   parent: BaseMothershipComputer
   name: homeguard light carrier fab console
   components:
+  - type: ShipyardScreen
+    faction: NCWL
   # Drones are bought from the buyer's personal bank, not the faction treasury.
   - type: ShipyardConsole
     usesFactionTreasury: false
@@ -215,6 +219,8 @@
   parent: BaseMothershipComputer
   name: imperial garrison light carrier fab console
   components:
+  - type: ShipyardScreen
+    faction: DSM
   # Drones are bought from the buyer's personal bank, not the faction treasury.
   - type: ShipyardConsole
     usesFactionTreasury: false
@@ -229,6 +235,8 @@
   parent: BaseMothershipComputer
   name: GSC shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     iffColor: IndianRed
     shuttles:
@@ -257,6 +265,8 @@
   parent: BaseMothershipComputer
   name: imperial shipyard
   components:
+  - type: ShipyardScreen
+    faction: DSM
   - type: ShipyardListing
     iffColor: "#C677A5"
     shuttles:
@@ -274,6 +284,8 @@
   parent: BaseMothershipComputer
   name: nemesis internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: DSM
   - type: ShipyardListing
     iffColor: "#C677A5"
     shuttles:
@@ -285,6 +297,8 @@
   parent: BaseMothershipComputer
   name: nemesis internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: DSM
   - type: ShipyardListing
     iffColor: "#C677A5"
     shuttles:
@@ -297,6 +311,8 @@
   parent: BaseMothershipComputer
   name: interdyne internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     iffColor: IndianRed
     shuttles:
@@ -311,6 +327,8 @@
   parent: BaseMothershipComputer
   name: SAWs internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     iffColor: IndianRed
     shuttles:
@@ -329,6 +347,8 @@
   parent: BaseMothershipComputer
   name: shinohara internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: SHI
   - type: ShipyardListing
     shuttles:
     - buffalo
@@ -342,6 +362,8 @@
   parent: BaseMothershipComputer
   name: cyberdawn internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     iffColor: IndianRed
     shuttles:
@@ -356,6 +378,8 @@
   parent: BaseMothershipComputer
   name: zhipov internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: NCWL
   # Drone-only listing, so it bills the buyer's personal bank like the other drone fab consoles.
   - type: ShipyardConsole
     usesFactionTreasury: false
@@ -371,6 +395,8 @@
   parent: BaseMothershipComputer
   name: clementine internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: NCWL
   - type: ShipyardListing
     iffColor: Orange
     shuttles:
@@ -382,6 +408,8 @@
   parent: BaseMothershipComputer
   name: jackal internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     iffColor: IndianRed
     shuttles:
@@ -394,6 +422,8 @@
   parent: BaseMothershipComputer
   name: Gliessian internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TSP
   - type: ShipyardListing
     iffColor: "#36B500"
     shuttles:
@@ -423,6 +453,8 @@
   parent: BaseMothershipComputer
   name: alseik tribal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TAP
   - type: ShipyardListing
     shuttles:
     - Svipul
@@ -435,6 +467,8 @@
   parent: BaseMothershipComputer
   name: Crown expeditionary shipyard
   components:
+  - type: ShipyardScreen
+    faction: ATH
   - type: ShipyardListing
     shuttles:
     - Archon
@@ -446,6 +480,8 @@
   parent: BaseMothershipComputer
   name: thukker tribal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TAP
   - type: ShipyardListing
     shuttles:
     - Hearth
@@ -455,6 +491,8 @@
   parent: BaseMothershipComputer
   name: izdari tribal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TAP
   - type: ShipyardListing
     shuttles:
     - Alkhuld
@@ -469,6 +507,8 @@
   parent: BaseMothershipComputer
   name: ouroboros internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TFSC
   - type: ShipyardListing
     shuttles:
     - Tick
@@ -512,6 +552,8 @@
   parent: BaseMothershipComputer
   name: fadeem internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: TAP
   - type: ShipyardListing
     shuttles:
     - Caravan
@@ -521,6 +563,8 @@
   parent: BaseMothershipComputer
   name: psoglav internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: NCWL
   - type: ShipyardListing
     iffColor: Orange
     shuttles:
@@ -531,6 +575,8 @@
   parent: BaseMothershipComputer
   name: covetor internal shipyard
   components:
+  - type: ShipyardScreen
+    faction: DSM
   - type: ShipyardListing
     iffColor: "#C677A5"
     shuttles:

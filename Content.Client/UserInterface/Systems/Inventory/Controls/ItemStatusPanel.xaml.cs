@@ -1,3 +1,4 @@
+using Content.Client._Crescent.UserInterface;
 using Content.Client.Items;
 using Content.Shared.Hands.Components;
 using Content.Shared.IdentityManagement;
@@ -71,6 +72,7 @@ public sealed partial class ItemStatusPanel : Control
         panelHighlight.Texture = textureHighlight;
         panelHighlight.SetPatchMargin(flat, 4);
         panelHighlight.SetPatchMargin(cutOut, 7);
+        HudAccentTint.Apply(HighlightPanel, Theme); // Eclipsion - faction accent
 
         _side = location;
     }

@@ -295,7 +295,7 @@
   id: gliessbiome
   name: Taypan Core
   swapDuration: 2
-  parallax: RatAspidParallax
+  parallax: TaypanCoreTurning
 
 #tatsumoto approach
 

@@ -170912,7 +170912,7 @@ entities:
     - type: DeviceLinkSink
       links:
       - 13510
-- proto: HolographStation
+- proto: HolographPlanet
   entities:
   - uid: 13508
     components:
