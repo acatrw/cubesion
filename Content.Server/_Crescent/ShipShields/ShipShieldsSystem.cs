@@ -400,14 +400,22 @@ public sealed partial class ShipShieldsSystem : EntitySystem
             }
         }
 
+        // One chain fixture, and it must never be able to form a contact.
+        //
+        // A ChainShape gets one broadphase proxy per segment but all of them share a single Fixture object, and
+        // the engine's new-pair check (SharedBroadphaseSystem.FindPairs) dedupes per Fixture *before* the batch
+        // is applied. Two segments overlapping the same other fixture in one tick therefore queue the same pair
+        // twice, and the second AddPair throws "An item with the same key has already been added. Key: Fixture"
+        // after it has already put the contact in the active list. From the next tick on DestroyContact throws
+        // "The LinkedList node does not belong to current LinkedList" and CollideContacts aborts every tick:
+        // physics stops, the client stops responding and Windows kills it as hung. This bubble is on every
+        // client (AddGlobalOverride) and never sleeps, so it used to take everyone down with it.
+        //
+        // PhasePrevention is a query-only layer - nothing carries it in a collision mask - so this fixture is
+        // reachable by IntersectRay and by the client overlays that read its shape, and by nothing else. It is
+        // hard because IntersectRay skips soft fixtures. Deflection contacts live on "internalShield", which is
+        // a PolygonShape and therefore has exactly one proxy. Do not give this one a colliding layer.
         _fixtureSystem.TryCreateFixture(uid, chain, name,
-            hard: false,
-            collisionLayer: (int) CollisionGroup.FullTileLayer,
-            body: physics);
-
-        // IntersectRay ignores soft fixtures. This hard fixture uses a query-only collision layer, so phase
-        // prevention can see the shield without making the bubble physically solid to ships or entities.
-        _fixtureSystem.TryCreateFixture(uid, chain, "phaseShield",
             hard: true,
             collisionLayer: (int) CollisionGroup.PhasePrevention,
             body: physics);

@@ -278,10 +278,11 @@ public sealed partial class CCVars
     /// <summary>
     /// Flat multiplier on collision kinetic energy - scales tile breaking, entity damage and impact radius together.
     /// Each contact already resolves twice, which is the classic ramming feel at 1. Raising it digs bigger holes
-    /// per hit, so rammers also slice further before stalling.
+    /// per hit, so rammers also slice further before stalling. 3 was too much: the tile and gib churn it produced
+    /// per hit was a large part of what stalled clients during a ram, so it sits at 1.5.
     /// </summary>
     public static readonly CVarDef<float> ImpactEnergyMultiplier =
-        CVarDef.Create("shuttle.impact.energy_multiplier", 1f, CVar.SERVERONLY);
+        CVarDef.Create("shuttle.impact.energy_multiplier", 1.5f, CVar.SERVERONLY);
 
     #endregion
 }

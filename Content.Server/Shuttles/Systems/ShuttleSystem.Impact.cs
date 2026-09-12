@@ -49,6 +49,12 @@ public sealed partial class ShuttleSystem
     private const float _minImpulseVelocity = 0.07f;
     // high-speed collisions tend to be a series of increasingly smaller collisions so don't spam admin logs
     private readonly TimeSpan _adminLogSpacing = TimeSpan.FromSeconds(3);
+    // A grind resolves many contacts a second and every impact sound is a networked entity that each client in
+    // range turns into an OpenAL source. Unbounded, a ram exhausts the client's audio sources mid-collision
+    // ("Error creating audio source" / "AL error: OutOfMemory") and the entity churn stalls it, so space them out.
+    private readonly TimeSpan _impactSoundSpacing = TimeSpan.FromSeconds(0.25);
+    // Sparks are networked entities too, so cap how many one drain is allowed to spawn.
+    private const int _maxSparksPerDrain = 24;
 
     private readonly SoundCollectionSpecifier _shuttleImpactSound = new("ShuttleImpactSound");
     private readonly ProtoId<ContentTileDefinition> _platingId = "Plating";
@@ -61,6 +67,10 @@ public sealed partial class ShuttleSystem
     private HashSet<EntityUid> _intersecting = new();
     // for _adminLogSpacing
     private Dictionary<EntityUid, TimeSpan> _impactedAt = new();
+    // for _impactSoundSpacing
+    private readonly Dictionary<EntityUid, TimeSpan> _impactSoundAt = new();
+    // Spark budget left in the drain currently being processed, see _maxSparksPerDrain.
+    private int _sparkBudget;
 
     /// <summary>
     /// One contact point of a grid-on-grid collision, captured during the physics step and resolved afterwards.
@@ -137,7 +147,7 @@ public sealed partial class ShuttleSystem
     {
         if (_pendingImpacts.Count == 0)
         {
-            if (_impactedAt.Count > 0)
+            if (_impactedAt.Count > 0 || _impactSoundAt.Count > 0)
                 PruneImpactLog();
 
             return;
@@ -150,6 +160,7 @@ public sealed partial class ShuttleSystem
         _pendingImpacts.Clear();
 
         _impactVelocities.Clear();
+        _sparkBudget = _maxSparksPerDrain;
 
         foreach (var impact in _processingImpacts)
         {
@@ -321,9 +332,16 @@ public sealed partial class ShuttleSystem
         var coordinates = new EntityCoordinates(ourEntity, impact.OurLocalPoint);
         var worldPoint = _transform.ToMapCoordinates(coordinates).Position;
 
-        var volume = MathF.Min(10f, MathF.Pow(jungleDiff, 0.5f) - 5f);
-        var audioParams = AudioParams.Default.WithVariation(SharedContentAudioSystem.DefaultVariation).WithVolume(volume);
-        _audio.PlayPvs(_shuttleImpactSound, coordinates, audioParams);
+        // Rate-limited because a scrape resolves many contacts per second, see _impactSoundSpacing.
+        if (CheckShouldPlaySound(ourEntity) && CheckShouldPlaySound(otherEntity))
+        {
+            var volume = MathF.Min(10f, MathF.Pow(jungleDiff, 0.5f) - 5f);
+            var audioParams = AudioParams.Default.WithVariation(SharedContentAudioSystem.DefaultVariation).WithVolume(volume);
+            _audio.PlayPvs(_shuttleImpactSound, coordinates, audioParams);
+
+            _impactSoundAt[ourEntity] = _gameTiming.CurTime;
+            _impactSoundAt[otherEntity] = _gameTiming.CurTime;
+        }
 
         // if we're not enabled, stop after playing sound
         if (!_enabled)
@@ -650,9 +668,13 @@ public sealed partial class ShuttleSystem
         if (TerminatingOrDeleted(uid))
             return;
 
-        // Spawn spark effects
+        // Spawn spark effects, up to the drain's budget
         foreach (var tile in sparkTiles)
         {
+            if (_sparkBudget <= 0)
+                break;
+
+            _sparkBudget--;
             var coords = _mapSystem.GridTileToLocal(uid, grid, tile);
             Spawn(_sparkEffect, coords);
         }
@@ -665,6 +687,15 @@ public sealed partial class ShuttleSystem
     private bool CheckShouldLog(EntityUid uid)
     {
         return !(_impactedAt.TryGetValue(uid, out var last) && _gameTiming.CurTime < last + _adminLogSpacing);
+    }
+
+    /// <summary>
+    /// Check whether this grid is allowed another impact sound yet. Used to keep a ram from spawning more audio
+    /// entities than a client can hold sources for.
+    /// </summary>
+    private bool CheckShouldPlaySound(EntityUid uid)
+    {
+        return !(_impactSoundAt.TryGetValue(uid, out var last) && _gameTiming.CurTime < last + _impactSoundSpacing);
     }
 
     /// <summary>
@@ -685,6 +716,20 @@ public sealed partial class ShuttleSystem
         foreach (var uid in _staleImpacts)
         {
             _impactedAt.Remove(uid);
+        }
+
+        _staleImpacts.Clear();
+
+        var soundCutoff = _gameTiming.CurTime - _impactSoundSpacing;
+        foreach (var (uid, time) in _impactSoundAt)
+        {
+            if (time < soundCutoff || TerminatingOrDeleted(uid))
+                _staleImpacts.Add(uid);
+        }
+
+        foreach (var uid in _staleImpacts)
+        {
+            _impactSoundAt.Remove(uid);
         }
 
         _staleImpacts.Clear();
