@@ -11,6 +11,11 @@
 # banner belongs to at a glance, and homeFaction is baked in so you cannot mis-map it. The plain ConquestFlag still
 # exists and auto-inherits whatever station's grid it is planted on.
 #
+# Every faction that can hold ground has one, all cut from the same sprite sheet: cloth in the faction's colour with
+# its trim along the edge, on the same grey pole. DSM, NCWL and TAP were drawn by hand; the rest are recoloured from
+# the sheet's neutral master by Tools/generate_conquest_banners.py, so edit the colours there and re-run rather than
+# hand-painting a new state. There is deliberately no IND banner — unaffiliated crews hold no territory.
+#
 # Every banner is indestructible (no Damageable — nothing can damage or blow it up) and immovable (anchored, with no
 # Anchorable/Pullable/Item, so it cannot be wrenched loose, pulled, or picked up).
 
@@ -60,39 +65,6 @@
 
 - type: entity
   parent: ConquestFlag
-  id: ConquestFlagSHI
-  suffix: SHI
-  name: SHI conquest banner
-  components:
-    - type: Sprite
-      color: "#17A2B8" # corporate cyan
-    - type: ConquestFlag
-      homeFaction: SHI
-
-- type: entity
-  parent: ConquestFlag
-  id: ConquestFlagTFSC
-  suffix: TFCF
-  name: TFCF conquest banner
-  components:
-    - type: Sprite
-      color: "#4CAF50" # coalition green
-    - type: ConquestFlag
-      homeFaction: TFSC
-
-- type: entity
-  parent: ConquestFlag
-  id: ConquestFlagGS
-  suffix: GS
-  name: GS conquest banner
-  components:
-    - type: Sprite
-      color: "#3F6FB5" # minutemen blue
-    - type: ConquestFlag
-      homeFaction: GS
-
-- type: entity
-  parent: ConquestFlag
   id: ConquestFlagTAP
   suffix: TAP
   name: TAP conquest banner
@@ -102,3 +74,79 @@
       state: green-gold
     - type: ConquestFlag
       homeFaction: TAP
+
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagSHI
+  suffix: SHI
+  name: SHI conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: teal-steel
+    - type: ConquestFlag
+      homeFaction: SHI
+
+# Legacy TFSC prototype ID, kept for map compatibility. The faction's canonical name is TFCF.
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagTFSC
+  suffix: TFCF
+  name: TFCF conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: crimson-steel
+    - type: ConquestFlag
+      homeFaction: TFSC
+
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagGS
+  suffix: GS
+  name: Gliess Santo conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: navy-white
+    - type: ConquestFlag
+      homeFaction: GS
+
+# The Minutemen's own colours, distinct from the Gliess Santo banner their survivors now serve under.
+# TSP is the ID jobs stamp on a mob; the CMM seen on a couple of consoles is machine-side only, so a
+# banner homed to it could never be reclaimed by anyone.
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagTSP
+  suffix: TSP
+  name: Minutemen conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: azure-buff
+    - type: ConquestFlag
+      homeFaction: TSP
+
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagSRM
+  suffix: SRM
+  name: Saint's Militia conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: black-bone
+    - type: ConquestFlag
+      homeFaction: SRM
+
+- type: entity
+  parent: ConquestFlag
+  id: ConquestFlagATH
+  suffix: ATH
+  name: Crown conquest banner
+  components:
+    - type: Sprite
+      sprite: _Crescent/Structures/medieval_pole_banners.rsi
+      state: ivory-gold
+    - type: ConquestFlag
+      homeFaction: ATH

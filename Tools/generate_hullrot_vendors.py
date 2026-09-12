@@ -1,10 +1,13 @@
 """Generates the Hullrot faction vendor RSIs.
 
 Two chassis, drawn from scratch rather than reskinned from the RMC ColMarTech racks:
-  armory -- heavy armoured cabinet: bolted side pillars, crest plate, weapon rack window, dispensing hatch.
+  armory -- caged gun locker in the vein of Crescent's own armory.rsi: overhanging hood, sprayed unit
+            markings, barred window with the racked stock behind it, keypad column, dispensing tray.
   supply -- slimmer requisitions rack: lit emblem sign, glass front with folded stock on shelves, tray.
+  sustenance -- Shinohara's ration vendor: broad lit header, tall window of boxed rations, keypad column.
 
-Every faction gets both chassis. Beyond the colours, each faction varies the silhouette of the cap, the
+Every faction gets the armory and supply chassis. The sustenance chassis is Shinohara's alone -- SHI
+supplies compact rations to the whole sector, so there is no per-faction variant of it. Beyond the colours, each faction varies the silhouette of the cap, the
 emblem, the trim pattern on the header and the pillar dressing, so two vendors read apart even in greyscale.
 Adding a faction = one FACTIONS entry (and an EMBLEMS glyph if it needs a new one).
 
@@ -77,6 +80,11 @@ FACTIONS = {
     "ath": dict(chassis="#9E998C", accent="#E0CF8A", cap="spire", emblem="crown", trim="double", pillar="stripe"),
     "tsp": dict(chassis="#3A4658", accent="#4E8FD6", cap="badge", emblem="shield", trim="solid", pillar="rivets"),
 }
+
+# Shinohara sells rations to every flag in the sector, so its ration vendor is a fleet-service machine
+# rather than a showroom one: a darker teal-cast steel than the pale corporate shell the SHI armoury and
+# requisitions racks wear, keeping the accent, the dome cap and the "S" so it still reads as Shinohara.
+SUSTENANCE = dict(chassis="#3F4E52", accent="#6FB0A6", cap="dome", emblem="s", trim="solid", pillar="stripe")
 
 EMBLEMS = {
     "square": [".......", ".#####.", ".#...#.", ".#.#.#.", ".#...#.", ".#####.", "......."],
@@ -158,6 +166,14 @@ class Canvas:
         if 0 <= x < S and 0 <= y < S:
             self.px[x, y] = tuple(c[:3]) + (a,)
 
+    def blend(self, x, y, c, t):
+        """Mix c into the pixel already there. put() with an alpha would punch a hole in an opaque layer."""
+        if not (0 <= x < S and 0 <= y < S):
+            return
+        r, g, b, a = self.px[x, y]
+        if a:
+            self.px[x, y] = mix((r, g, b), c, t) + (a,)
+
     def rect(self, x0, y0, x1, y1, c, a=255):
         for y in range(y0, y1 + 1):
             for x in range(x0, x1 + 1):
@@ -171,22 +187,22 @@ class Canvas:
             self.put(x0, y, c)
             self.put(x1, y, c)
 
-    def glyph(self, rows, x0, y0, c):
+    def glyph(self, rows, x0, y0, c, a=255):
         for j, row in enumerate(rows):
             for i, ch in enumerate(row):
                 if ch == "#":
-                    self.put(x0 + i, y0 + j, c)
+                    self.put(x0 + i, y0 + j, c, a)
 
 
 # Geometry. Bodies are odd-width so the emblem centres on a pixel column.
 GEO = {
     "armory": dict(
-        bx0=2, bx1=28, bt=6,
-        plate=(11, 7, 19, 15), band=(7, 9, 23, 12),
-        glass=(8, 18, 16, 25), glass_frame=(7, 17, 17, 26),
-        screen=(20, 18, 22, 20), screen_frame=(19, 17, 23, 21),
-        keys=(20, 23, 22, 24), led=(23, 23), slot=(20, 26, 22, 26),
-        hatch=(9, 28, 21, 28), console=(19, 17, 23, 26),
+        bx0=2, bx1=29, hood=(1, 1, 30, 3),
+        band=(2, 4, 29, 10), plate=(4, 4, 10, 10), label=(12, 4, 27, 10),
+        glass=(5, 13, 20, 26), glass_frame=(4, 12, 21, 27),
+        screen=(23, 13, 28, 16), screen_frame=(22, 12, 29, 17),
+        keys=(23, 19, 27, 22), led=(28, 19), slot=(23, 24, 27, 24),
+        hatch=(6, 29, 19, 29), console=(22, 12, 29, 27),
     ),
     "supply": dict(
         bx0=4, bx1=26, bt=6,
@@ -196,24 +212,17 @@ GEO = {
         keys=(21, 23, 22, 24), led=(23, 23), slot=(21, 26, 22, 26),
         hatch=(9, 29, 21, 29), console=(20, 17, 23, 27),
     ),
+    "sustenance": dict(
+        bx0=3, bx1=29, bt=4,
+        sign=(4, 5, 28, 15), plate=(6, 6, 14, 14),
+        glass=(8, 17, 21, 26), glass_frame=(7, 16, 22, 27),
+        screen=(24, 18, 27, 20), screen_frame=(23, 17, 28, 21),
+        keys=(24, 23, 27, 24), led=(28, 23), slot=(24, 26, 27, 26),
+        hatch=(8, 29, 21, 29), console=(23, 16, 28, 27),
+    ),
 }
 
-RIFLES = (9, 12, 15)
 STOCK_COLORS = [(92, 98, 76), (124, 124, 128), (188, 180, 158), (62, 72, 98), (106, 76, 62)]
-
-
-def rifle_pixels():
-    px = {}
-    for x in RIFLES:
-        for y in (18, 19, 20):
-            px[(x, y)] = METAL_DK
-        for y in (21, 22, 23):
-            px[(x, y)] = METAL
-            px[(x + 1, y)] = METAL_DK
-        px[(x + 1, 24)] = METAL_DK  # magazine
-        px[(x, 24)] = STOCK
-        px[(x, 25)] = STOCK
-    return px
 
 
 def shelf_items(p):
@@ -234,6 +243,8 @@ def shelf_items(p):
 
 
 def draw_body(kind, fac, p):
+    if kind == "armory":
+        return armory_body(fac, p)
     g = GEO[kind]
     c = Canvas()
     bx0, bx1, bt = g["bx0"], g["bx1"], g["bt"]
@@ -264,10 +275,7 @@ def draw_body(kind, fac, p):
         if any((x + dx, y + dy) not in mask for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
             c.put(x, y, p["out"])
 
-    if kind == "armory":
-        draw_armory(c, g, fac, p)
-    else:
-        draw_supply(c, g, fac, p)
+    (draw_supply if kind == "supply" else draw_sustenance)(c, g, fac, p)
     return c
 
 
@@ -324,40 +332,6 @@ def draw_glass(c, g, p):
             c.put(x, y, col)
 
 
-def draw_armory(c, g, fac, p):
-    draw_pillar(c, 3, g["bt"] + 1, 29, fac, p, False)
-    draw_pillar(c, 25, g["bt"] + 1, 29, fac, p, True)
-    for y in range(g["bt"] + 1, 30):
-        c.put(6, y, p["seam"])
-        c.put(24, y, p["seam"])
-
-    x0, y0, x1, y1 = g["band"]
-    for y in range(y0, y1 + 1):
-        for x in range(x0, x1 + 1):
-            c.put(x, y, trim_color(fac["trim"], x, y, y0, y1, p))
-    draw_plate(c, g, fac, p, p["acc_dim"])
-    for x in range(7, 24):
-        c.put(x, 16, p["seam"])
-
-    draw_glass(c, g, p)
-    gx0, gy0, _, _ = g["glass"]
-    for (x, y) in ((gx0 + 1, gy0 + 1), (gx0, gy0 + 2), (gx0 + 2, gy0)):
-        c.put(x, y, GLASS_HI)
-    for (x, y), col in rifle_pixels().items():
-        c.put(x, y, col)
-
-    draw_console(c, g, p)
-
-    hx0, hy, hx1, _ = g["hatch"]
-    for x in range(hx0 - 1, hx1 + 2):
-        c.put(x, hy - 1, p["lt"])
-        c.put(x, hy, p["out"])
-        c.put(x, hy + 1, p["dk"])
-    for x in range(hx0 - 1, hx1 + 2):
-        if x in (hx0 - 1, hx1 + 1):
-            c.put(x, hy, p["seam"])
-
-
 def draw_supply(c, g, fac, p):
     bt = g["bt"]
     for y in range(bt + 1, 30):
@@ -405,6 +379,345 @@ def draw_supply(c, g, fac, p):
         c.put(x, hy, p["lt"])
 
 
+# ---------------------------------------------------------------- sustenance chassis
+#
+# Shinohara's compact-ration vendor. It shares the supply rack's silhouette machinery -- heightmap cap,
+# plinth, glass front, keypad column -- but is a broader, heavier machine: the header is a wide lit sign
+# with the crest plate pushed left and a stencilled ration band beside it, the window is tall enough for
+# three shelves of boxed rations, and the tray at the foot is a deep recess rather than a lip.
+
+RATION = [(96, 104, 72), (128, 116, 86), (74, 86, 90), (112, 92, 66), (86, 98, 102)]
+
+
+def ration_items(g, p):
+    """(x, y) -> colour for the boxed rations stacked behind the sustenance glass."""
+    px = {}
+    x0, y0, x1, y1 = g["glass"]
+    k = 0
+    for top in (y0 + 1, y0 + 4, y0 + 7):
+        x = x0 + 1
+        while x + 2 <= x1 - 1:
+            col = RATION[k % len(RATION)]
+            k += 1
+            for dx in range(3):
+                px[(x + dx, top)] = mix(col, WHITE, 0.24)
+                px[(x + dx, top + 1)] = col
+            px[(x + 1, top + 1)] = p["acc_dk"]          # the SHI band printed on every wrapper
+            x += 4
+    return px
+
+
+def draw_sustenance(c, g, fac, p):
+    bt = g["bt"]
+    gx0, gy0, gx1, gy1 = g["glass"]
+    fx0, fy0, fx1, fy1 = g["glass_frame"]
+    cx0, _, cx1, cy1 = g["console"]
+
+    # Left dressing column and the seam that separates the window from the keypad column.
+    draw_pillar(c, fx0 - 3, bt + 2, 29, fac, p, False)
+    for y in range(bt + 1, 30):
+        c.put(cx0 - 1, y, p["seam"])
+
+    # Header sign: crest plate on the left, stencilled ration band filling the rest.
+    sx0, sy0, sx1, sy1 = g["sign"]
+    px0, py0, px1, py1 = g["plate"]
+    c.frame(sx0, sy0, sx1, sy1, p["out"])
+    for y in range(sy0 + 1, sy1):
+        for x in range(sx0 + 1, sx1):
+            c.put(x, y, p["acc_dim"] if x <= px1 + 1
+                  else trim_color(fac["trim"], x, y, py0 + 1, py1 - 1, p))
+    draw_plate(c, g, fac, p, p["acc_dim"])
+    for row, y in enumerate(range(py0 + 3, py1 - 1, 2)):   # stencilled ration marking on the band
+        for x in range(px1 + 3, sx1 - 1 - row * 3):
+            if x % 4 != 3:
+                c.put(x, y, scale(p["dk"], 0.55))
+    for x in range(sx0, sx1 + 1):
+        c.put(x, sy1 + 1, p["seam"])
+
+    # Window: three shelves of rations behind glass, with a rail under each.
+    draw_glass(c, g, p)
+    for (x, y), col in ration_items(g, p).items():
+        c.put(x, y, col)
+    for y in (gy0 + 3, gy0 + 6, gy0 + 9):
+        for x in range(gx0, gx1 + 1):
+            c.put(x, y, METAL_DK)
+    c.put(gx0, gy0, GLASS_HI)
+    c.put(gx0 + 1, gy0, GLASS_HI)
+
+    draw_console(c, g, p)
+
+    # Deep dispensing recess in the kick plate.
+    for y in range(28, 31):
+        for x in range(g["bx0"] + 1, g["bx1"]):
+            c.blend(x, y, p["out"], 0.4 if y == 28 else 0.25)
+    hx0, hy, hx1, _ = g["hatch"]
+    for x in range(hx0, hx1 + 1):
+        c.put(x, hy - 1, p["out"])
+        c.put(x, hy, (16, 18, 22))
+        c.put(x, hy + 1, mix(p["dk"], p["lt"], 0.35))
+    c.put(hx0, hy, p["seam"])
+    c.put(hx1, hy, p["seam"])
+
+
+# ---------------------------------------------------------------- armory chassis
+#
+# The reference is Crescent's own armory.rsi: a heavy gunmetal locker with a caged front, not a shop
+# display. Faction paint is deliberately sparse -- a sprayed stencil, a marking stripe on the header
+# plate, painted ammo cans and the console glow -- so a rack reads as military kit first and as
+# <faction> second. The cap shape, the stencil, the header stripe and the pillar bolts still differ
+# per faction, which is what tells two racks apart in a dark corridor.
+
+CAGE_TOP = (23, 26, 32)
+CAGE_BOT = (9, 10, 13)
+WIRE = (150, 158, 168)
+GUN_B = (68, 73, 80)       # barrel / sight
+GUN_M = (112, 119, 128)    # receiver
+GUN_H = (163, 171, 180)    # ejection port glint
+GUN_S = (86, 66, 46)       # stock
+CAN_DK = (48, 52, 46)
+CRATE = (88, 80, 64)
+CRATE_DK = (54, 49, 39)
+
+RIFLE = [".b..", ".b..", ".b..", "bbb.", ".b..", "mmh.", ".mm.", ".mg.", ".s..", ".ss."]
+SMG = ["....", "....", ".b..", "bbb.", ".b..", "mmh.", ".mm.", ".mg.", ".s..", ".ss."]
+GUN_COLS = {"b": GUN_B, "m": GUN_M, "h": GUN_H, "s": GUN_S, "g": GUN_B}
+
+
+def armory_interior(fac, p):
+    """(x, y) -> colour for everything racked behind the wire; shared by the body and the light spill."""
+    px = {}
+    for x in range(5, 21):                                     # hanging rail
+        px[(x, 13)] = GUN_M if x % 5 == 0 else GUN_B
+    for slot, x0 in enumerate((6, 11, 16)):
+        for j, row in enumerate(RIFLE if slot != 2 else SMG):
+            for k, ch in enumerate(row):
+                if ch != ".":
+                    px[(x0 + k, 14 + j)] = GUN_COLS[ch]
+                    px.setdefault((x0 + k + 1, 15 + j), (6, 7, 9))
+    for x in range(5, 21):                                     # shelf
+        px[(x, 24)] = GUN_B
+        px[(x, 25)] = (30, 33, 38)
+    for x in range(6, 10):                                     # painted ammo can
+        px[(x, 25)] = p["acc_dk"]
+        px[(x, 26)] = CAN_DK
+    px[(6, 26)] = scale(CAN_DK, 1.3)
+    for x in range(11, 15):                                    # magazine stack
+        px[(x, 25)] = GUN_M if x % 2 else GUN_B
+        px[(x, 26)] = GUN_B
+    for x in range(16, 20):                                    # crate
+        px[(x, 25)] = CRATE
+        px[(x, 26)] = CRATE_DK
+    px[(17, 25)] = CRATE_DK
+    return px
+
+
+def armory_cap(c, fac, p, x0, x1):
+    """The one row of silhouette above the hood -- kept small so every rack still reads as a locker."""
+    shape = fac["cap"]
+    mid = (x0 + x1) // 2
+    if shape == "vents":
+        for x in (x0 + 3, x0 + 4, x1 - 4, x1 - 3):
+            c.put(x, 0, p["dk"])
+    elif shape == "crown":
+        for x in (x0 + 4, mid, x1 - 4):
+            c.put(x, 0, p["acc_dk"])
+    elif shape == "dome":
+        for x in range(x0 + 5, x1 - 4):
+            c.put(x, 0, p["lt"])
+    elif shape == "stepped":
+        for x in range(x0 + 3, x1 - 2):
+            c.put(x, 0, p["md"])
+        for x in range(x0 + 7, x1 - 6):
+            c.put(x, 0, p["lt"])
+    elif shape == "arch":
+        for x in range(mid - 4, mid + 5):
+            c.put(x, 0, p["md"] if abs(x - mid) > 2 else p["lt"])
+    elif shape == "spire":
+        for x in (mid - 1, mid, mid + 1):
+            c.put(x, 0, p["acc"] if x == mid else p["acc_dk"])
+        for x in (x0 + 2, x1 - 2):
+            c.put(x, 0, p["dk"])
+    elif shape == "badge":
+        for x in range(mid - 3, mid + 4):
+            c.put(x, 0, p["dk"] if abs(x - mid) == 3 else p["md"])
+
+
+def armory_body(fac, p):
+    g = GEO["armory"]
+    c = Canvas()
+    bx0, bx1 = g["bx0"], g["bx1"]
+    hx0, hy0, hx1, hy1 = g["hood"]
+
+    # Cabinet: lit top-left edge, shaded right edge, gentle vertical falloff, plinth at the foot.
+    for y in range(hy1 + 1, 31):
+        t = (y - hy1) / (30 - hy1)
+        for x in range(bx0, bx1 + 1):
+            col = mix(p["md"], p["dk"], 0.35 * t)
+            if x in (bx0, bx1):
+                col = p["out"]
+            elif x == bx0 + 1:
+                col = p["lt"]
+            elif x == bx1 - 1:
+                col = p["dk"]
+            c.put(x, y, col)
+    for x in range(bx0, bx1 + 1):
+        c.put(x, 30, p["dk"])
+        c.put(x, 31, scale(p["out"], 0.7))
+    c.put(bx0, 31, scale(p["out"], 0.5))
+    c.put(bx1, 31, scale(p["out"], 0.5))
+
+    # Overhanging hood.
+    for x in range(hx0, hx1 + 1):
+        c.put(x, hy0, p["hi"] if x < hx1 - 6 else p["lt"])
+        c.put(x, hy0 + 1, p["md"] if x < hx1 - 3 else p["seam"])
+        c.put(x, hy1, scale(p["dk"], 0.7))
+    armory_cap(c, fac, p, hx0, hx1)
+    c.frame(hx0, hy0, hx1, hy1, p["out"])
+    c.put(hx0 + 1, hy0, p["hi"])
+    c.put(hx1 - 1, hy0, p["dk"])
+
+    # Header: sprayed stencil on the left, stamped marking plate on the right.
+    bnx0, bny0, bnx1, bny1 = g["band"]
+    for y in range(bny0, bny1 + 1):
+        for x in range(bnx0 + 1, bnx1):
+            c.put(x, y, mix(p["md"], p["dk"], 0.45 if y in (bny0, bny1) else 0.2))
+    px0, py0, px1, py1 = g["plate"]
+    c.glyph(EMBLEMS[fac["emblem"]], px0, py0, mix(p["acc"], p["dk"], 0.35))
+    lx0, ly0, lx1, ly1 = g["label"]
+    for y in range(ly0, ly0 + 3):                              # sprayed marking stripe
+        for x in range(lx0, lx1 + 1):
+            c.put(x, y, mix(trim_color(fac["trim"], x, y, ly0, ly0 + 2, p), p["dk"], 0.3))
+    for x in range(lx0, lx1 - 1):                              # stencilled lot number under it
+        if x % 4 != 3:
+            c.put(x, ly1 - 1, scale(p["dk"], 0.55))
+    c.put(lx1 - 1, ly0 + 4, p["hi"])
+    c.put(lx1, ly0 + 4, p["out"])
+    for x in range(bnx0, bnx1 + 1):                            # seam under the header
+        c.put(x, bny1 + 1, p["out"])
+
+    # Side pillar: the faction dressing lives on the bolt column beside the cage.
+    fx0, fy0, fx1, fy1 = g["glass_frame"]
+    for y in range(fy0, fy1 + 1):
+        c.put(bx0 + 1, y, p["lt"] if y % 2 else p["md"])
+    if fac["pillar"] == "bolts":
+        for y in (fy0 + 2, (fy0 + fy1) // 2, fy1 - 2):
+            c.put(bx0 + 1, y, p["hi"])
+            c.put(bx0 + 1, y + 1, p["out"])
+    elif fac["pillar"] == "stripe":
+        for y in range(fy0 + 1, fy1):
+            c.put(bx0 + 1, y, p["acc_dk"])
+        c.put(bx0 + 1, fy0 + 1, p["acc"])
+    else:
+        for y in range(fy0 + 1, fy1, 3):
+            c.put(bx0 + 1, y, p["hi"])
+
+    # Cage: recessed frame, dark interior, racked stock, wire in front of it.
+    c.frame(fx0, fy0, fx1, fy1, p["out"])
+    gx0, gy0, gx1, gy1 = g["glass"]
+    for y in range(gy0, gy1 + 1):
+        col = mix(CAGE_TOP, CAGE_BOT, (y - gy0) / max(1, gy1 - gy0))
+        for x in range(gx0, gx1 + 1):
+            c.put(x, y, scale(col, 0.55) if (y == gy0 or x == gx0) else col)
+    for (x, y), col in armory_interior(fac, p).items():
+        c.put(x, y, col)
+    for x in range(gx0, gx1 + 1, 5):                           # cage bars, in the gaps between racks
+        for y in range(gy0, gy1 + 1):
+            c.blend(x, y, WIRE, 0.30)
+            c.blend(x + 1, y, (0, 0, 0), 0.18)
+
+    # Control column: readout, keypad, card slot, vent.
+    cx0, cy0, cx1, cy1 = g["console"]
+    for y in range(cy0, cy1 + 1):
+        c.put(cx0, y, p["seam"])
+    c.frame(*g["screen_frame"], p["out"])
+    c.rect(*g["screen"], SCREEN_OFF)
+    kx0, ky0, kx1, ky1 = g["keys"]
+    for y in range(ky0, ky1 + 1, 2):
+        for x in range(kx0, kx1 + 1, 2):
+            c.put(x, y, p["hi"])
+            c.put(x, y + 1, p["out"])
+    c.put(*g["led"], LED_GO_DIM)
+    sx0, sy, sx1, _ = g["slot"]
+    for x in range(sx0, sx1 + 1):
+        c.put(x, sy, p["out"])
+        c.put(x, sy + 1, p["hi"])
+    for y in range(cy1 - 1, cy1 + 1):
+        for x in range(cx0 + 2, cx1 - 1):
+            c.put(x, y, p["dk"] if (x + y) % 2 else p["seam"])
+
+    # Dispensing tray in the kick plate.
+    for y in range(28, 31):                                    # kick plate sits in shadow
+        for x in range(bx0 + 1, bx1):
+            c.blend(x, y, p["out"], 0.45 if y == 28 else 0.3)
+    hx0, hy, hx1, _ = g["hatch"]
+    for x in range(hx0, hx1 + 1):
+        c.put(x, hy - 1, p["out"])
+        c.put(x, hy, (16, 18, 22))
+        c.put(x, hy + 1, mix(p["dk"], p["lt"], 0.35))
+    c.put(hx0, hy, p["seam"])
+    c.put(hx1, hy, p["seam"])
+    return c
+
+
+def armory_ambient(c, g, fac, p):
+    """Powered: the rack lamp spills down over the stock, the stencil catches a little of it."""
+    gx0, gy0, gx1, gy1 = g["glass"]
+    content = armory_interior(fac, p)
+    for y, a in ((gy0, 78), (gy0 + 1, 40), (gy0 + 2, 18), (gy0 + 3, 8)):
+        for x in range(gx0, gx1 + 1):
+            if (x, y) not in content:
+                c.put(x, y, p["acc_lt"], a)
+    for (x, y), col in content.items():
+        if y <= gy0 + 6:
+            c.put(x, y, mix(col, p["acc_lt"], 0.22 if y <= gy0 + 2 else 0.10))
+    px0, py0, _, _ = g["plate"]
+    c.glyph(EMBLEMS[fac["emblem"]], px0, py0, p["acc"], 150)
+
+
+SCREEN_ROWS = [(1, 3), (1, 2), (2, 4), (0, 3)]
+
+
+def armory_screen(c, g, bg, fg, f, bars=True):
+    """Ammunition readout: a short stack of list rows that shuffles frame to frame."""
+    x0, y0, x1, y1 = g["screen"]
+    c.rect(x0, y0, x1, y1, scale(bg, 0.55))
+    if not bars:
+        return
+    for j in range(y1 - y0 + 1):
+        w = SCREEN_ROWS[(f + j) % len(SCREEN_ROWS)][j % 2]
+        row = fg if j == f % (y1 - y0 + 1) else mix(fg, scale(bg, 0.55), 0.55)
+        for i in range(w):
+            c.put(x0 + i, y0 + j, row)
+        c.put(x1, y0 + j, fg if (f + j) % 3 == 0 else scale(bg, 0.55))
+
+
+def armory_broken(fac, p):
+    g = GEO["armory"]
+    c = armory_body(fac, p)
+    gx0, gy0, gx1, gy1 = g["glass"]
+    for x in range(gx0, gx1 + 1):                              # racks stripped, two guns left behind
+        for y in range(gy0, gy1 + 1):
+            if x > gx0 + 4 and not (y >= gy1 - 2 and x > gx1 - 6):
+                c.put(x, y, mix(CAGE_TOP, CAGE_BOT, (y - gy0) / (gy1 - gy0)))
+            c.blend(x, y, (0, 0, 0), 0.35)
+    for dx, dy in ((6, 1), (7, 2), (8, 2), (9, 3), (10, 4), (11, 4), (12, 5), (9, 6), (10, 7)):
+        c.blend(gx0 + dx, gy0 + dy, WIRE, 0.75)                # bars torn back
+    for dy in range(0, gy1 - gy0, 2):
+        c.blend(gx1 - 1, gy0 + dy, WIRE, 0.4)
+    sx0, sy0, sx1, sy1 = g["screen"]
+    c.rect(sx0, sy0, sx1, sy1, (4, 5, 6))
+    c.put(sx0 + 1, sy0, GLASS_HI)
+    c.put(sx0 + 2, sy0 + 1, GLASS_HI)
+    px0, py0, _, _ = g["plate"]
+    c.glyph(EMBLEMS[fac["emblem"]], px0, py0, scale(p["acc_dim"], 0.55))
+    for (x, y) in ((22, 26), (23, 27), (24, 26), (25, 28), (21, 28), (26, 27), (23, 25)):
+        r, gg, b, a = c.px[x, y]
+        if a:
+            c.put(x, y, scale((r, gg, b), 0.4))
+    c.put(*g["led"], (30, 16, 14))
+    return c.im
+
+
 # ---------------------------------------------------------------- lights (unshaded overlays)
 
 SCREEN_TEXT = [["##.", ".#.", "###"], ["#.#", "##.", ".##"], [".##", "#.#", "##."], ["###", ".#.", "#.."]]
@@ -423,28 +736,40 @@ def paint_screen(c, g, bg, fg, rows):
 
 def paint_ambient(c, kind, g, fac, p):
     """Always-on lights: the emblem, plus the rack light (armory) or the sign trim (supply)."""
-    px0, py0, px1, _ = g["plate"]
     if kind == "armory":
-        rifles = rifle_pixels()
-        gx0, gy0, gx1, _ = g["glass"]
-        for y, a in ((gy0, 120), (gy0 + 1, 64), (gy0 + 2, 30)):
-            for x in range(gx0, gx1 + 1):
-                if (x, y) not in rifles:
-                    c.put(x, y, p["acc"], a)
-    else:
-        # The trim pattern lights up rather than washing out into a flat block; the plate stays dark.
-        sx0, sy0, sx1, sy1 = g["sign"]
-        for y in range(sy0 + 1, sy1):
-            for x in range(sx0 + 1, sx1):
-                if px0 <= x <= px1:
-                    continue
-                if sy0 + 1 < y < sy1 - 1:
-                    c.put(x, y, mix(trim_color(fac["trim"], x, y, sy0 + 2, sy1 - 2, p), WHITE, 0.15))
-                else:
-                    c.put(x, y, p["acc"])
+        armory_ambient(c, g, fac, p)
+        return
+    if kind == "sustenance":
+        # Sustenance: the ration band lights up beside the crest; the window gets a shelf lamp at the top.
+        px0, py0, px1, py1 = g["plate"]
+        sx1 = g["sign"][2]
+        for y in range(py0 + 1, py1):
+            for x in range(px1 + 2, sx1):
+                c.put(x, y, mix(trim_color(fac["trim"], x, y, py0 + 1, py1 - 1, p), WHITE, 0.15))
+        for row, y in enumerate(range(py0 + 3, py1 - 1, 2)):
+            for x in range(px1 + 3, sx1 - 1 - row * 3):
+                if x % 4 != 3:
+                    c.put(x, y, scale(p["acc_dk"], 0.45))
+        c.glyph(EMBLEMS[fac["emblem"]], px0 + 1, py0 + 1, p["acc_lt"])
         gx0, gy0, gx1, _ = g["glass"]
         for x in range(gx0, gx1 + 1):
-            c.put(x, gy0, p["acc_lt"], 70)
+            c.put(x, gy0, p["acc_lt"], 90)
+            c.put(x, gy0 + 1, p["acc_lt"], 30)
+        return
+    # Supply: the trim pattern lights up rather than washing out into a flat block; the plate stays dark.
+    px0, py0, px1, _ = g["plate"]
+    sx0, sy0, sx1, sy1 = g["sign"]
+    for y in range(sy0 + 1, sy1):
+        for x in range(sx0 + 1, sx1):
+            if px0 <= x <= px1:
+                continue
+            if sy0 + 1 < y < sy1 - 1:
+                c.put(x, y, mix(trim_color(fac["trim"], x, y, sy0 + 2, sy1 - 2, p), WHITE, 0.15))
+            else:
+                c.put(x, y, p["acc"])
+    gx0, gy0, gx1, _ = g["glass"]
+    for x in range(gx0, gx1 + 1):
+        c.put(x, gy0, p["acc_lt"], 70)
     c.glyph(EMBLEMS[fac["emblem"]], px0 + 1, py0 + 1, p["acc_lt"])
 
 
@@ -452,7 +777,10 @@ def lights_normal(kind, fac, p, f):
     g = GEO[kind]
     c = Canvas()
     paint_ambient(c, kind, g, fac, p)
-    paint_screen(c, g, p["acc_dk"], p["acc_lt"], SCREEN_TEXT[f % 4])
+    if kind == "armory":
+        armory_screen(c, g, p["acc_dk"], p["acc_lt"], f)
+    else:
+        paint_screen(c, g, p["acc_dk"], p["acc_lt"], SCREEN_TEXT[f % 4])
     c.put(*g["led"], LED_GO if f < 2 else LED_GO_DIM)
     return c.im
 
@@ -461,7 +789,12 @@ def lights_deny(kind, fac, p, f):
     g = GEO[kind]
     c = Canvas()
     paint_ambient(c, kind, g, fac, p)
-    if f == 0:
+    if kind == "armory":
+        armory_screen(c, g, scale(DENY, 0.5 if f == 0 else 0.3), DENY, f, bars=False)
+        c.frame(*g["screen"], DENY if f == 0 else scale(DENY, 0.6))
+        if f == 0:
+            c.put(*g["led"], DENY)
+    elif f == 0:
         paint_screen(c, g, scale(DENY, 0.45), DENY, DENY_X)
         c.put(*g["led"], DENY)
     else:
@@ -477,7 +810,10 @@ def lights_eject(kind, fac, p, f):
     c = Canvas()
     paint_ambient(c, kind, g, fac, p)
     rows = EJECT_ARROW if f % 2 == 0 else ["...", "#.#", ".#."]
-    paint_screen(c, g, p["acc_dk"], p["acc_lt"], rows)
+    if kind == "armory":
+        armory_screen(c, g, p["acc_dk"], p["acc_lt"], f * 2)
+    else:
+        paint_screen(c, g, p["acc_dk"], p["acc_lt"], rows)
     c.put(*g["led"], LED_GO)
     hx0, hy, hx1, _ = g["hatch"]
     mid = (hx0 + hx1) // 2
@@ -494,6 +830,8 @@ CRACKS = [(0, 0), (1, 1), (1, 2), (2, 3), (3, 3), (4, 4), (4, 5), (5, 6), (3, 5)
 
 
 def draw_broken(kind, fac, p):
+    if kind == "armory":
+        return armory_broken(fac, p)
     g = GEO[kind]
     c = draw_body(kind, fac, p)
     gx0, gy0, gx1, gy1 = g["glass"]
@@ -623,6 +961,7 @@ def main():
     for kind in ("armory", "supply"):
         for name, fac in FACTIONS.items():
             rendered[(kind, name)] = write_rsi(kind, name, fac)
+    rendered[("sustenance", "shi")] = write_rsi("sustenance", "shi", SUSTENANCE)
     print(f"wrote {len(rendered)} RSIs to {os.path.normpath(OUT)}")
 
     screens = {name: write_screen(name, fac) for name, fac in FACTIONS.items() if name != "neutral"}
@@ -633,10 +972,13 @@ def main():
         z, pad = 4, 4
         names = list(FACTIONS)
         cell = S * z + pad
-        out = Image.new("RGBA", (6 * cell + pad, len(names) * cell + pad), (40, 44, 50, 255))
+        kinds = ("armory", "supply", "sustenance")
+        out = Image.new("RGBA", (3 * len(kinds) * cell + pad, len(names) * cell + pad), (40, 44, 50, 255))
         for r, name in enumerate(names):
-            for k, kind in enumerate(("armory", "supply")):
-                st = rendered[(kind, name)]
+            for k, kind in enumerate(kinds):
+                st = rendered.get((kind, name))
+                if st is None:
+                    continue
                 off = st["off"][0]
                 lit = Image.alpha_composite(off, st["normal-unshaded"][0])
                 brk = Image.alpha_composite(st["broken"][0], st["panel"][0])

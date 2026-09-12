@@ -1,5 +1,6 @@
 using Content.Server.DoAfter;
 using Content.Server.Popups;
+using Content.Shared._Crescent.Factions;
 using Content.Shared._Crescent.HullrotFaction;
 using Content.Shared._Crescent.RoundEnd;
 using Content.Shared.DoAfter;
@@ -113,7 +114,7 @@ public sealed class ConquestFlagSystem : EntitySystem
 
         _popup.PopupEntity(Loc.GetString("conquest-flag-capture-begin-self"), uid, user);
         // Everyone who can see the banner gets the warning, so defenders have something to answer.
-        _popup.PopupEntity(Loc.GetString("conquest-flag-capture-begin-others", ("faction", faction.Faction)),
+        _popup.PopupEntity(Loc.GetString("conquest-flag-capture-begin-others", ("faction", FactionDisplay.Abbreviation(faction.Faction))),
             uid, Filter.PvsExcept(user), true, PopupType.MediumCaution);
 
         return true;
@@ -138,8 +139,8 @@ public sealed class ConquestFlagSystem : EntitySystem
         args.Handled = true;
 
         var msg = string.Equals(faction.Faction, flag.HomeFaction, StringComparison.Ordinal)
-            ? Loc.GetString("conquest-flag-reclaimed", ("faction", faction.Faction))
-            : Loc.GetString("conquest-flag-captured", ("faction", faction.Faction));
+            ? Loc.GetString("conquest-flag-reclaimed", ("faction", FactionDisplay.Abbreviation(faction.Faction)))
+            : Loc.GetString("conquest-flag-captured", ("faction", FactionDisplay.Abbreviation(faction.Faction)));
         // Local to whoever can see the banner — the sector-wide beat is the conquest rule's capture announcement,
         // fired only once the station's LAST banner falls, so many-banner stations do not spam everyone on each flip.
         _popup.PopupEntity(msg, uid, Filter.Pvs(uid), true, PopupType.LargeCaution);
@@ -149,7 +150,7 @@ public sealed class ConquestFlagSystem : EntitySystem
     {
         ResolveHome(uid, flag);
 
-        var home = string.IsNullOrWhiteSpace(flag.HomeFaction) ? "—" : flag.HomeFaction;
+        var home = string.IsNullOrWhiteSpace(flag.HomeFaction) ? "—" : FactionDisplay.Abbreviation(flag.HomeFaction);
         args.PushMarkup(Loc.GetString("conquest-flag-examine-home", ("faction", home)));
 
         if (!string.IsNullOrWhiteSpace(flag.OwnerFaction))
@@ -158,7 +159,7 @@ public sealed class ConquestFlagSystem : EntitySystem
                 string.Equals(flag.OwnerFaction, flag.HomeFaction, StringComparison.Ordinal)
                     ? "conquest-flag-examine-held-home"
                     : "conquest-flag-examine-held-enemy",
-                ("faction", flag.OwnerFaction)));
+                ("faction", FactionDisplay.Abbreviation(flag.OwnerFaction))));
         }
 
         if (_timing.CurTime < flag.UnlockTime)
@@ -168,7 +169,7 @@ public sealed class ConquestFlagSystem : EntitySystem
         }
         else if (flag.ContestingFaction != null && _timing.CurTime < flag.ContestUntil)
         {
-            args.PushMarkup(Loc.GetString("conquest-flag-examine-capturing", ("faction", flag.ContestingFaction)));
+            args.PushMarkup(Loc.GetString("conquest-flag-examine-capturing", ("faction", FactionDisplay.Abbreviation(flag.ContestingFaction))));
         }
         else
         {

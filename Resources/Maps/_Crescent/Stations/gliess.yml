@@ -116760,13 +116760,6 @@ entities:
     - type: Transform
       parent: 1
       pos: 1.5,-19.5
-- proto: SpawnMobPibble
-  entities:
-  - uid: 7908
-    components:
-    - type: Transform
-      parent: 1
-      pos: 10.5,8.5
 - proto: SpawnMobPlantbot
   entities:
   - uid: 7909

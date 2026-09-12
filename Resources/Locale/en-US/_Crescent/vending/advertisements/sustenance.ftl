@@ -1,0 +1,9 @@
+advertisement-shi-sustenance-1 = Shinohara Heavy Industries. Supplying the sector, one ration at a time.
+advertisement-shi-sustenance-2 = Compact military nutrition. Ready to eat, wherever duty takes you.
+advertisement-shi-sustenance-3 = Your uniform may change. Your ration supplier doesn't have to.
+advertisement-shi-sustenance-4 = Long patrol ahead? Stock up on SHI field rations.
+advertisement-shi-sustenance-5 = From the shipyard to the front line, Shinohara keeps you fed.
+advertisement-shi-sustenance-6 = Serving every flag in the sector. Have your credits ready.
+thankyou-shi-sustenance-1 = Thank you for choosing Shinohara Heavy Industries.
+thankyou-shi-sustenance-2 = Rations secured. Safe travels, customer.
+thankyou-shi-sustenance-3 = Remember to replenish your field supplies at your nearest SHI vendor.

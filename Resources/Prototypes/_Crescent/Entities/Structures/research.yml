@@ -1,14 +1,13 @@
-﻿- type: entity
+- type: entity
   id: ResearchAndDevelopmentServerMinutemen
   parent: [ BaseMachinePowered, ConstructibleMachine ]
   name: minutemen research server
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/minutemen.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -77,10 +76,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/interdyne.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -149,10 +147,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/cyberdawn.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -221,10 +218,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/imperial.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -293,10 +289,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/communard.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -365,10 +360,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/corporate.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -437,10 +431,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/gliessian.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -508,6 +501,12 @@
   name: PTA Gu Tian research server
   description: Stores Gu Tian's restricted Pang Tai Arms manufacturing catalogue and a complete civilian research archive.
   components:
+  - type: Sprite
+    sprite: _Crescent/Structures/Machines/ResearchServers/pangtai.rsi
+    layers:
+      - state: server
+      - state: server_o
+        map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: TechnologyDatabase
     supportedDisciplines:
     - PangTai
@@ -523,10 +522,9 @@
   description: Contains the collective knowledge of the Pact's scientists and engineers. Destroying it would set their research program back years.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/families.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer
@@ -597,10 +595,9 @@
   description: Stores the station's current-cycle calibrations and working research catalogue. The underlying knowledge survives elsewhere, but losing this server would force a painful local rebuild.
   components:
   - type: Sprite
-    sprite: Structures/Machines/server.rsi
+    sprite: _Crescent/Structures/Machines/ResearchServers/coalition.rsi
     layers:
       - state: server
-      - state: variant-research
       - state: server_o
         map: ["enum.WiresVisualLayers.MaintenancePanel"]
   - type: ResearchServer

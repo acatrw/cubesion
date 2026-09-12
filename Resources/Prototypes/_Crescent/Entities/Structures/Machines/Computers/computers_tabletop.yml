@@ -86,7 +86,7 @@
 - type: entity
   parent: [BaseComputerTabletopShipRepairStation, ComputerShipRepairStationTFSC]
   id: ComputerTabletopShipRepairStationTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopShipRepairStation, ComputerShipRepairStationCMM]
@@ -146,7 +146,7 @@
 - type: entity
   parent: [BaseComputerTabletopOverwatch, TFSCOverwatchComputer]
   id: ComputerTabletopOverwatchTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopOverwatch, SRMOverwatchComputer]
@@ -191,7 +191,7 @@
 - type: entity
   parent: [BaseComputerTabletopFactionTreasury, ComputerFactionTreasuryTFSC]
   id: ComputerTabletopFactionTreasuryTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopFactionTreasury, ComputerFactionTreasuryGS]
@@ -369,7 +369,7 @@
 - type: entity
   parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleTFSC]
   id: ComputerTabletopFactionRecruitmentTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleGS]
@@ -399,7 +399,7 @@
 - type: entity
   parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerTFSC]
   id: ComputerTabletopFactionRoundEndTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerCMM]
@@ -449,7 +449,7 @@
 - type: entity
   parent: [BaseComputerTabletopHullrotMainframe, TFSCMainframeConsole]
   id: ComputerTabletopMainframeTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopHullrotMainframe, SRMMainframeConsole]
@@ -501,7 +501,7 @@
 - type: entity
   parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentTFSC]
   id: ComputerTabletopPaymentTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentGS]
@@ -551,7 +551,7 @@
 - type: entity
   parent: [BaseComputerTabletopHullrotTaxation, ComputerFactionTaxationTFSC]
   id: ComputerTabletopFactionTaxationTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 # Special-purpose consoles
 

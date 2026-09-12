@@ -377,7 +377,7 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
         // Taking held ground always passes through the manual neutralization stage first, so the sector hears the
         // holder lose it and hears the attacker claim it only after the second interaction completes.
         _chat.DispatchGlobalAnnouncement(
-            Loc.GetString("territory-captured-announcement", ("faction", owner), ("region", RegionName(ent))),
+            Loc.GetString("territory-captured-announcement", ("faction", FactionDisplay.Abbreviation(owner)), ("region", RegionName(ent))),
             Loc.GetString("territory-announcer-name"),
             colorOverride: Color.Goldenrod);
     }
@@ -392,7 +392,7 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
         if (previous != null)
         {
             _chat.DispatchGlobalAnnouncement(
-                Loc.GetString("territory-neutralised-announcement", ("faction", previous), ("region", RegionName(ent))),
+                Loc.GetString("territory-neutralised-announcement", ("faction", FactionDisplay.Abbreviation(previous)), ("region", RegionName(ent))),
                 Loc.GetString("territory-announcer-name"),
                 colorOverride: Color.Goldenrod);
         }
@@ -411,7 +411,7 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
         }
 
         args.PushMarkup(ent.Comp.AppliedOwner is { } owner
-            ? Loc.GetString("territory-examine-owner", ("faction", owner))
+            ? Loc.GetString("territory-examine-owner", ("faction", FactionDisplay.Abbreviation(owner)))
             : Loc.GetString("territory-examine-unclaimed"));
 
         if (!TryComp<CaptureFlagComponent>(ent, out var flag))
@@ -422,14 +422,14 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
             case CaptureFlagStage.Neutralizing when flag.ProgressTeam is { } neutralizer:
                 args.PushMarkup(Loc.GetString(
                     "territory-examine-progress",
-                    ("faction", neutralizer),
+                    ("faction", FactionDisplay.Abbreviation(neutralizer)),
                     ("percent", CapturePercent(ent.Comp))));
                 break;
 
             case CaptureFlagStage.Capturing when flag.ProgressTeam is { } capturer:
                 args.PushMarkup(Loc.GetString(
                     "territory-examine-progress",
-                    ("faction", capturer),
+                    ("faction", FactionDisplay.Abbreviation(capturer)),
                     ("percent", CapturePercent(ent.Comp))));
                 break;
         }
@@ -486,7 +486,7 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
         if (regionGrid is { } namedGrid)
         {
             ApplyGridOwner(namedGrid, ent.Comp, owner);
-            _metadata.SetEntityName(namedGrid, $"{owner} {RegionName(ent)}");
+            _metadata.SetEntityName(namedGrid, $"{FactionDisplay.Abbreviation(owner)} {RegionName(ent)}");
         }
     }
 
@@ -598,7 +598,10 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
         if (ent.Comp.UpdateName)
         {
             ent.Comp.BaseName ??= PersistentTerritoryFactions.StripOwnerPrefix(MetaData(ent).EntityName);
-            _metadata.SetEntityName(ent, owner == null ? ent.Comp.BaseName : $"{owner} {ent.Comp.BaseName}");
+            _metadata.SetEntityName(ent,
+                owner == null
+                    ? ent.Comp.BaseName
+                    : $"{FactionDisplay.Abbreviation(owner)} {ent.Comp.BaseName}");
         }
 
         if (ent.Comp.UpdateMachineFaction && HasComp<FactionMachineComponent>(ent))
@@ -677,7 +680,8 @@ public sealed class PersistentCaptureRegionSystem : EntitySystem
 
         if (owner != null)
         {
-            owner = owner.Trim();
+            // Admins type the abbreviation they see in game, which for the TFCF is not its frozen prototype id.
+            owner = FactionDisplay.ResolveId(owner.Trim());
             if (!PersistentTerritoryFactions.IsSupported(owner))
                 return false;
         }

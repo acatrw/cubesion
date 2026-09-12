@@ -1,0 +1,19 @@
+# Place twice per imperial wreck: one guaranteed, one with chance: 0.5.
+# Use intact wall tiles, not DSMWallWreckRandomizer tiles that may disappear.
+- type: entity
+  id: DSMBattlewornFlagSpawner
+  parent: MarkerBase
+  name: DSM battleworn banner spawner
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    layers:
+    - state: red
+    - sprite: _Crescent/Structures/imperialflag_improved.rsi
+      state: battleworn
+  - type: RandomSpawner
+    prototypes:
+    - ImperialFlagBattleworn
+    chance: 1
+    offset: 0

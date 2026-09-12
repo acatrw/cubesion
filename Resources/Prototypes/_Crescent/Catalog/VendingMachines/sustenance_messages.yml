@@ -1,0 +1,16 @@
+- type: messagePack
+  id: ShinoharaSustenanceAds
+  messages:
+  - advertisement-shi-sustenance-1
+  - advertisement-shi-sustenance-2
+  - advertisement-shi-sustenance-3
+  - advertisement-shi-sustenance-4
+  - advertisement-shi-sustenance-5
+  - advertisement-shi-sustenance-6
+
+- type: messagePack
+  id: ShinoharaSustenanceGoodbyes
+  messages:
+  - thankyou-shi-sustenance-1
+  - thankyou-shi-sustenance-2
+  - thankyou-shi-sustenance-3

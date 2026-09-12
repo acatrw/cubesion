@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 11/24/2025 09:44:32
-  entityCount: 1115
+  entityCount: 1116
 maps: []
 grids:
 - 1
@@ -5578,14 +5578,20 @@ entities:
       parent: 1
     - type: Thruster
       enabled: False
-- proto: ImperialFlag
+- proto: DSMBattlewornFlagSpawner
   entities:
   - uid: 862
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 3.5,-11.5
       parent: 1
+  - uid: 1116
+    components:
+    - type: Transform
+      pos: -2.5,-3.5
+      parent: 1
+    - type: RandomSpawner
+      chance: 0.5
 - proto: LuxuryPen
   entities:
   - uid: 863

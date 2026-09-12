@@ -128,7 +128,7 @@
   - type: WallMount
     arc: 360
   - type: Sprite
-    drawdepth: WallTops
+    drawdepth: Items # Cover windows and railings while remaining below standing mobs.
     sprite: _Crescent/Structures/churchglass.rsi
 
 - type: entity
@@ -209,8 +209,40 @@
     arc: 360
   - type: Sprite
     drawdepth: WallTops
-    sprite: _Crescent/Structures/imperialflag.rsi
+    sprite: _Crescent/Structures/imperialflag_improved.rsi
     state: flag
+
+- type: entity
+  parent: ImperialFlag
+  id: ImperialFlagCeremonial
+  suffix: Ceremonial
+  components:
+  - type: Sprite
+    state: ceremonial
+
+- type: entity
+  parent: ImperialFlag
+  id: ImperialFlagSwallowtail
+  suffix: Swallowtail
+  components:
+  - type: Sprite
+    state: swallowtail
+
+- type: entity
+  parent: ImperialFlag
+  id: ImperialFlagGuard
+  suffix: Guard
+  components:
+  - type: Sprite
+    state: guard
+
+- type: entity
+  parent: ImperialFlag
+  id: ImperialFlagBattleworn
+  suffix: Battleworn
+  components:
+  - type: Sprite
+    state: battleworn
 
 - type: entity
   parent: BaseSign

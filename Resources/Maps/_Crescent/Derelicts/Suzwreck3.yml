@@ -7624,20 +7624,20 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 16.5,-5.5
       parent: 1
-- proto: ImperialFlag
+- proto: DSMBattlewornFlagSpawner
   entities:
   - uid: 1204
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 3.5,-11.5
       parent: 1
   - uid: 1205
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 9.5,-11.5
       parent: 1
+    - type: RandomSpawner
+      chance: 0.5
 - proto: LiquidOxygenCanisterBroken
   entities:
   - uid: 1206

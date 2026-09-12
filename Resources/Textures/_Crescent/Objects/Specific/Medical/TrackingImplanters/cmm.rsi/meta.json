@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Palette swap of Objects/Specific/Medical/implanter.rsi (taken from vgstation13 commit 1cdfb0230cc96d0ba751fa002d04f8aa2f25ad7d, resprite by @linkblyat), faction markings by Taleryn via Tools/generate_tracking_implanters.py",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "broken"
+    },
+    {
+      "name": "implanter0"
+    },
+    {
+      "name": "implanter1"
+    }
+  ]
+}

@@ -35,7 +35,8 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
-      state: id
+      sprite: _Crescent/Structures/Computers/recruitment.rsi
+      state: recruitment
     - map: ["computerLayerKeys"]
       state: id_key
   - type: LitOnPowered

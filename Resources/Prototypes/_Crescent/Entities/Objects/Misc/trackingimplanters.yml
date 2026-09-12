@@ -48,6 +48,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantInterdyne
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/interdyne.rsi
 
 # CMM
 - type: entity
@@ -77,6 +79,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantCMM
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/cmm.rsi
 
 # SHI
 - type: entity
@@ -106,6 +110,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantShinohara
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/shi.rsi
 
 # DSM
 - type: entity
@@ -135,6 +141,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantDSMCommand
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/dsm_command.rsi
 
 - type: entity
   parent: TrackingImplant
@@ -163,6 +171,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantDSMCivilian
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/dsm_civilian.rsi
 
 # NCWL
 - type: entity
@@ -192,6 +202,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantNCWL
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/ncwl.rsi
 
 # CRN
 - type: entity
@@ -220,6 +232,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantCRN
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/crn.rsi
 
 # ATH
 - type: entity
@@ -248,6 +262,8 @@
   components:
     - type: Implanter
       implant: TrackingImplantATH
+    - type: Sprite
+      sprite: _Crescent/Objects/Specific/Medical/TrackingImplanters/ath.rsi
 
 # NAP - uncomment when NAP has comms
 #- type: entity

@@ -18,15 +18,6 @@ namespace Content.Client.UserInterface.Controls
 
         public ScalingViewport Viewport { get; }
 
-        /// <summary>
-        ///     Whether vertical fitting may crop the viewport horizontally.
-        /// </summary>
-        /// <remarks>
-        ///     Layouts that reserve horizontal space outside the viewport, such as the separated chat HUD, should
-        ///     disable this. Otherwise part of the configured view width is permanently hidden behind the crop.
-        /// </remarks>
-        public bool AllowHorizontalClipping { get; set; } = true;
-
         public MainViewport()
         {
             IoCManager.InjectDependencies(this);
@@ -60,7 +51,7 @@ namespace Content.Client.UserInterface.Controls
             var stretch = _cfg.GetCVar(CCVars.ViewportStretch);
             var renderScaleUp = _cfg.GetCVar(CCVars.ViewportScaleRender);
             var fixedFactor = _cfg.GetCVar(CCVars.ViewportFixedScaleFactor);
-            var verticalFit = _cfg.GetCVar(CCVars.ViewportVerticalFit) && AllowHorizontalClipping;
+            var verticalFit = _cfg.GetCVar(CCVars.ViewportVerticalFit);
 
             if (stretch)
             {
@@ -115,7 +106,7 @@ namespace Content.Client.UserInterface.Controls
             // where we are clipping the viewport to make it fit.
             var cfgToleranceClip = _cfg.GetCVar(CCVars.ViewportSnapToleranceClip);
 
-            var cfgVerticalFit = _cfg.GetCVar(CCVars.ViewportVerticalFit) && AllowHorizontalClipping;
+            var cfgVerticalFit = _cfg.GetCVar(CCVars.ViewportVerticalFit);
 
             // Calculate if the viewport, when rendered at an integer scale,
             // is close enough to the control size to enable "snapping" to NN,

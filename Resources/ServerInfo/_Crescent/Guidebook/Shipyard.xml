@@ -11,15 +11,16 @@ Shipyard consoles sell faction-approved vessels and record ownership on a [bold]
 </Box>
 
 1. Activate an available shipyard console and review the vessel's price, role, and restrictions.
-2. Confirm that you have permission and enough funding. Some faction consoles draw from restricted funds or enforce a per-round vessel limit.
+2. Confirm that you have permission and enough funding. Faction consoles draw on the faction treasury and cap how many vessels you may requisition per shift.
 3. Select the vessel and confirm the purchase. The console prints an SOC containing the ship's deed.
+[color=#6ab7d6]An expensive vessel may be too large for the terminal to authorise on its own. The console then files an approval request with the treasury instead of selling, and you wait for someone with authority to clear it.[/color]
 4. Keep the SOC safe. The console reports whether the new vessel docked successfully or arrived nearby, including its direction when applicable.
 5. Before departure, locate the helm, power controls, emergency equipment, air supply, and a way to communicate with your station.
 
 [head=3][color=#e8b04b]Selling a ship[/color][/head]
 
 1. Return the ship to a compatible shipyard and dock it securely.
-2. Have [bold]every crew member disembark[/bold]. The console refuses a sale while crew remain aboard.
+2. Have [bold]everyone disembark[/bold]. The console refuses a sale while any living thing is still aboard, pets and stowaways included.
 3. Insert the vessel's SOC into the shipyard console and review the appraisal.
 4. Confirm the sale only after removing personal or faction property you intend to keep.
 

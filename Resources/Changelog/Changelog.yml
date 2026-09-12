@@ -624,9 +624,9 @@ Entries:
         type: Tweak
       - message: Skeletons no longer shrug off piercing damage. Bullets and other piercing hits now land on bone exactly as hard as they land on a human.
         type: Tweak
-      - message: Skeletons are restricted to the TFSC. The species no longer appears in the character editor for any other faction, and a profile that somehow keeps it is reset to human on validation.
+      - message: Skeletons are restricted to the TFCF. The species no longer appears in the character editor for any other faction, and a profile that somehow keeps it is reset to human on validation.
         type: Tweak
-      - message: Within the TFSC, only the command tier can be a skeleton - Ringleader, Lieutenant, Coordinator, Intelligence Officer and Foreman. The rank and file roles now refuse skeleton characters the same way they already refused voidborn.
+      - message: Within the TFCF, only the command tier can be a skeleton - Ringleader, Lieutenant, Coordinator, Intelligence Officer and Foreman. The rank and file roles now refuse skeleton characters the same way they already refused voidborn.
         type: Tweak
     id: 6050
     time: '2026-08-15T00:00:00.0000000+00:00'
@@ -1295,4 +1295,29 @@ Entries:
         type: Fix
     id: 6111
     time: '2026-09-11T00:00:00.0000000+00:00'
+    url: null
+  - author: Taleryn
+    changes:
+      - message: The Taypani Free Companies Federation is now called the TFCF everywhere players can read it. Territory announcements, radar names, banner examines, conquest captures and the round end summary were still printing the retired TFSC abbreviation because they showed the raw faction ID.
+        type: Fix
+      - message: Renamed the last TFSC labels on the Vagrant anti-boarder turret, the Swarmer missile pod, the tabletop console variants and Ramzi's old flag.
+        type: Fix
+      - message: The territory and force-victory admin commands now accept TFCF as well as the old ID, and list TFCF in their help.
+        type: Tweak
+    id: 6112
+    time: '2026-09-12T00:00:00.0000000+00:00'
+    url: null
+  - author: Taleryn
+    changes:
+      - message: Every faction research server now has its own sprite. The ten of them all shared the same stock grey rack, so you could not tell an Imperial server from a Communard or a Cyberdawn one without examining it. Each now has its faction's chassis colour, crest plate, storage bays and intake grille.
+        type: Add
+    id: 6113
+    time: '2026-09-12T00:00:00.0000000+00:00'
+    url: null
+  - author: Taleryn
+    changes:
+      - message: The sustenance vendor is now a Shinohara Heavy Industries compact ration vendor, with SHI's own chassis, crest and advertisements instead of the Nanotrasen prison food machine flavour it inherited upstream.
+        type: Tweak
+    id: 6114
+    time: '2026-09-12T00:00:00.0000000+00:00'
     url: null

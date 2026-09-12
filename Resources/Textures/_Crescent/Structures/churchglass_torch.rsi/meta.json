@@ -1,0 +1,14 @@
+{
+    "version":  1,
+    "license":  "",
+    "copyright":  "Sprited by Taleryn for Hullrot:Eclipsion, based on churchglass.rsi by the Sector Crescent team. Do not copy, use, modify, relicense, or redistribute.",
+    "size":  {
+                 "y":  70,
+                 "x":  32
+             },
+    "states":  [
+                   {
+                       "name":  "icon"
+                   }
+               ]
+}

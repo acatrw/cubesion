@@ -301,7 +301,7 @@
 #       - PowerCageUraniumCell
 
 # - type: entity
-#   name: TFSC Raptor Spawner
+#   name: TFCF Raptor Spawner
 #   id: SpawnFighterRaptor
 #   parent: MarkerBase
 #   components:
@@ -317,7 +317,7 @@
 # - type: entity
 #   id: FighterTFSCRaptor
 #   parent: [ MediumFighter, BaseMech ]
-#   name: TFSC 'Raptor' mk.II medium gunship
+#   name: TFCF 'Raptor' mk.II medium gunship
 #   description: In truth, just an overmodified version of the civilian Hermes-class transport shuttle. The Raptor-class serves as the heavier cousin of the Viper, able to mount medium-class starfighter weapons, including missiles and torpedoes -- although the heavy modifications have left it with weaker plating when compared to others of it's size.
 #   components:
 #   - type: EntityIFFDesignation
@@ -380,7 +380,7 @@
 #       - PowerCageUraniumCell
 
 # - type: entity
-#   name: TFSC Viper Spawner
+#   name: TFCF Viper Spawner
 #   id: SpawnFighterViper
 #   parent: MarkerBase
 #   components:
@@ -396,7 +396,7 @@
 # - type: entity
 #   id: FighterTFSCViper
 #   parent: [ LightFighter, BaseMech ]
-#   name: TFSC 'Viper' mk.I light fighter
+#   name: TFCF 'Viper' mk.I light fighter
 #   description: A defaced Valor-class, the Viper stands out from the vessel it inherited it's design from by it's overmodified thruster bays, able to reach higher top speeds and much more quickly - but it pays the price in terms of armor plating, weaker than others of it's size.
 #   components:
 #   - type: EntityIFFDesignation

@@ -1,7 +1,10 @@
 # NCSP -> TFSC faction rename.
-# NCSP ('New Crescent Syndicate of Privateers') was the old name for the faction now
-# called TFSC ('Taypan Free Stations Coalition'). These entries keep grids saved before
-# the rename loadable. Keys are the old IDs and must never be renamed.
+# NCSP ('New Crescent Syndicate of Privateers') and then TFSC ('Taypan Free Stations
+# Coalition') were the old names for the faction now called TFCF ('Taypani Free Companies
+# Federation'). Its prototype IDs are still spelled TFSC on purpose - renaming them would
+# orphan every saved grid - so only player-visible text carries the current name. These
+# entries keep grids saved before the first rename loadable. Keys are the old IDs and must
+# never be renamed.
 
 AirlockSyndicateHorizontalLockedNCSP: AirlockSyndicateHorizontalLockedTFSC
 AirlockSyndicateHorizontalLockedNCSPCommand: AirlockSyndicateHorizontalLockedTFSCCommand

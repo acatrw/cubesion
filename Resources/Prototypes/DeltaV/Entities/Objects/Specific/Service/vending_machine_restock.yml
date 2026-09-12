@@ -27,8 +27,8 @@
 - type: entity
   parent: BaseVendingMachineRestockDeltaV
   id: VendingMachineRestockSustenance
-  name: Sustenance vendor restock box
-  description: Prisoners have to eat too. Nobody said they had to eat well.
+  name: SHI compact ration vendor restock box
+  description: A Shinohara Heavy Industries shipment of compact military rations for the sector's SHI ration vendors.
   components:
   - type: VendingMachineRestock
     canRestock:
