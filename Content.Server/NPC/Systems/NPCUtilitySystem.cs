@@ -19,6 +19,8 @@ using Content.Shared.Hands.Components;
 using Content.Shared.Inventory;
 using Content.Shared._Crescent.Diplomacy; // Eclipsion
 using Content.Shared._Crescent.HullrotFaction; // Eclipsion
+using Content.Shared._Crescent.Weapons.AntiBoarder; // Eclipsion
+using Content.Shared.Emag.Components; // Eclipsion
 using Content.Shared.Mech.Components; // Eclipsion
 using Content.Shared.Mobs; // Eclipsion
 using Content.Shared.Mobs.Components; // Eclipsion
@@ -432,6 +434,10 @@ public sealed class NPCUtilitySystem : EntitySystem
         }
 
         if (target == owner)
+            return;
+
+        // Service bots are not boarders, however unsuited they look. An emagged one is fair game again.
+        if (HasComp<AntiBoarderIgnoredComponent>(target) && !HasComp<EmaggedComponent>(target))
             return;
 
         // Anti-boarder guns trust the faction credential in the wearer's ID slot. An allied card grants safe

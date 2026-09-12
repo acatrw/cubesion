@@ -187,7 +187,7 @@
   parent: BaseTurretShipgun
   id: BaseWeaponTurretSwarmer
   suffix: ShipGun
-  name: TFSC 'Swarmer' self-replicating missile pod
+  name: TFCF 'Swarmer' self-replicating missile pod
   components:
     - type: Sprite
       sprite: _Crescent/Objects/Autoturrets/swarmermissile.rsi

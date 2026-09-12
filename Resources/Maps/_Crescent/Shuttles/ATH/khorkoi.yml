@@ -431,7 +431,7 @@ entities:
       autoRecharge: True
     - type: ApcPowerReceiver
       powerLoad: 2000
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 45
     components:

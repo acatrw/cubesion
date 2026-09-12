@@ -1,17 +1,131 @@
 - type: vendingMachineInventory
   id: TaypaniSurplusVendorPack
   startingInventory:
-    WeaponSniperNCWLNovomosin: 6
-    WeaponRifleSHINimrod: 6
-    WeaponRifleCarter: 6
-    WeaponShotgunKammerer: 6
-    SpeedLoaderRifle: 18
-    MagazineBoxRifle: 18
-    MagazineLightRifle: 18
-    MagazineBoxLightRifle: 18
-    BoxLethalshot: 18
-    BoxShotgunSlug: 18
-    ClothingMaskINDGasmask: 6
-    ClothingHandsGlovesCombat: 6
-    ClothingShoesBootsMagCombatFilled: 6
-    AmmoTechFabCircuitboard: 4
+    WeaponSniperNCWLNovomosinTaypaniVend: 6
+    WeaponRifleSHINimrodTaypaniVend: 6
+    WeaponRifleCarterTaypaniVend: 6
+    WeaponShotgunKammererTaypaniVend: 6
+    SpeedLoaderRifleTaypaniVend: 18
+    MagazineBoxRifleTaypaniVend: 18
+    MagazineLightRifleTaypaniVend: 18
+    MagazineBoxLightRifleTaypaniVend: 18
+    BoxLethalshotTaypaniVend: 18
+    BoxShotgunSlugTaypaniVend: 18
+    ClothingMaskINDGasmaskTaypaniVend: 6
+    ClothingHandsGlovesCombatTaypaniVend: 6
+    ClothingShoesBootsMagCombatFilledTaypaniVend: 6
+    AmmoTechFabCircuitboardTaypaniVend: 4
+
+# Storefront variants keep this vendor's balance from changing the value of
+# items produced by lathes or sold by faction-specific suppliers.
+- type: entity
+  parent: WeaponSniperNCWLNovomosin
+  id: WeaponSniperNCWLNovomosinTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 8000
+
+- type: entity
+  parent: WeaponRifleSHINimrod
+  id: WeaponRifleSHINimrodTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 15000
+
+- type: entity
+  parent: WeaponRifleCarter
+  id: WeaponRifleCarterTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 20000
+
+- type: entity
+  parent: WeaponShotgunKammerer
+  id: WeaponShotgunKammererTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 11000
+
+- type: entity
+  parent: SpeedLoaderRifle
+  id: SpeedLoaderRifleTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 500
+
+- type: entity
+  parent: MagazineBoxRifle
+  id: MagazineBoxRifleTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1250
+
+- type: entity
+  parent: MagazineLightRifle
+  id: MagazineLightRifleTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 900
+
+- type: entity
+  parent: MagazineBoxLightRifle
+  id: MagazineBoxLightRifleTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1250
+
+- type: entity
+  parent: BoxLethalshot
+  id: BoxLethalshotTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 750
+
+- type: entity
+  parent: BoxShotgunSlug
+  id: BoxShotgunSlugTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: ClothingMaskINDGasmask
+  id: ClothingMaskINDGasmaskTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 500
+
+- type: entity
+  parent: ClothingHandsGlovesCombat
+  id: ClothingHandsGlovesCombatTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1500
+
+- type: entity
+  parent: ClothingShoesBootsMagCombatFilled
+  id: ClothingShoesBootsMagCombatFilledTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 2500
+
+- type: entity
+  parent: AmmoTechFabCircuitboard
+  id: AmmoTechFabCircuitboardTaypaniVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 5000

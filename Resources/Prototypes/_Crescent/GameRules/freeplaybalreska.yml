@@ -1,0 +1,132 @@
+# DSM & NCWL Freeplay with Nova Balreska as the NCWL home station.
+- type: gamePreset
+  id: FreeplayBalreska
+  alias:
+  - freeplaybalreska
+  name: Freeplay Balreska
+  showInVote: true
+  description: DSM and NCWL Freeplay with the Workers' Union based at Nova Balreska. Lasts 2-4 hours.
+  excludedJobs:
+  - UnionfallCadetDSM
+  - UnionfallRiflemanDSM
+  - UnionfallDoctorDSM
+  - UnionfallOfficerDSM
+  - UnionfallLeaderDSM
+  - UnionfallShipCaptainDSM
+  - UnionfallShipCrewDSM
+  - UnionfallCadetNCWL
+  - UnionfallRiflemanNCWL
+  - UnionfallDoctorNCWL
+  - UnionfallOfficerNCWL
+  - UnionfallLeaderNCWL
+  - UnionfallShipCaptainNCWL
+  - UnionfallShipCrewNCWL
+  - planetfall_worker
+  - planetfall_partisan
+  - planetfall_mvdofficer
+  - planetfall_mvdgrunt
+  - planetfall_kapitan
+  - planetfall_doctor
+  - planetfall_courtier
+  - planetfall_advocatus
+  - planetfall_governor
+  - planetfall_freeholder
+  - planetfall_oathbound
+  - planetfall_levyman
+  - planetfall_surgeon
+  rules:
+  - FreeplayBalreska
+  - HullrotEventScheduler
+  - HullrotRoundTimeLimit
+  - HullrotConquest
+
+- type: entity
+  id: FreeplayBalreska
+  parent: FreeplayDSMNCWL
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: AdventureRule
+    # Map dictionaries replace the parent list; keep the complete Freeplay sector here.
+    gameMapsByID:
+      NCWLHomeStation:
+        gameMapID: PortBalreska
+        posX: 0
+        posY: -5000
+        IFFColor: Orange
+        IFFFaction: NCWL
+      AuroraImperialis:
+        gameMapID: AuroraImperialis
+        posX: 0
+        posY: 5000
+        IFFColor: "#C677A5"
+        IFFFaction: DSM
+      GliessSanto:
+        gameMapID: GliessSanto
+        posX: 0
+        posY: 0
+        IFFColor: White
+      Taypan1AsteroidBelt:
+        gameMapID: Taypan1AsteroidBelt
+        posX: -2000
+        posY: 2000
+        pinned: true
+      Taypan2AsteroidBelt:
+        gameMapID: Taypan2AsteroidBelt
+        posX: 2000
+        posY: -2000
+        pinned: true
+      ImperialHaulerWreck:
+        gameMapID: ImperialHaulerWreck
+        posX: 0
+        posY: 0
+        randomRingMin: 0
+        randomRingMax: 8500
+        minClearance: 2000
+        IFFLabel: Derelict
+        pinned: true
+      Fighter1:
+        gameMapID: Fighter1
+        posX: 0
+        posY: 0
+        randomRingMin: 0
+        randomRingMax: 8500
+        minClearance: 2000
+        IFFLabel: Derelict
+        pinned: true
+      Fighter2:
+        gameMapID: Fighter2
+        posX: 0
+        posY: 0
+        randomRingMin: 0
+        randomRingMax: 8500
+        minClearance: 2000
+        IFFLabel: Derelict
+        pinned: true
+      SolarSailorDerelict:
+        gameMapID: SolarSailorDerelict
+        posX: 0
+        posY: 0
+        randomRingMin: 0
+        randomRingMax: 8500
+        minClearance: 2000
+        IFFLabel: Derelict
+        pinned: true
+      FogwreckedDerelict:
+        gameMapID: FogwreckedDerelict
+        posX: 0
+        posY: 0
+        randomRingMin: 0
+        randomRingMax: 8500
+        minClearance: 2000
+        IFFLabel: Derelict
+        pinned: true
+      DerelictWaystation:
+        gameMapID: DerelictWaystation
+        posX: 2000
+        posY: 2000
+        pinned: true
+      Graveyard:
+        gameMapID: Graveyard
+        posX: -2000
+        posY: -2000
+        pinned: true

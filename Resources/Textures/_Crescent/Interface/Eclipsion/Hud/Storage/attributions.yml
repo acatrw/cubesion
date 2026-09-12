@@ -1,0 +1,4 @@
+- files: ["back.png", "exit.png", "piece_bottom.png", "piece_bottomLeft.png", "piece_bottomRight.png", "piece_center.png", "piece_left.png", "piece_right.png", "piece_top.png", "piece_topLeft.png", "piece_topRight.png", "sidebar_bottom.png", "sidebar_fat.png", "sidebar_mid.png", "sidebar_top.png", "tile_blocked.png", "tile_blocked_opaque.png", "tile_empty.png", "tile_empty_opaque.png"]
+  license: "CC-BY-NC-SA-3.0"
+  copyright: "Default HUD theme storage textures (goonstation commit e77d85d9c1d93aa32da7702737ceeac2b56738ac, modified by PixelTK), recoloured to the Eclipsion gunmetal palette for Hullrot:Eclipsion"
+  source: "https://github.com/goonstation/goonstation"

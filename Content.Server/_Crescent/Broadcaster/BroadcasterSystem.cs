@@ -148,9 +148,12 @@ public sealed partial class BroadcasterSystem : SharedBroadcasterSystem
             return;
         if (currentlyPlayingOn[message.outpost] != -1)
             return;
-        currentlyPlayingOn[message.outpost] = args.indexForBroadcast;
+        // Every early return past this point has to happen before the outpost is marked as playing.
+        // Marking it and then bailing left no entry in playtimesLeft, so Update never cleared the mark
+        // and the outpost could never broadcast again for the rest of the round.
         if (comp.AvailableAnnouncements is null)
             return;
+        currentlyPlayingOn[message.outpost] = args.indexForBroadcast;
         var comps = EntityManager.GetAllComponents(typeof(BroadcasterComponent));
         playtimesLeft.Add(comp.Outpost, broadcastableMessages[args.indexForBroadcast].duration);
         UpdateAllConsoles(comp.Outpost);

@@ -23,6 +23,13 @@ public sealed partial class FactionPrototype : IPrototype
     /// </summary>
     [DataField("buttonColor")] public Color FactionButtonColor = Color.DarkSlateGray;
 
+    /// <summary>
+    ///     Eclipsion - accent the client UI takes on while the local player belongs to this faction.
+    ///     Kept separate from <see cref="FactionButtonColor"/>, which is too dark to read on the HUD
+    ///     (several factions use Black). Null leaves the neutral accent.
+    /// </summary>
+    [DataField("uiAccent")] public Color? UiAccent;
+
     [DataField("description", required: true)] public string Description = default!;
 
     [DataField("icon", required: true)] public SpriteSpecifier Icon = SpriteSpecifier.Invalid;

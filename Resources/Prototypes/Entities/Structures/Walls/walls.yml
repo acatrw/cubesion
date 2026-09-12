@@ -713,21 +713,18 @@
         - !type:PlaySoundBehavior
           sound:
             collection: MetalSlam
+    # Eclipsion - this used to be two thresholds at 300: a plain destroy one followed by the girder one.
+    # DestructibleSystem stops at the first threshold that queues the entity for deletion, so the girder
+    # never spawned. Merged into the single threshold WallShuttle and WallPlastitaniumDiagonal already use.
     - trigger:
-        !type:DamageTrigger
-        damage: 300
-      behaviors:
-      - !type:PlaySoundBehavior
-        sound:
-          collection: MetalSlam
-      - !type:DoActsBehavior
-        acts: ["Destruction"]
-    - trigger: #this trigger is a Nyano addition
         !type:DamageTrigger
         damage: 300
       behaviors:
       - !type:ChangeConstructionNodeBehavior
         node: girder
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalSlam
       - !type:DoActsBehavior
         acts: ["Destruction"]
   - type: Construction

@@ -1,0 +1,29 @@
+- type: entity
+  parent: ChurchWindow
+  id: ChurchWindowSword
+  name: frosted cathedral window (sword)
+  description: "A stained-glass window depicting a haloed saint bearing a sword."
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/churchglass_sword.rsi
+    state: icon
+
+- type: entity
+  parent: ChurchWindow
+  id: ChurchWindowTorch
+  name: frosted cathedral window (torch)
+  description: "A stained-glass window depicting a robed saint holding a ceremonial torch."
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/churchglass_torch.rsi
+    state: icon
+
+- type: entity
+  parent: ChurchWindow
+  id: ChurchWindowWings
+  name: frosted cathedral window (wings)
+  description: "A stained-glass window depicting a haloed figure with ivory wings."
+  components:
+  - type: Sprite
+    sprite: _Crescent/Structures/churchglass_wings.rsi
+    state: icon

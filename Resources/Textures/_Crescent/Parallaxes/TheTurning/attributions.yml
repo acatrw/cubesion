@@ -1,0 +1,4 @@
+- files: ["turning.png", "intact.png", "shattered.png"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Original art by Taleryn for Hullrot:Eclipsion. Purple temporal state based on Taleryn's holograph_planet celestial sprites. Source images and reproducible atlas assembly in Tools/Art/TheTurning."
+  source: "Hullrot Development Team"

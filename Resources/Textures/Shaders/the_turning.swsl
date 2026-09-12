@@ -1,0 +1,29 @@
+// Two RGBA endpoints packed horizontally, rendered as one square parallax layer.
+// The same timeline is used in Tools/Art/TheTurning/preview.html.
+light_mode unshaded;
+
+void fragment() {
+    highp float t = mod(TIME, 24.0);
+    highp float broken = smoothstep(9.0, 11.0, t) * (1.0 - smoothstep(17.0, 19.0, t));
+    highp float purple = smoothstep(7.0, 9.0, t) * (1.0 - smoothstep(19.0, 21.0, t));
+    highp float transition = 4.0 * broken * (1.0 - broken);
+
+    // Subtle horizontal temporal tearing, strongest while changing physical state.
+    highp float row = floor(UV.y * 128.0);
+    highp float tear = sin(row * 1.71 + floor(TIME * 8.0)) * 0.006 * transition;
+    highp vec2 uv = vec2(clamp(UV.x + tear, 0.002, 0.998), UV.y);
+    highp vec4 intact = zTexture(vec2(uv.x * 0.5, uv.y));
+    highp vec4 shattered = zTexture(vec2(0.5 + uv.x * 0.5, uv.y));
+
+    // The world turns violet before it breaks and stays violet while reforming.
+    highp float luminance = dot(intact.rgb, vec3(0.2126, 0.7152, 0.0722));
+    highp vec3 violet = luminance * vec3(0.88, 0.30, 1.0);
+    intact.rgb = mix(intact.rgb, violet, purple);
+
+    // Blend premultiplied endpoints so transparent gaps never produce dark fringes.
+    highp float opacity = mix(intact.a, shattered.a, broken);
+    highp vec3 rgb = mix(intact.rgb * intact.a, shattered.rgb * shattered.a, broken);
+    rgb /= max(opacity, 0.0001);
+    highp float scanline = 1.0 - purple * 0.10 * (0.5 + 0.5 * sin(UV.y * 804.2477 + TIME * 2.0));
+    COLOR = vec4(rgb * scanline, opacity);
+}

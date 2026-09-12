@@ -97,8 +97,17 @@ public sealed partial class ShipRepairStationSystem
                     continue;
                 }
 
+                // Shields, ship consoles and weapons keep their identity after being unanchored or
+                // carried onto another grid. As long as that exact entity survives, the empty spot
+                // aboard is not a missing part and cannot be used to duplicate valuable equipment.
+                if (_drydock.OriginalPreventsReplacement(part))
+                    continue;
+
                 if (TryClaim(standing, part.Tile, part.Proto, out var present))
                 {
+                    // The crew replaced the destroyed original. Track the fitted entity from now on
+                    // so removing it later cannot make another copy eligible for reconstruction.
+                    part.Original = present;
                     AddHealJob(station, ref survey, ref raw, present, part.Tile);
                     continue;
                 }
@@ -437,7 +446,9 @@ public sealed partial class ShipRepairStationSystem
         EntityUid target,
         Vector2i tile)
     {
-        if (!TryComp<DamageableComponent>(target, out var damage) || damage.TotalDamage <= FixedPoint2.Zero)
+        if (!Transform(target).Anchored
+            || !TryComp<DamageableComponent>(target, out var damage)
+            || damage.TotalDamage <= FixedPoint2.Zero)
             return;
 
         if (!_healed.Add(target))
@@ -639,12 +650,21 @@ public sealed partial class ShipRepairStationSystem
     /// </summary>
     private bool TileHolds(EntityUid grid, MapGridComponent gridComp, Vector2i tile, string proto)
     {
+        return TileHolds(grid, gridComp, tile, proto, out _);
+    }
+
+    private bool TileHolds(EntityUid grid, MapGridComponent gridComp, Vector2i tile, string proto, out EntityUid present)
+    {
         foreach (var ent in _map.GetAnchoredEntities(grid, gridComp, tile))
         {
-            if (MetaData(ent).EntityPrototype?.ID == proto)
+            if (!TerminatingOrDeleted(ent) && MetaData(ent).EntityPrototype?.ID == proto)
+            {
+                present = ent;
                 return true;
+            }
         }
 
+        present = EntityUid.Invalid;
         return false;
     }
 

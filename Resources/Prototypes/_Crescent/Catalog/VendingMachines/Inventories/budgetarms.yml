@@ -1,22 +1,175 @@
 - type: vendingMachineInventory
   id: SHIBudgetArmoryInventory
   startingInventory:
-    WeaponPistolBlastpopRed: 6
-    WeaponPistolBlastpopPurple: 6
-    WeaponPistolBlastpopGray: 6
-    WeaponPistolBlastpopGreen: 6
-    WeaponPistolBlastpopGold: 6
-    WeaponPistolBlastpopBlue: 6
-    WeaponPistolMk58: 6
-    MagazinePistol6mm: 12
-    WeaponSubMachineGunSabre: 4
-    MagazinePistol6mmSmg: 8
-    ClothingBeltSheathMacheteIndependentFilled: 12
-    WeaponShotgunSHIDoubleBarreled4g: 4
-    WeaponShotgunBlaster: 4
-    MagazineClip18gBuck: 12
-    BoxLethalshot: 4
-    BoxBeanbag: 4
-    WeaponRifleSHINimrod: 6
-    SpeedLoaderRifle: 12
-    ClothingOuterHardsuitFishbed: 8
+    WeaponPistolBlastpopRedSHIBudgetVend: 6
+    WeaponPistolBlastpopPurpleSHIBudgetVend: 6
+    WeaponPistolBlastpopGraySHIBudgetVend: 6
+    WeaponPistolBlastpopGreenSHIBudgetVend: 6
+    WeaponPistolBlastpopGoldSHIBudgetVend: 6
+    WeaponPistolBlastpopBlueSHIBudgetVend: 6
+    WeaponPistolMk58SHIBudgetVend: 6
+    MagazinePistol6mmSHIBudgetVend: 12
+    WeaponSubMachineGunSabreSHIBudgetVend: 4
+    MagazinePistol6mmSmgSHIBudgetVend: 8
+    ClothingBeltSheathMacheteIndependentFilledSHIBudgetVend: 12
+    WeaponShotgunSHIDoubleBarreled4gSHIBudgetVend: 4
+    WeaponShotgunBlasterSHIBudgetVend: 4
+    MagazineClip18gBuckSHIBudgetVend: 12
+    BoxLethalshotSHIBudgetVend: 4
+    BoxBeanbagSHIBudgetVend: 4
+    WeaponRifleSHINimrodSHIBudgetVend: 6
+    SpeedLoaderRifleSHIBudgetVend: 12
+    ClothingOuterHardsuitFishbedSHIBudgetVend: 8
+
+# Storefront variants keep the BudgetArms mark-up local to this vendor.
+- type: entity
+  parent: WeaponPistolBlastpopRed
+  id: WeaponPistolBlastpopRedSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolBlastpopPurple
+  id: WeaponPistolBlastpopPurpleSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolBlastpopGray
+  id: WeaponPistolBlastpopGraySHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolBlastpopGreen
+  id: WeaponPistolBlastpopGreenSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolBlastpopGold
+  id: WeaponPistolBlastpopGoldSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolBlastpopBlue
+  id: WeaponPistolBlastpopBlueSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 1000
+
+- type: entity
+  parent: WeaponPistolMk58
+  id: WeaponPistolMk58SHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 4000
+
+- type: entity
+  parent: MagazinePistol6mm
+  id: MagazinePistol6mmSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 500
+
+- type: entity
+  parent: WeaponSubMachineGunSabre
+  id: WeaponSubMachineGunSabreSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 10000
+
+- type: entity
+  parent: MagazinePistol6mmSmg
+  id: MagazinePistol6mmSmgSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 750
+
+- type: entity
+  parent: ClothingBeltSheathMacheteIndependentFilled
+  id: ClothingBeltSheathMacheteIndependentFilledSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 2500
+
+- type: entity
+  parent: WeaponShotgunSHIDoubleBarreled4g
+  id: WeaponShotgunSHIDoubleBarreled4gSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 6000
+
+- type: entity
+  parent: WeaponShotgunBlaster
+  id: WeaponShotgunBlasterSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 11000
+
+- type: entity
+  parent: MagazineClip18gBuck
+  id: MagazineClip18gBuckSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 600
+
+- type: entity
+  parent: BoxLethalshot
+  id: BoxLethalshotSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 750
+
+- type: entity
+  parent: BoxBeanbag
+  id: BoxBeanbagSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 250
+
+- type: entity
+  parent: WeaponRifleSHINimrod
+  id: WeaponRifleSHINimrodSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 15000
+
+- type: entity
+  parent: SpeedLoaderRifle
+  id: SpeedLoaderRifleSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 500
+
+- type: entity
+  parent: ClothingOuterHardsuitFishbed
+  id: ClothingOuterHardsuitFishbedSHIBudgetVend
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: StaticPrice
+    price: 8000

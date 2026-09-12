@@ -1377,7 +1377,7 @@ entities:
       angularDamping: 0
       linearDamping: 0
       canCollide: False
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 139
     components:

@@ -2882,7 +2882,7 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 18.5,4.5
       parent: 2
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 91
     components:

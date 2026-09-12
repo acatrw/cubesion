@@ -94,6 +94,7 @@ ui-options-hud-theme-clockwork = Clockwork
 ui-options-hud-theme-retro = Retro
 ui-options-hud-theme-minimalist = Minimalist
 ui-options-hud-theme-ashen = Ashen
+ui-options-hud-theme-eclipsion = Eclipsion
 ui-options-vp-stretch = Stretch viewport to fit game window
 ui-options-vp-scale = Fixed viewport scale: x{ $scale }
 ui-options-vp-integer-scaling = Prefer integer scaling (might cause black bars/clipping)
@@ -113,6 +114,8 @@ ui-options-vp-width = Viewport width: { $width }
 ui-options-hud-layout = HUD layout:
 ui-options-action-bar-vertical = Vertical action bar
 ui-options-action-bar-vertical-tooltip = Stack the action hotbar down the left of the screen instead of across the top. Actions that do not fit wrap into another column.
+ui-options-faction-accent = Faction accent colour
+ui-options-faction-accent-tooltip = Tint window titles, pressed buttons and the active hand with your faction's colour. Off keeps the neutral steel accent.
 
 ## Controls menu
 

@@ -437,12 +437,17 @@ public sealed partial class ShipRepairStationSystem
     /// </summary>
     private EntityUid? ReinstateDrydockPart(EntityUid grid, MapGridComponent gridComp, DrydockPart part)
     {
-        if (StillStanding(part, grid))
+        // Check the protected original again at execution time as it may have been moved after the
+        // quote was accepted. A live shield, console or weapon must never yield a second copy.
+        if (StillStanding(part, grid) || _drydock.OriginalPreventsReplacement(part))
             return null;
 
         // A crewman may have rebuilt this between the survey and now.
-        if (TileHolds(grid, gridComp, part.Tile, part.Proto))
+        if (TileHolds(grid, gridComp, part.Tile, part.Proto, out var present))
+        {
+            part.Original = present;
             return null;
+        }
 
         if (!_proto.HasIndex(part.Proto))
             return null;
@@ -488,6 +493,12 @@ public sealed partial class ShipRepairStationSystem
     {
         if (spec.OriginalEntity is not { } net || !TryGetEntity(net, out var original) || TerminatingOrDeleted(original.Value))
             return true;
+
+        // The hand-tool snapshot normally replaces a live entity floating in map space and deletes
+        // the old one. Protected equipment instead keeps its identity everywhere and is only
+        // eligible for replacement once the original has actually been destroyed.
+        if (_drydock.ReplacementRequiresDestruction(original.Value))
+            return false;
 
         var ev = new ShipRepairReinstateQueryEvent(true);
         RaiseLocalEvent(original.Value, ref ev);

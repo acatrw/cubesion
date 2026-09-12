@@ -7,6 +7,8 @@
     state: cpu_medical
   - type: ComputerBoard
     prototype: ComputerInterdyneLifeInsurance
+  - type: ComputerTabletopBoard
+    prototype: ComputerTabletopInterdyneLifeInsurance
 
 - type: entity
   parent: BaseMachineCircuitboard

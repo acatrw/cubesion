@@ -7,6 +7,7 @@ using Content.Server._Crescent.Diplomacy;
 using Content.Server._Crescent.Factions;
 using Content.Shared._Crescent.Diplomacy;
 using Content.Shared._Crescent.HullrotFaction;
+using Content.Shared.Emag.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Mech.Components;
 using Content.Shared.Mobs;
@@ -207,6 +208,34 @@ public sealed class AutoPDTurretTargetingTest
                 Assert.That(result.GetHighest(), Is.EqualTo(EntityUid.Invalid),
                     "Unanchoring the turret made DSM crew a valid target.");
             }
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [TestCase("MobCleanBot")]
+    [TestCase("MobMedibot")]
+    public async Task ServiceBotIsNotTargeted(string bot)
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var entMan = server.EntMan;
+            var turret = entMan.SpawnEntity("WeaponTurretAutoPDDSM", map.GridCoords);
+            var target = entMan.SpawnEntity(bot, new EntityCoordinates(map.Grid, new Vector2(1f, 0f)));
+
+            var htn = entMan.GetComponent<HTNComponent>(turret);
+            var utility = server.System<NPCUtilitySystem>();
+
+            Assert.That(utility.GetEntities(htn.Blackboard, "NearbyPDTTargets").GetHighest(), Is.EqualTo(EntityUid.Invalid),
+                $"The anti-boarder turret targeted a {bot}.");
+
+            entMan.AddComponent<EmaggedComponent>(target);
+            Assert.That(utility.GetEntities(htn.Blackboard, "NearbyPDTTargets").GetHighest(), Is.EqualTo(target),
+                $"The anti-boarder turret ignored an emagged {bot}.");
         });
 
         await pair.CleanReturnAsync();

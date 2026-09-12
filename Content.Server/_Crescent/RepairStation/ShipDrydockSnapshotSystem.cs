@@ -103,6 +103,7 @@ public sealed class ShipDrydockSnapshotSystem : EntitySystem
                 Rotation = xform.LocalRotation,
                 Original = child,
                 IsMount = HasComp<HardpointComponent>(child),
+                ReplacementRequiresDestruction = ReplacementRequiresDestruction(child),
             });
         }
     }
@@ -159,6 +160,38 @@ public sealed class ShipDrydockSnapshotSystem : EntitySystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Whether the recorded entity itself must cease to exist before the slip may replace it.
+    /// This prevents valuable removable equipment from being duplicated by carrying it off-grid and
+    /// repeatedly asking the slip to restore the now-empty mounting point.
+    /// </summary>
+    public bool ReplacementRequiresDestruction(EntityUid uid)
+    {
+        foreach (var scope in _scopes)
+        {
+            if (scope.ReplacementRequiresDestruction != null
+                && _whitelist.IsWhitelistPass(scope.ReplacementRequiresDestruction, uid))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Whether a protected part's exact snapshotted entity is still alive somewhere in the world.
+    /// Deliberately does not inspect its transform: nullspace, a container, open space and another
+    /// grid all still mean the player has the original part.
+    /// </summary>
+    public bool OriginalPreventsReplacement(DrydockPart part)
+    {
+        return part.Original is { } original
+               && part.ReplacementRequiresDestruction
+               && !TerminatingOrDeleted(original)
+               && MetaData(original).EntityPrototype?.ID == part.Proto.Id;
     }
 
     /// <summary>

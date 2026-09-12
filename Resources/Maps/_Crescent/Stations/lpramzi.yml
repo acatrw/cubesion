@@ -4763,7 +4763,7 @@ entities:
       rot: 1.5707963267948966 rad
       pos: -3.5,4.5
       parent: 1
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 404
     components:
@@ -5592,7 +5592,7 @@ entities:
   - uid: 718
     components:
     - type: MetaData
-      desc: An outdated flag that belongs to the TFSC.
+      desc: An outdated flag that belongs to the TFCF.
       name: privateer's flag
     - type: Transform
       pos: 1.5,-22.5

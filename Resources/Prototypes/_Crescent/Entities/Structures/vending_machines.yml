@@ -11,13 +11,15 @@
     offState: off
     brokenState: broken
     normalState: normal-unshaded
+    denyState: deny-unshaded
+    ejectState: eject-unshaded
   - type: Advertise
     pack: AmmoVendAds
   - type: SpeakOnUIClosed
     pack: GenericVendGoodbyes
   - type: Speech
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_tfsc.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -40,13 +42,15 @@
     offState: off
     brokenState: broken
     normalState: normal-unshaded
+    denyState: deny-unshaded
+    ejectState: eject-unshaded
   - type: Advertise
     pack: AmmoVendAds
   - type: SpeakOnUIClosed
     pack: GenericVendGoodbyes
   - type: Speech
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_dsm.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -98,13 +102,15 @@
     offState: off
     brokenState: broken
     normalState: normal-unshaded
+    denyState: deny-unshaded
+    ejectState: eject-unshaded
   - type: Advertise
     pack: AmmoVendAds
   - type: SpeakOnUIClosed
     pack: GenericVendGoodbyes
   - type: Speech
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_ncwl.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -138,7 +144,7 @@
   - type: Speech
   - type: Sprite
     noRot: true
-    sprite: Structures/Machines/VendingMachines/cigs.rsi
+    sprite: _Crescent/Structures/imperial_cig_vendor.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -507,7 +513,6 @@
   components:
   - type: VendingMachine
     pack: TaypaniSurplusVendorPack
-    globalPriceMod: 1.5
     offState: off
     brokenState: broken
     normalState: normal-unshaded

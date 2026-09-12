@@ -86,7 +86,7 @@
 - type: entity
   parent: [BaseComputerTabletopShipRepairStation, ComputerShipRepairStationTFSC]
   id: ComputerTabletopShipRepairStationTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopShipRepairStation, ComputerShipRepairStationCMM]
@@ -146,7 +146,7 @@
 - type: entity
   parent: [BaseComputerTabletopOverwatch, TFSCOverwatchComputer]
   id: ComputerTabletopOverwatchTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopOverwatch, SRMOverwatchComputer]
@@ -191,7 +191,7 @@
 - type: entity
   parent: [BaseComputerTabletopFactionTreasury, ComputerFactionTreasuryTFSC]
   id: ComputerTabletopFactionTreasuryTFSC
-  suffix: Tabletop, TFSC
+  suffix: Tabletop, TFCF
 
 - type: entity
   parent: [BaseComputerTabletopFactionTreasury, ComputerFactionTreasuryGS]
@@ -202,4 +202,719 @@
   parent: [BaseComputerTabletopFactionTreasury, ComputerFactionTreasuryTAP]
   id: ComputerTabletopFactionTreasuryTAP
   suffix: Tabletop, TAP
+
+# General Hullrot computers
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotGeneric
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: generic
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotGeneric, ComputerDiplomacyConsole]
+  id: ComputerTabletopDiplomacyConsole
+  suffix: Tabletop
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotGeneric, ComputerMassCloak]
+  id: ComputerTabletopMassCloak
+  suffix: Tabletop
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      sprite: Structures/Shuttles/iff.rsi
+      state: helm
+    - map: ["computerLayerKeys"]
+      sprite: Structures/Machines/computers.rsi
+      state: generic_keys
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      sprite: Structures/Machines/computers.rsi
+      state: generic_panel_open
+
+- type: entity
+  parent: [ComputerTabletopMassCloak, ComputerMothershipMassCloak]
+  id: ComputerTabletopMothershipMassCloak
+  suffix: Tabletop, Mothership
+
+# Cargo and broadcast consoles
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotCargo
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: request
+    - map: ["computerLayerKeys"]
+      state: tech_key
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersShip]
+  id: ComputerTabletopCargoOrdersShip
+  suffix: Tabletop, Ship
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersSurezai]
+  id: ComputerTabletopCargoOrdersSurezai
+  suffix: Tabletop, Surezai
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersCommie]
+  id: ComputerTabletopCargoOrdersCommie
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersPangtai]
+  id: ComputerTabletopCargoOrdersPangtai
+  suffix: Tabletop, Pang Tai
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersShinohara]
+  id: ComputerTabletopCargoOrdersShinohara
+  suffix: Tabletop, Shinohara
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersShinoharaStation]
+  id: ComputerTabletopCargoOrdersShinoharaStation
+  suffix: Tabletop, Shinohara Station
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersFreeport]
+  id: ComputerTabletopCargoOrdersFreeport
+  suffix: Tabletop, Freeport
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersHayes]
+  id: ComputerTabletopCargoOrdersHayes
+  suffix: Tabletop, Hayes
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerCargoOrdersGliess]
+  id: ComputerTabletopCargoOrdersGliess
+  suffix: Tabletop, Gliess
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotCargo, ComputerBroadcast]
+  id: ComputerTabletopBroadcast
+  suffix: Tabletop
+
+# Command, recruitment and directive consoles
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotId
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: id
+    - map: ["computerLayerKeys"]
+      state: id_key
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleDSM]
+  id: ComputerTabletopFactionRecruitmentDSM
+  suffix: Tabletop, DSM
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleNCWL]
+  id: ComputerTabletopFactionRecruitmentNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleSHI]
+  id: ComputerTabletopFactionRecruitmentSHI
+  suffix: Tabletop, SHI
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleTFSC]
+  id: ComputerTabletopFactionRecruitmentTFSC
+  suffix: Tabletop, TFCF
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleGS]
+  id: ComputerTabletopFactionRecruitmentGS
+  suffix: Tabletop, GS
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRecruitmentConsoleTAP]
+  id: ComputerTabletopFactionRecruitmentTAP
+  suffix: Tabletop, TAP
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerDSM]
+  id: ComputerTabletopFactionRoundEndDSM
+  suffix: Tabletop, DSM
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerNCWL]
+  id: ComputerTabletopFactionRoundEndNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerSHI]
+  id: ComputerTabletopFactionRoundEndSHI
+  suffix: Tabletop, SHI
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerTFSC]
+  id: ComputerTabletopFactionRoundEndTFSC
+  suffix: Tabletop, TFCF
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotId, FactionRoundEndComputerCMM]
+  id: ComputerTabletopFactionRoundEndCMM
+  suffix: Tabletop, CMM
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotMainframe
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: command
+    - map: ["computerLayerKeys"]
+      state: tech_key
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, DSMMainframeConsole]
+  id: ComputerTabletopMainframeDSM
+  suffix: Tabletop, DSM
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, NCWLMainframeConsole]
+  id: ComputerTabletopMainframeNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, SHIMainframeConsole]
+  id: ComputerTabletopMainframeSHI
+  suffix: Tabletop, SHI
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, TAPMainframeConsole]
+  id: ComputerTabletopMainframeTAP
+  suffix: Tabletop, TAP
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, TFSCMainframeConsole]
+  id: ComputerTabletopMainframeTFSC
+  suffix: Tabletop, TFCF
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, SRMMainframeConsole]
+  id: ComputerTabletopMainframeSRM
+  suffix: Tabletop, SRM
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotMainframe, GSMainframeConsole]
+  id: ComputerTabletopMainframeGS
+  suffix: Tabletop, GS
+
+# Payroll and taxation consoles
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotPayroll
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: payroll
+    - map: ["computerLayerKeys"]
+      state: tech_key
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentDSM]
+  id: ComputerTabletopPaymentDSM
+  suffix: Tabletop, DSM
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentNCWL]
+  id: ComputerTabletopPaymentNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentSHI]
+  id: ComputerTabletopPaymentSHI
+  suffix: Tabletop, SHI
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentTFSC]
+  id: ComputerTabletopPaymentTFSC
+  suffix: Tabletop, TFCF
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentGS]
+  id: ComputerTabletopPaymentGS
+  suffix: Tabletop, GS
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotPayroll, ComputerPaymentTAP]
+  id: ComputerTabletopPaymentTAP
+  suffix: Tabletop, TAP
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotTaxation
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: taxation
+    - map: ["computerLayerKeys"]
+      state: tech_key
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTaxation, ComputerFactionTaxationShinohara]
+  id: ComputerTabletopFactionTaxationShinohara
+  suffix: Tabletop, Shinohara
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTaxation, ComputerFactionTaxationNCWL]
+  id: ComputerTabletopFactionTaxationNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTaxation, ComputerFactionTaxationEmpire]
+  id: ComputerTabletopFactionTaxationEmpire
+  suffix: Tabletop, Empire
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTaxation, ComputerFactionTaxationTFSC]
+  id: ComputerTabletopFactionTaxationTFSC
+  suffix: Tabletop, TFCF
+
+# Special-purpose consoles
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotAlert
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: comm
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotAlert, ComputerAlertConsole]
+  id: ComputerTabletopAlertConsole
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotShuttleTech
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: shuttle
+    - map: ["computerLayerKeys"]
+      state: tech_key
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotShuttleTech, ComputerHardlinerFireControl]
+  id: ComputerTabletopHardlinerFireControl
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotLifeInsurance
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: tcboss
+    - map: ["computerLayerKeys"]
+      state: tech_key
+    - map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      state: generic_panel_open
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotLifeInsurance, ComputerInterdyneLifeInsurance]
+  id: ComputerTabletopInterdyneLifeInsurance
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotDna
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: dna
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotDna, ComputerDnaDatabase]
+  id: ComputerTabletopDnaDatabase
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotTechShareRequest
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: comm_syndie
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTechShareRequest, TechShareRequestConsole]
+  id: ComputerTabletopTechShareRequest
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotTechShareReceiver
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      sprite: _Crescent/Structures/Machines/computers.rsi
+      state: tech_share_receiver
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotTechShareReceiver, TechShareReceiverConsole]
+  id: ComputerTabletopTechShareReceiver
+  suffix: Tabletop
+
+- type: entity
+  parent: BaseCrescentComputerTabletop
+  id: BaseComputerTabletopHullrotDroneControl
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    layers:
+    - map: ["computerLayerBody"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: computer_tabletop
+    - map: ["computerLayerKeyboard"]
+      sprite: _NF/Structures/Machines/computer_tabletop.rsi
+      state: generic_keyboard_tabletop
+    - map: ["computerLayerScreen"]
+      state: shuttle
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotDroneControl, ComputerDroneControl]
+  id: ComputerTabletopDroneControl
+  suffix: Tabletop
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotDroneControl, ComputerDroneControlStation]
+  id: ComputerTabletopDroneControlStation
+  suffix: Tabletop, Station
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotDroneControl, ComputerDroneControlNCWL]
+  id: ComputerTabletopDroneControlNCWL
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [ComputerTabletopTargeting, ComputerTargetingCapturable]
+  id: ComputerTabletopTargetingCapturable
+  suffix: Tabletop, Capturable territory
+
+# Current Hullrot shipyard and mothership consoles. The unprefixed predecessors are
+# migration-only; these variants follow the Rat-prefixed prototypes used by maps.
+
+- type: entity
+  parent: [ComputerTabletopShipyard, RatComputerShipyardCrescent]
+  id: RatComputerTabletopShipyardCrescent
+  suffix: Tabletop, Crescent
+
+- type: entity
+  parent: [ComputerTabletopShipyardSecurity, RatComputerShipyardSecurity]
+  id: RatComputerTabletopShipyardSecurity
+  suffix: Tabletop, Security
+
+- type: entity
+  parent: [ComputerTabletopShipyardExpedition, RatComputerShipyardExpedition]
+  id: RatComputerTabletopShipyardExpedition
+  suffix: Tabletop, Expedition
+
+- type: entity
+  parent: [ComputerTabletopShipyardScrap, RatComputerShipyardScrap]
+  id: RatComputerTabletopShipyardScrap
+  suffix: Tabletop, Scrap
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, HyperwarLPCShipyardComputer]
+  id: HyperwarLPCShipyardComputerTabletop
+  suffix: Tabletop, Hyperwar
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, UnionfallLPCShipyardComputer]
+  id: UnionfallLPCShipyardComputerTabletop
+  suffix: Tabletop, Unionfall
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatNCWLMothershipComputer]
+  id: RatNCWLMothershipComputerTabletop
+  suffix: Tabletop, NCWL
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatNCWLLightCarrierComputer]
+  id: RatNCWLLightCarrierComputerTabletop
+  suffix: Tabletop, NCWL Light Carrier
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatDSMLightCarrierComputer]
+  id: RatDSMLightCarrierComputerTabletop
+  suffix: Tabletop, DSM Light Carrier
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatJackalMothershipComputer]
+  id: RatJackalMothershipComputerTabletop
+  suffix: Tabletop, Jackal
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatCountsmanMothershipComputer]
+  id: RatCountsmanMothershipComputerTabletop
+  suffix: Tabletop, Countsman
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatNemesisMothershipComputer]
+  id: RatNemesisMothershipComputerTabletop
+  suffix: Tabletop, Nemesis
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatUnionfallNemesisMothershipComputer]
+  id: RatUnionfallNemesisMothershipComputerTabletop
+  suffix: Tabletop, Unionfall Nemesis
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatInterdyneMothershipComputer]
+  id: RatInterdyneMothershipComputerTabletop
+  suffix: Tabletop, Interdyne
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatSawsMothershipComputer]
+  id: RatSawsMothershipComputerTabletop
+  suffix: Tabletop, SAWs
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatTatsumotoMothershipComputer]
+  id: RatTatsumotoMothershipComputerTabletop
+  suffix: Tabletop, Tatsumoto
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatRamziMothershipComputer]
+  id: RatRamziMothershipComputerTabletop
+  suffix: Tabletop, Ramzi
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatZhipovMothershipComputer]
+  id: RatZhipovMothershipComputerTabletop
+  suffix: Tabletop, Zhipov
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatUnionfallClementineMothershipComputer]
+  id: RatUnionfallClementineMothershipComputerTabletop
+  suffix: Tabletop, Unionfall Clementine
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatJackalCarrierMothershipComputer]
+  id: RatJackalCarrierMothershipComputerTabletop
+  suffix: Tabletop, Jackal Carrier
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatCMMMothershipComputer]
+  id: RatCMMMothershipComputerTabletop
+  suffix: Tabletop, CMM
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatRefugeMothershipComputer]
+  id: RatRefugeMothershipComputerTabletop
+  suffix: Tabletop, Refuge
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatAnathemaMothershipComputer]
+  id: RatAnathemaMothershipComputerTabletop
+  suffix: Tabletop, Anathema
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatAlseikMothershipComputer]
+  id: RatAlseikMothershipComputerTabletop
+  suffix: Tabletop, Alseik
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatAuthorityMothershipComputer]
+  id: RatAuthorityMothershipComputerTabletop
+  suffix: Tabletop, Authority
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatThukkerMothershipComputer]
+  id: RatThukkerMothershipComputerTabletop
+  suffix: Tabletop, Thukker
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatIzdariMothershipComputer]
+  id: RatIzdariMothershipComputerTabletop
+  suffix: Tabletop, Izdari
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatOuroborosMothershipComputer]
+  id: RatOuroborosMothershipComputerTabletop
+  suffix: Tabletop, Ouroboros
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatNAPMothershipComputer]
+  id: RatNAPMothershipComputerTabletop
+  suffix: Tabletop, NAP
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatTrashcanMothershipComputer]
+  id: RatTrashcanMothershipComputerTabletop
+  suffix: Tabletop, Trashcan
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatCockroachMothershipComputer]
+  id: RatCockroachMothershipComputerTabletop
+  suffix: Tabletop, Cockroach
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatFadeemMothershipComputer]
+  id: RatFadeemMothershipComputerTabletop
+  suffix: Tabletop, Fadeem
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatPsoglavMothershipComputer]
+  id: RatPsoglavMothershipComputerTabletop
+  suffix: Tabletop, Psoglav
+
+- type: entity
+  parent: [BaseMothershipComputerTabletop, RatCovetorMothershipComputer]
+  id: RatCovetorMothershipComputerTabletop
+  suffix: Tabletop, Covetor
 

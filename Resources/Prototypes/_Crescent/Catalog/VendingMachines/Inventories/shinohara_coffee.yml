@@ -1,0 +1,9 @@
+- type: vendingMachineInventory
+  id: ShinoharaHotDrinksMachineInventory
+  startingInventory:
+    DrinkShinoharaCoffee: 20
+    DrinkTeacup: 5
+    DrinkGreenTea: 5
+    DrinkHotCoco: 5
+  emaggedInventory:
+    DrinkNothing: 2

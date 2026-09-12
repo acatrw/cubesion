@@ -2570,7 +2570,7 @@ entities:
         Yellow - Toggles respectibe shutters
 
         Frameless - Closes every shutter
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 305
     components:

@@ -8,8 +8,16 @@
         </controls:NanoHeading>
         <BoxContainer Name="Loaded" Orientation="Vertical" Visible="False">
             <Label Name="Summary" HorizontalAlignment="Center" Margin="3 3"/>
-            <BoxContainer Name="ViewBox" Orientation="Horizontal" HorizontalAlignment="Center">
-
+            <BoxContainer Name="Carousel" Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextureButton Name="PreviousButton"
+                               TexturePath="left_arrow.svg.192dpi.png"
+                               VerticalAlignment="Center"
+                               Visible="False"/>
+                <LayoutContainer Name="ViewBox" MinSize="200 116" InheritChildMeasure="False"/>
+                <TextureButton Name="NextButton"
+                               TexturePath="right_arrow.svg.192dpi.png"
+                               VerticalAlignment="Center"
+                               Visible="False"/>
             </BoxContainer>
             <controls:VSpacer/>
             <Button Name="CharacterSetup" Text="{Loc 'lobby-character-preview-panel-character-setup-button'}"

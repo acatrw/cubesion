@@ -9,13 +9,11 @@
   description: A statue depicting the legendary Saint Romaine, wearing what appears to be his signature moth cloak.
   components:
   - type: InteractionOutline
-  # Same layer stack as the store version so the statue looks identical in-game.
+  # Same sprite as the store version so the statue looks identical in-game.
   - type: Sprite
     sprite: _Crescent/Structures/statue_romaine.rsi
     layers:
     - state: icon
-    - state: icon
-      shader: unshaded
     snapCardinals: false
   - type: Transform
     noRot: true
@@ -64,6 +62,4 @@
     sprite: _Crescent/Structures/statue_serraine.rsi
     layers:
     - state: icon
-    - state: icon
-      shader: unshaded
     snapCardinals: false

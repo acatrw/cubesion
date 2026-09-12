@@ -56,6 +56,9 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
 
+    /// Held so the carousel subscription can be dropped even once the lobby state is gone.
+    private LobbyCharacterPreviewPanel? _subscribedPreview;
+
     /// This is the character preview panel in the chat. This should only update if their character updates
     private LobbyCharacterPreviewPanel? PreviewPanel => GetLobbyPreview();
 
@@ -82,12 +85,22 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         _gameTicker = EntityManager.System<ClientGameTicker>();
         _gameTicker.GamemodeJobsUpdated += OnGamemodeJobsUpdated;
 
+        _subscribedPreview = PreviewPanel;
+        if (_subscribedPreview != null)
+            _subscribedPreview.CharacterSelected += OnPreviewCharacterSelected;
+
         PreviewPanel?.SetLoaded(_preferencesManager.ServerDataLoaded);
         ReloadCharacterSetup();
     }
 
     public void OnStateExited(LobbyState state)
     {
+        if (_subscribedPreview != null)
+        {
+            _subscribedPreview.CharacterSelected -= OnPreviewCharacterSelected;
+            _subscribedPreview = null;
+        }
+
         if (_gameTicker != null)
         {
             _gameTicker.GamemodeJobsUpdated -= OnGamemodeJobsUpdated;
@@ -230,9 +243,10 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             return;
 
         // Get selected character, load it, then set it
-        var character = _preferencesManager.Preferences?.SelectedCharacter;
+        var prefs = _preferencesManager.Preferences;
+        var character = prefs?.SelectedCharacter;
 
-        if (character is not HumanoidCharacterProfile humanoid)
+        if (prefs == null || character is not HumanoidCharacterProfile humanoid)
         {
             PreviewPanel.SetSprite(EntityUid.Invalid);
             PreviewPanel.SetSummaryText(string.Empty);
@@ -240,8 +254,46 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         }
 
         var dummy = LoadProfileEntity(humanoid, true, true);
-        PreviewPanel.SetSprite(dummy);
+        var (previous, next) = GetPreviewNeighbours(prefs);
+        PreviewPanel.SetCharacters(dummy, previous, next);
         PreviewPanel.SetSummaryText(humanoid.Summary);
+    }
+
+    /// <summary>
+    ///     Loads the characters either side of the selected one so they can peek out from behind it.
+    ///     Slots are sparse, so the carousel walks them in slot order and wraps around.
+    /// </summary>
+    private (LobbyPreviewNeighbour? Previous, LobbyPreviewNeighbour? Next) GetPreviewNeighbours(PlayerPreferences prefs)
+    {
+        var slots = prefs.Characters.Keys.OrderBy(slot => slot).ToList();
+        var index = slots.IndexOf(prefs.SelectedCharacterIndex);
+
+        if (slots.Count < 2 || index == -1)
+            return (null, null);
+
+        // With only two characters both arrows lead to the same one, so only the right side gets a doll behind it.
+        var previous = LoadPreviewNeighbour(prefs, slots[(index - 1 + slots.Count) % slots.Count], slots.Count > 2);
+        var next = LoadPreviewNeighbour(prefs, slots[(index + 1) % slots.Count], true);
+
+        return (previous, next);
+    }
+
+    private LobbyPreviewNeighbour? LoadPreviewNeighbour(PlayerPreferences prefs, int slot, bool withDoll)
+    {
+        if (!prefs.Characters.TryGetValue(slot, out var profile) || profile is not HumanoidCharacterProfile humanoid)
+            return null;
+
+        var dummy = withDoll ? LoadProfileEntity(humanoid, true, true) : (EntityUid?) null;
+        return new LobbyPreviewNeighbour(slot, dummy, humanoid.Name);
+    }
+
+    private void OnPreviewCharacterSelected(int slot)
+    {
+        if (_preferencesManager.Preferences?.SelectedCharacterIndex == slot)
+            return;
+
+        _preferencesManager.SelectCharacter(slot);
+        ReloadCharacterSetup();
     }
 
     /// <summary>

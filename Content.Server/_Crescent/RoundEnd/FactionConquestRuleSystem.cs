@@ -5,6 +5,7 @@ using Content.Server.GameTicking.Rules;
 using Content.Server._Crescent.Diplomacy;
 using Content.Server._Crescent.ShipShields;
 using Content.Shared._Crescent.Diplomacy;
+using Content.Shared._Crescent.Factions;
 using Content.Shared._Crescent.RoundEnd;
 using Content.Shared._Crescent.ShipShields;
 using Content.Shared._Crescent.SpaceArtillery;
@@ -98,7 +99,8 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
     private void AppendSummary(FactionConquestRuleComponent conquest, ref RoundEndTextAppendEvent args)
     {
         args.AddLine(conquest.Winners.Count > 0
-            ? Loc.GetString("faction-conquest-summary-winner", ("factions", string.Join(", ", conquest.Winners)))
+            ? Loc.GetString("faction-conquest-summary-winner",
+                ("factions", string.Join(", ", conquest.Winners.Select(FactionDisplay.Abbreviation))))
             : Loc.GetString("faction-conquest-summary-nobody"));
 
         var query = EntityQueryEnumerator<FactionStationComponent>();
@@ -109,7 +111,7 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
                     ? "faction-conquest-summary-station-fallen"
                     : "faction-conquest-summary-station-standing",
                 ("station", station.StationName),
-                ("faction", station.Faction)));
+                ("faction", FactionDisplay.Abbreviation(station.Faction))));
         }
     }
 
@@ -162,7 +164,7 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
 
             // Tell the sector, or the response window is a silent countdown nobody can respond to.
             _chat.DispatchServerAnnouncement(Loc.GetString(conquest.PendingAnnouncement,
-                ("factions", string.Join(", ", winners)),
+                ("factions", string.Join(", ", winners.Select(FactionDisplay.Abbreviation))),
                 ("minutes", (int) conquest.VictoryDelay.TotalMinutes)));
             return;
         }
@@ -236,8 +238,10 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
 
             activeRules.Add(conquest);
 
+            // Admins type the abbreviation they see in game, which for the TFCF is not its frozen prototype id.
+            var requestedId = FactionDisplay.ResolveId(requestedFaction.Trim());
             var match = conquest.VictoryAnnouncements.Keys.FirstOrDefault(faction =>
-                faction.Equals(requestedFaction.Trim(), StringComparison.OrdinalIgnoreCase));
+                faction.Equals(requestedId, StringComparison.OrdinalIgnoreCase));
 
             if (match == null || announcingRule != null)
                 continue;
@@ -257,7 +261,8 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
             var valid = activeRules
                 .SelectMany(rule => rule.VictoryAnnouncements.Keys)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(faction => faction, StringComparer.OrdinalIgnoreCase);
+                .OrderBy(faction => faction, StringComparer.OrdinalIgnoreCase)
+                .Select(FactionDisplay.Abbreviation);
             error = $"Unknown faction '{requestedFaction}'. Valid factions: {string.Join(", ", valid)}.";
             return false;
         }
@@ -289,7 +294,7 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
         else
             _chat.DispatchServerAnnouncement(Loc.GetString(conquest.MinorVictoryAnnouncement));
 
-        GameTicker.EndRound($"{string.Join(", ", winners)} won the war for Taypan.");
+        GameTicker.EndRound($"{string.Join(", ", winners.Select(FactionDisplay.Abbreviation))} won the war for Taypan.");
         Timer.Spawn(conquest.RestartDelay, () => GameTicker.RestartRound());
     }
 
@@ -431,8 +436,8 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
 
         _chat.DispatchServerAnnouncement(Loc.GetString(conquest.ControlAnnouncement,
             ("station", station.StationName),
-            ("faction", station.Faction),
-            ("captor", captor ?? station.Faction),
+            ("faction", FactionDisplay.Abbreviation(station.Faction)),
+            ("captor", FactionDisplay.Abbreviation(captor ?? station.Faction)),
             ("minutes", (int) conquest.HoldToFall.TotalMinutes)));
     }
 
@@ -497,7 +502,7 @@ public sealed class FactionConquestRuleSystem : GameRuleSystem<FactionConquestRu
 
         _chat.DispatchServerAnnouncement(Loc.GetString(conquest.ControlCancelledAnnouncement,
             ("station", station.StationName),
-            ("faction", station.Faction)));
+            ("faction", FactionDisplay.Abbreviation(station.Faction))));
     }
 
     /// <summary>

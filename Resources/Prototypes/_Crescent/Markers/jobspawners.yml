@@ -37,6 +37,18 @@
     - state: passenger
 
 - type: entity
+  id: SpawnPointNCWLMVDOfficer
+  parent: SpawnPointJobBase
+  name: NCWLMVDOfficer
+  components:
+  - type: SpawnPoint
+    job_id: MVDOfficerNCWL
+  - type: Sprite
+    layers:
+    - state: green
+    - state: passenger
+
+- type: entity
   id: SpawnPointNCWLFleetkapitan
   parent: SpawnPointJobBase
   name: NCWLFleetkapitan
@@ -79,6 +91,18 @@
   components:
   - type: SpawnPoint
     job_id: ArtificerNCWL
+  - type: Sprite
+    layers:
+      - state: green
+      - state: passenger
+
+- type: entity
+  id: SpawnPointNCWLIndustryTaskmaster
+  parent: SpawnPointJobBase
+  name: NCWLIndustryTaskmaster
+  components:
+  - type: SpawnPoint
+    job_id: IndustryTaskmasterNCWL
   - type: Sprite
     layers:
       - state: green

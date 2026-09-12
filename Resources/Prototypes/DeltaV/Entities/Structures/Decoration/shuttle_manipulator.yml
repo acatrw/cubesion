@@ -31,7 +31,7 @@
   id: HolographStarSystem
   parent: HolographStation
   name: star system hologram projector
-  description: A hologram of a violet star, its asteroid belt, and the broken worlds still keeping orbit around it.
+  description: A glimpse of a distant alien galaxy. A violet sun burns among drifting debris, a ringed giant, fractured worlds, and tiny moons tracing unfamiliar orbits.
   components:
   - type: Sprite
     state: holograph_star_system

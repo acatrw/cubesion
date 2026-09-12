@@ -57,4 +57,11 @@ public sealed class DrydockPart
     /// rebuilt before anything else that stands on the same tile.
     /// </summary>
     public bool IsMount;
+
+    /// <summary>
+    /// Whether this part's exact recorded entity must be destroyed before the slip may replace it.
+    /// Captured with the snapshot so removing or changing components on the live entity cannot turn
+    /// valuable equipment into an apparently unprotected missing part.
+    /// </summary>
+    public bool ReplacementRequiresDestruction;
 }

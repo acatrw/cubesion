@@ -167,7 +167,8 @@ namespace Content.Client.Entry
             _clientPreferencesManager.Initialize();
             _euiManager.Initialize();
             _voteManager.Initialize();
-            _userInterfaceManager.SetDefaultTheme("SS14DefaultTheme");
+            // Eclipsion - gunmetal HUD by default; players who picked a theme keep it (interface.theme is set).
+            _userInterfaceManager.SetDefaultTheme("EclipsionTheme");
             _userInterfaceManager.SetActiveTheme(_configManager.GetCVar(CVars.InterfaceTheme));
             _documentParsingManager.Initialize();
             _discordAuth.Initialize();

@@ -1,0 +1,69 @@
+- type: shader
+  id: TheTurningPlanet
+  kind: source
+  path: /Textures/Shaders/the_turning.swsl
+
+- type: parallax
+  id: TaypanCoreTurning
+  layers:
+    - texture:
+        !type:ImageParallaxTextureSource
+        path: /Textures/Parallaxes/layer1.png
+      slowness: 0.998046875
+    # Draw the planet before the transparent star layers so stars pass in front.
+    - texture:
+        !type:ImageParallaxTextureSource
+        path: /Textures/_Crescent/Parallaxes/TheTurning/turning.png
+      shader: TheTurningPlanet
+      # The 2:1 endpoint atlas becomes a 1024px square.
+      scale: "1, 2"
+      # Distant origin-relative parallax: 100m of travel shifts it 16px.
+      # Zero confines this 32m-wide layer to the station; one locks it to the camera.
+      slowness: 0.995
+      worldHomePosition: "0, 0"
+      tiled: false
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars
+        configPath: /Prototypes/Parallaxes/parallax_config_stars.toml
+      slowness: 0.986625
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars_dim
+        configPath: /Prototypes/Parallaxes/parallax_config_stars_dim.toml
+      slowness: 0.979375
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars_faster
+        configPath: /Prototypes/Parallaxes/parallax_config_stars-2.toml
+      slowness: 0.957265625
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars_dim_faster
+        configPath: /Prototypes/Parallaxes/parallax_config_stars_dim-2.toml
+      slowness: 0.954352
+  # The planet also remains visible with low-quality parallax enabled.
+  layersLQ:
+    - texture:
+        !type:ImageParallaxTextureSource
+        path: /Textures/Parallaxes/layer1.png
+      slowness: 0.998046875
+    - texture:
+        !type:ImageParallaxTextureSource
+        path: /Textures/_Crescent/Parallaxes/TheTurning/turning.png
+      shader: TheTurningPlanet
+      scale: "1, 2"
+      slowness: 0.995
+      worldHomePosition: "0, 0"
+      tiled: false
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars
+        configPath: /Prototypes/Parallaxes/parallax_config_stars.toml
+      slowness: 0.986625
+    - texture:
+        !type:GeneratedParallaxTextureSource
+        id: hq_wizard_stars_dim
+        configPath: /Prototypes/Parallaxes/parallax_config_stars_dim.toml
+      slowness: 0.979375
+  layersLQUseHQ: false

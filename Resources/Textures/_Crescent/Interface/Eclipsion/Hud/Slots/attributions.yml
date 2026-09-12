@@ -1,0 +1,4 @@
+- files: ["back.png", "belt.png", "ears.png", "glasses.png", "gloves.png", "hand_l.png", "hand_l_no_letter.png", "hand_m.png", "hand_r.png", "hand_r_no_letter.png", "head.png", "id.png", "mask.png", "neck.png", "pocket.png", "shoes.png", "suit.png", "suit_storage.png", "toggle.png", "uniform.png", "web.png"]
+  license: "CC-BY-NC-SA-3.0"
+  copyright: "Slot silhouettes taken from the Default HUD theme (goonstation commit e77d85d9c1d93aa32da7702737ceeac2b56738ac, modified by PixelTK), recoloured and re-seated on the Eclipsion slot frame for Hullrot:Eclipsion"
+  source: "https://github.com/goonstation/goonstation"

@@ -52,7 +52,7 @@
         Heat: 80
   - type: ExplodeOnTrigger
   - type: Explosive
-    explosionType: Default
+    explosionType: Shipgun # not Default - ship ordnance intensities through Default deal 15x dmg/intensity
     maxIntensity: 150
     intensitySlope: 45
     totalIntensity: 700

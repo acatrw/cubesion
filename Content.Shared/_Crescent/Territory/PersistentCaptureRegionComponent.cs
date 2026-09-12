@@ -1,10 +1,12 @@
+using Content.Shared._Crescent.Factions;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Crescent.Territory;
 
 /// <summary>
 /// The major powers allowed to participate in persistent territory control. The faction prototype still uses the
-/// legacy <c>TFSC</c> ID for the Taypani Free Companies Federation (TFCF).
+/// legacy <c>TFSC</c> ID for the Taypani Free Companies Federation, which is shown to players as TFCF through
+/// <see cref="FactionDisplay"/>.
 /// </summary>
 public static class PersistentTerritoryFactions
 {
@@ -20,13 +22,20 @@ public static class PersistentTerritoryFactions
         return faction is "DSM" or "NCWL" or "TFSC" or "SHI";
     }
 
+    /// <summary>
+    /// Removes an owner prefix from a radar name, whichever spelling wrote it. Names saved or mapped before a
+    /// faction's abbreviation changed still carry the old one, so both have to be recognized or the prefix stacks.
+    /// </summary>
     public static string StripOwnerPrefix(string name)
     {
         foreach (var faction in Ids)
         {
-            var prefix = $"{faction} ";
-            if (name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                return name[prefix.Length..];
+            foreach (var spelling in FactionDisplay.Spellings(faction))
+            {
+                var prefix = $"{spelling} ";
+                if (name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    return name[prefix.Length..];
+            }
         }
 
         return name;

@@ -6491,7 +6491,7 @@ entities:
           ents: []
           showEnts: False
           occludes: True
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 528
     components:

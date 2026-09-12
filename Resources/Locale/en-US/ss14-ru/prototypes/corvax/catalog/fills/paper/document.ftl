@@ -1,4 +1,4 @@
-ent-PrintedDocument = { ent-Paper }
+ent-PrintedDocument = paper
     .desc = Bureaucratic unit. A document printed on a printer.
 ent-PrintedDocumentReportStation = Report on the situation at the station
     .desc = { ent-PrintedDocument.desc }

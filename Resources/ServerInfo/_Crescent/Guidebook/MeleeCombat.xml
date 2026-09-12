@@ -11,22 +11,27 @@ Melee on Hullrot: Eclipsion is not a simple click-fest. Swings, parries, stamina
 - [color=#6ab7d6][keybind="UseSecondary"/][/color] is your [bold]parry or block[/bold]. It raises your guard to catch an incoming attack, and timing is everything.
 - [color=#6ab7d6][keybind="MouseMiddle"/][/color] is a [bold]light attack[/bold]. It strikes one target instead of sweeping an arc, so it will not catch an ally standing beside your enemy, but it can only be used about once every two seconds. Bare fists always swing light, so this is only for a weapon in hand.
 
-[head=3][color=#e8b04b]Parrying and timing[/color][/head]
+[head=3][color=#e8b04b]Parrying, blocking, and the riposte[/color][/head]
 
-A parry only rewards you if it lands in the [bold]moment the enemy's blow arrives[/bold]. Hold your parry too early and you waste stamina, and react too late and you eat the hit.
+You need a [bold]melee weapon in hand[/bold] to parry. Bare fists cannot, and neither can a gun.
 
-- A [color=#8fc98a]well-timed parry[/color] stops the incoming damage and can stagger your opponent, opening them up for your counter.
-- A [color=#d9776c]mistimed parry[/color] leaves you exposed and drains your stamina for nothing.
+Your guard stays up for about half a second, and the [bold]first fifth of a second[/bold] of that is the perfect window. Which one you get decides the whole exchange:
 
-Watch your opponent's swings and learn their rhythm. Parry [bold]reactively[/bold] rather than on a loop. Against multiple attackers parrying becomes much harder, so try not to let yourself get surrounded.
+- A [color=#8fc98a]perfect parry[/color] takes no damage, gives you stamina back, staggers and slows the attacker, and opens a [bold]riposte[/bold]. Hit them within the next second or so and that strike lands for [color=#8fc98a]more than double damage[/color]. A popup tells you when the window is open.
+- An ordinary [color=#6ab7d6]block[/color] still stops the damage and staggers them briefly, but it costs you a little stamina and earns no riposte.
+- A [color=#d9776c]missed parry[/color] costs stamina and leaves you unable to parry again for a moment.
+
+A perfect parry also requires you to be [bold]facing the attacker[/bold]. Turn into the blow, not away from it.
+
+Watch your opponent's swings and learn their rhythm. Parry [bold]reactively[/bold] rather than on a loop. Against several attackers only one blow can be caught at a time, so try not to let yourself get surrounded.
 
 [head=3][color=#e8b04b]Stamina[/color][/head]
 
-Committed attacks and poorly timed defense consume [color=#e8b04b]stamina[/color]. Light hits can help you recover stamina, while running dry leaves you vulnerable to a stagger.
+Every committed swing spends [color=#e8b04b]stamina[/color], and landing it gives roughly that much back. [color=#d9776c]Missing is what drains you[/color], not attacking.
 
-- Do not spam committed swings. Throwing endless heavy attacks empties your stamina and leaves you defenseless.
-- Land committed hits, parry the important blows, and give yourself moments to recover.
-- Draining [bold]your opponent's[/bold] stamina is a win condition. Pressure them into blocking and swinging until they gas out, then punish.
+- Swinging wildly at empty air is the fastest way to run dry and lose your guard.
+- Blocks cost a little, failed parries cost more, and a perfect parry pays you back.
+- Draining [bold]your opponent's[/bold] stamina is a win condition. Make them swing and miss, then punish the stagger.
 
 [head=3][color=#e8b04b]Wielding melee weapons[/color][/head]
 

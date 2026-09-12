@@ -3236,7 +3236,7 @@ entities:
     - type: Transform
       pos: 6.5,-3.5
       parent: 1
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 426
     components:

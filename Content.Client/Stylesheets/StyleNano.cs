@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Client._Crescent.UserInterface;
 using Content.Client.ContextMenu.UI;
 using Content.Client.Examine;
 using Content.Client.PDA;
@@ -92,7 +93,36 @@ namespace Content.Client.Stylesheets
         public const string StyleClassPopupMessageLarge = "PopupMessageLarge";
         public const string StyleClassPopupMessageLargeCaution = "PopupMessageLargeCaution";
 
-        public static readonly Color PanelDark = Color.FromHex("#1E1E22");
+        // Eclipsion Start - gunmetal palette + faction accent
+        /// <summary>
+        ///     Accent used when the local player has no faction (lobby, ghosts) or the faction accent is off.
+        /// </summary>
+        public static readonly Color AccentNeutral = Color.FromHex("#7E9CB8");
+
+        public static readonly Color EclipsionPanel = Color.FromHex("#16191D");
+        public static readonly Color EclipsionPanelDeep = Color.FromHex("#0F1216");
+        public static readonly Color EclipsionPanelRaised = Color.FromHex("#20252B");
+        public static readonly Color EclipsionEdge = Color.FromHex("#2E343B");
+        public static readonly Color EclipsionTextDim = Color.FromHex("#8E99A5");
+
+        /// <summary>
+        ///     The Eclipsion button texture's fill is 214/255, not white, so it can carry a bevel.
+        ///     Run a colour through this to get the modulate that makes the fill come out as that colour.
+        /// </summary>
+        public static Color OnButtonTexture(Color target)
+        {
+            const float fill = 214f / 255f;
+            return new Color(
+                MathF.Min(1f, target.R / fill),
+                MathF.Min(1f, target.G / fill),
+                MathF.Min(1f, target.B / fill),
+                target.A);
+        }
+
+        private const string EclipsionNano = "/Textures/_Crescent/Interface/Eclipsion/Nano";
+        public const string StyleClassWindowAccentDivider = "WindowAccentDivider";        // Eclipsion End
+
+        public static readonly Color PanelDark = Color.FromHex("#15181C"); // Eclipsion - was #1E1E22
 
         public static readonly Color NanoGold = Color.FromHex("#A88B5E");
         public static readonly Color GoodGreenFore = Color.FromHex("#31843E");
@@ -100,12 +130,13 @@ namespace Content.Client.Stylesheets
         public static readonly Color DangerousRedFore = Color.FromHex("#BB3232");
         public static readonly Color DisabledFore = Color.FromHex("#5A5A5A");
 
-        public static readonly Color ButtonColorDefault = Color.FromHex("#464950");
+        // Eclipsion - gunmetal buttons; values are pre-divided for the bevelled button fill.
+        public static readonly Color ButtonColorDefault = Color.FromHex("#373E47");
         public static readonly Color ButtonColorDefaultRed = Color.FromHex("#D43B3B");
-        public static readonly Color ButtonColorHovered = Color.FromHex("#575b61");
+        public static readonly Color ButtonColorHovered = Color.FromHex("#4A535F");
         public static readonly Color ButtonColorHoveredRed = Color.FromHex("#DF6B6B");
-        public static readonly Color ButtonColorPressed = Color.FromHex("#3e6c45");
-        public static readonly Color ButtonColorDisabled = Color.FromHex("#292929");
+        public static readonly Color ButtonColorPressed = Color.FromHex("#5D7388");
+        public static readonly Color ButtonColorDisabled = Color.FromHex("#1F2327");
 
         public static readonly Color ButtonColorCautionDefault = Color.FromHex("#8F6A33");
         public static readonly Color ButtonColorCautionHovered = Color.FromHex("#C0934E");
@@ -127,21 +158,21 @@ namespace Content.Client.Stylesheets
         public static readonly Color PointMagenta = Color.FromHex("#FF00FF");
 
         // Context menu button colors
-        public static readonly Color ButtonColorContext = Color.FromHex("#1119");
-        public static readonly Color ButtonColorContextHover = Color.FromHex("#575b61");
-        public static readonly Color ButtonColorContextPressed = Color.FromHex("#3e6c45");
+        public static readonly Color ButtonColorContext = Color.FromHex("#0C0E1199"); // Eclipsion - was #1119
+        public static readonly Color ButtonColorContextHover = Color.FromHex("#3A424B"); // Eclipsion - was #575b61
+        public static readonly Color ButtonColorContextPressed = Color.FromHex("#4A5D70"); // Eclipsion - was #3e6c45
         public static readonly Color ButtonColorContextDisabled = Color.Black;
 
         // Examine button colors
         public static readonly Color ExamineButtonColorContext = Color.Transparent;
-        public static readonly Color ExamineButtonColorContextHover = Color.FromHex("#575b61");
-        public static readonly Color ExamineButtonColorContextPressed = Color.FromHex("#3e6c45");
+        public static readonly Color ExamineButtonColorContextHover = Color.FromHex("#3A424B"); // Eclipsion - was #575b61
+        public static readonly Color ExamineButtonColorContextPressed = Color.FromHex("#4A5D70"); // Eclipsion - was #3e6c45
         public static readonly Color ExamineButtonColorContextDisabled = Color.FromHex("#5A5A5A");
 
         // Fancy Tree elements
-        public static readonly Color FancyTreeEvenRowColor = Color.FromHex("#25252A");
+        public static readonly Color FancyTreeEvenRowColor = Color.FromHex("#1B1F24"); // Eclipsion - was #25252A
         public static readonly Color FancyTreeOddRowColor = FancyTreeEvenRowColor * new Color(0.8f, 0.8f, 0.8f);
-        public static readonly Color FancyTreeSelectedRowColor = new Color(55, 55, 68);
+        public static readonly Color FancyTreeSelectedRowColor = Color.FromHex("#2C3642"); // Eclipsion - was (55, 55, 68)
 
         //Used by the APC and SMES menus
         public const string StyleClassPowerStateNone = "PowerStateNone";
@@ -160,7 +191,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassButtonColorRed = "ButtonColorRed";
         public const string StyleClassButtonColorGreen = "ButtonColorGreen";
 
-        public static readonly Color ChatBackgroundColor = Color.FromHex("#25252AF2");
+        public static readonly Color ChatBackgroundColor = Color.FromHex("#14171BF2"); // Eclipsion - was #25252AF2
 
         // DeltaV - AAC button variables
         public static readonly string CommandButtonClass = "CommandButton";
@@ -198,8 +229,16 @@ namespace Content.Client.Stylesheets
 
         public override Stylesheet Stylesheet { get; }
 
-        public StyleNano(IResourceCache resCache) : base(resCache)
+        public StyleNano(IResourceCache resCache, Color? accent = null) : base(resCache) // Eclipsion - faction accent
         {
+            // Eclipsion Start - faction accent
+            var accentColor = accent ?? AccentNeutral;
+            var accentTitle = Color.InterpolateBetween(accentColor, Color.White, 0.25f);
+            var accentPressed = OnButtonTexture(Color.InterpolateBetween(accentColor, Color.Black, 0.38f));
+            var accentFill = Color.InterpolateBetween(accentColor, Color.Black, 0.2f);
+            var accentSelected = Color.InterpolateBetween(EclipsionPanel, accentColor, 0.3f);
+            // Eclipsion End
+
             var notoSans8 = resCache.NotoStack(size: 8);
             var notoSans10 = resCache.NotoStack(size: 10);
             var notoSansItalic10 = resCache.NotoStack(variation: "Italic", size: 10);
@@ -221,7 +260,7 @@ namespace Content.Client.Stylesheets
             var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
             var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
 
-            var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
+            var windowHeaderTex = resCache.GetTexture($"{EclipsionNano}/window_header.png"); // Eclipsion - recoloured
             var windowHeader = new StyleBoxTexture
             {
                 Texture = windowHeaderTex,
@@ -237,7 +276,7 @@ namespace Content.Client.Stylesheets
                 ExpandMarginBottom = 3,
                 ContentMarginBottomOverride = 0
             };
-            var windowBackgroundTex = resCache.GetTexture("/Textures/Interface/Nano/window_background.png");
+            var windowBackgroundTex = resCache.GetTexture($"{EclipsionNano}/window_background.png"); // Eclipsion - recoloured
             var windowBackground = new StyleBoxTexture
             {
                 Texture = windowBackgroundTex,
@@ -245,7 +284,7 @@ namespace Content.Client.Stylesheets
             windowBackground.SetPatchMargin(StyleBox.Margin.Horizontal | StyleBox.Margin.Bottom, 2);
             windowBackground.SetExpandMargin(StyleBox.Margin.Horizontal | StyleBox.Margin.Bottom, 2);
 
-            var borderedWindowBackgroundTex = resCache.GetTexture("/Textures/Interface/Nano/window_background_bordered.png");
+            var borderedWindowBackgroundTex = resCache.GetTexture($"{EclipsionNano}/window_background_bordered.png"); // Eclipsion - recoloured
             var borderedWindowBackground = new StyleBoxTexture
             {
                 Texture = borderedWindowBackgroundTex,
@@ -273,7 +312,7 @@ namespace Content.Client.Stylesheets
             };
             handSlotHighlight.SetPatchMargin(StyleBox.Margin.All, 2);
 
-            var borderedTransparentWindowBackgroundTex = resCache.GetTexture("/Textures/Interface/Nano/transparent_window_background_bordered.png");
+            var borderedTransparentWindowBackgroundTex = resCache.GetTexture($"{EclipsionNano}/transparent_window_background_bordered.png"); // Eclipsion - recoloured
             var borderedTransparentWindowBackground = new StyleBoxTexture
             {
                 Texture = borderedTransparentWindowBackgroundTex,
@@ -295,7 +334,7 @@ namespace Content.Client.Stylesheets
 
             var buttonContext = new StyleBoxTexture { Texture = Texture.White };
 
-            var buttonRectTex = resCache.GetTexture("/Textures/Interface/Nano/light_panel_background_bordered.png");
+            var buttonRectTex = resCache.GetTexture($"{EclipsionNano}/light_panel_background_bordered.png"); // Eclipsion - recoloured
             var buttonRect = new StyleBoxTexture(BaseButton)
             {
                 Texture = buttonRectTex
@@ -312,7 +351,7 @@ namespace Content.Client.Stylesheets
 
             var buttonRectPressed = new StyleBoxTexture(buttonRect)
             {
-                Modulate = ButtonColorPressed
+                Modulate = accentPressed // Eclipsion - faction accent
             };
 
             var buttonRectDisabled = new StyleBoxTexture(buttonRect)
@@ -340,10 +379,10 @@ namespace Content.Client.Stylesheets
             };
             var buttonRectActionMenuItemPressed = new StyleBoxTexture(buttonRectActionMenuItem)
             {
-                Modulate = ButtonColorPressed
+                Modulate = accentPressed // Eclipsion - faction accent
             };
 
-            var buttonTex = resCache.GetTexture("/Textures/Interface/Nano/button.svg.96dpi.png");
+            var buttonTex = resCache.GetTexture($"{EclipsionNano}/button.png"); // Eclipsion - bevelled chamfer
             var topButtonBase = new StyleBoxTexture
             {
                 Texture = buttonTex,
@@ -394,7 +433,7 @@ namespace Content.Client.Stylesheets
 
             var textureInvertedTriangle = resCache.GetTexture("/Textures/Interface/Nano/inverted_triangle.svg.png");
 
-            var lineEditTex = resCache.GetTexture("/Textures/Interface/Nano/lineedit.png");
+            var lineEditTex = resCache.GetTexture($"{EclipsionNano}/lineedit.png"); // Eclipsion - recoloured
             var lineEdit = new StyleBoxTexture
             {
                 Texture = lineEditTex,
@@ -413,7 +452,7 @@ namespace Content.Client.Stylesheets
             };
             chatSubBg.SetContentMarginOverride(StyleBox.Margin.All, 2);
 
-            var actionSearchBoxTex = resCache.GetTexture("/Textures/Interface/Nano/black_panel_dark_thin_border.png");
+            var actionSearchBoxTex = resCache.GetTexture($"{EclipsionNano}/black_panel_dark_thin_border.png"); // Eclipsion - recoloured
             var actionSearchBox = new StyleBoxTexture
             {
                 Texture = actionSearchBoxTex,
@@ -421,27 +460,33 @@ namespace Content.Client.Stylesheets
             actionSearchBox.SetPatchMargin(StyleBox.Margin.All, 3);
             actionSearchBox.SetContentMarginOverride(StyleBox.Margin.Horizontal, 5);
 
-            var tabContainerPanelTex = resCache.GetTexture("/Textures/Interface/Nano/tabcontainer_panel.png");
+            var tabContainerPanelTex = resCache.GetTexture($"{EclipsionNano}/tabcontainer_panel.png"); // Eclipsion - recoloured
             var tabContainerPanel = new StyleBoxTexture
             {
                 Texture = tabContainerPanelTex,
             };
             tabContainerPanel.SetPatchMargin(StyleBox.Margin.All, 2);
 
-            var tabContainerBoxActive = new StyleBoxFlat { BackgroundColor = new Color(64, 64, 64) };
+            // Eclipsion - the active tab is underlined in the accent instead of just being lighter.
+            var tabContainerBoxActive = new StyleBoxFlat
+            {
+                BackgroundColor = EclipsionPanelRaised,
+                BorderColor = accentColor,
+                BorderThickness = new Thickness(0, 0, 0, 2),
+            };
             tabContainerBoxActive.SetContentMarginOverride(StyleBox.Margin.Horizontal, 5);
-            var tabContainerBoxInactive = new StyleBoxFlat { BackgroundColor = new Color(32, 32, 32) };
+            var tabContainerBoxInactive = new StyleBoxFlat { BackgroundColor = EclipsionPanelDeep }; // Eclipsion - was (32, 32, 32)
             tabContainerBoxInactive.SetContentMarginOverride(StyleBox.Margin.Horizontal, 5);
 
             var progressBarBackground = new StyleBoxFlat
             {
-                BackgroundColor = new Color(0.25f, 0.25f, 0.25f)
+                BackgroundColor = EclipsionPanelRaised // Eclipsion - was (0.25, 0.25, 0.25)
             };
             progressBarBackground.SetContentMarginOverride(StyleBox.Margin.Vertical, 14.5f);
 
             var progressBarForeground = new StyleBoxFlat
             {
-                BackgroundColor = new Color(0.25f, 0.50f, 0.25f)
+                BackgroundColor = accentFill // Eclipsion - was (0.25, 0.50, 0.25)
             };
             progressBarForeground.SetContentMarginOverride(StyleBox.Margin.Vertical, 14.5f);
 
@@ -452,7 +497,7 @@ namespace Content.Client.Stylesheets
             var monotoneCheckBoxTextureUnchecked = resCache.GetTexture("/Textures/Interface/Nano/Monotone/monotone_checkbox_unchecked.svg.96dpi.png");
 
             // Tooltip box
-            var tooltipTexture = resCache.GetTexture("/Textures/Interface/Nano/tooltip.png");
+            var tooltipTexture = resCache.GetTexture($"{EclipsionNano}/tooltip.png"); // Eclipsion - recoloured
             var tooltipBox = new StyleBoxTexture
             {
                 Texture = tooltipTexture,
@@ -476,13 +521,13 @@ namespace Content.Client.Stylesheets
             placeholder.SetExpandMargin(StyleBox.Margin.All, -5);
             placeholder.Mode = StyleBoxTexture.StretchMode.Tile;
 
-            var itemListBackgroundSelected = new StyleBoxFlat { BackgroundColor = new Color(75, 75, 75) };
+            var itemListBackgroundSelected = new StyleBoxFlat { BackgroundColor = accentSelected }; // Eclipsion - was (75, 75, 75)
             itemListBackgroundSelected.SetContentMarginOverride(StyleBox.Margin.Vertical, 2);
             itemListBackgroundSelected.SetContentMarginOverride(StyleBox.Margin.Horizontal, 4);
             var itemListItemBackgroundDisabled = new StyleBoxFlat { BackgroundColor = new Color(10, 10, 10) };
             itemListItemBackgroundDisabled.SetContentMarginOverride(StyleBox.Margin.Vertical, 2);
             itemListItemBackgroundDisabled.SetContentMarginOverride(StyleBox.Margin.Horizontal, 4);
-            var itemListItemBackground = new StyleBoxFlat { BackgroundColor = new Color(55, 55, 55) };
+            var itemListItemBackground = new StyleBoxFlat { BackgroundColor = EclipsionPanelRaised }; // Eclipsion - was (55, 55, 55)
             itemListItemBackground.SetContentMarginOverride(StyleBox.Margin.Vertical, 2);
             itemListItemBackground.SetContentMarginOverride(StyleBox.Margin.Horizontal, 4);
             var itemListItemBackgroundTransparent = new StyleBoxFlat { BackgroundColor = Color.Transparent };
@@ -526,7 +571,7 @@ namespace Content.Client.Stylesheets
             var sliderFillBox = new StyleBoxTexture
             {
                 Texture = sliderFillTex,
-                Modulate = Color.FromHex("#3E6C45")
+                Modulate = accentFill // Eclipsion - was #3E6C45
             };
 
             var sliderBackBox = new StyleBoxTexture
@@ -538,7 +583,7 @@ namespace Content.Client.Stylesheets
             var sliderForeBox = new StyleBoxTexture
             {
                 Texture = sliderOutlineTex,
-                Modulate = Color.FromHex("#494949")
+                Modulate = Color.FromHex("#3A424B") // Eclipsion - was #494949
             };
 
             var sliderGrabBox = new StyleBoxTexture
@@ -561,7 +606,7 @@ namespace Content.Client.Stylesheets
             var insetBack = new StyleBoxTexture
             {
                 Texture = buttonTex,
-                Modulate = Color.FromHex("#202023"),
+                Modulate = OnButtonTexture(EclipsionPanelDeep), // Eclipsion - was #202023
             };
             insetBack.SetPatchMargin(StyleBox.Margin.All, 10);
 
@@ -590,7 +635,7 @@ namespace Content.Client.Stylesheets
                     new SelectorElement(typeof(Label), new[] {DefaultWindow.StyleClassWindowTitle}, null, null),
                     new[]
                     {
-                        new StyleProperty(Label.StylePropertyFontColor, NanoGold),
+                        new StyleProperty(Label.StylePropertyFontColor, accentTitle), // Eclipsion - faction accent
                         new StyleProperty(Label.StylePropertyFont, notoSansDisplayBold14),
                     }),
                 // Alert (white) window title.
@@ -692,7 +737,7 @@ namespace Content.Client.Stylesheets
 
                 Element<ContainerButton>().Class(ContainerButton.StyleClassButton)
                     .Pseudo(ContainerButton.StylePseudoClassPressed)
-                    .Prop(Control.StylePropertyModulateSelf, ButtonColorPressed),
+                    .Prop(Control.StylePropertyModulateSelf, accentPressed), // Eclipsion - faction accent
 
                 Element<ContainerButton>().Class(ContainerButton.StyleClassButton)
                     .Pseudo(ContainerButton.StylePseudoClassDisabled)
@@ -864,7 +909,7 @@ namespace Content.Client.Stylesheets
 
                 Element<ContainerButton>().Class(StyleClassStorageButton)
                     .Pseudo(ContainerButton.StylePseudoClassPressed)
-                    .Prop(Control.StylePropertyModulateSelf, ButtonColorPressed),
+                    .Prop(Control.StylePropertyModulateSelf, accentPressed), // Eclipsion - faction accent
 
                 Element<ContainerButton>().Class(StyleClassStorageButton)
                     .Pseudo(ContainerButton.StylePseudoClassDisabled)
@@ -873,17 +918,18 @@ namespace Content.Client.Stylesheets
                 Element<ContainerButton>().Class(ListContainer.StyleClassListContainerButton)
                     .Prop(ContainerButton.StylePropertyStyleBox, listContainerButton),
 
+                // Eclipsion - gunmetal rows, accent-tinted selection (were (55, 55, 68) / (75, 75, 86))
                 Element<ContainerButton>().Class(ListContainer.StyleClassListContainerButton)
                     .Pseudo(ContainerButton.StylePseudoClassNormal)
-                    .Prop(Control.StylePropertyModulateSelf, new Color(55, 55, 68)),
+                    .Prop(Control.StylePropertyModulateSelf, EclipsionPanelRaised),
 
                 Element<ContainerButton>().Class(ListContainer.StyleClassListContainerButton)
                     .Pseudo(ContainerButton.StylePseudoClassHover)
-                    .Prop(Control.StylePropertyModulateSelf, new Color(75, 75, 86)),
+                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#2C333B")),
 
                 Element<ContainerButton>().Class(ListContainer.StyleClassListContainerButton)
                     .Pseudo(ContainerButton.StylePseudoClassPressed)
-                    .Prop(Control.StylePropertyModulateSelf, new Color(75, 75, 86)),
+                    .Prop(Control.StylePropertyModulateSelf, accentSelected),
 
                 Element<ContainerButton>().Class(ListContainer.StyleClassListContainerButton)
                     .Pseudo(ContainerButton.StylePseudoClassDisabled)
@@ -1039,7 +1085,7 @@ namespace Content.Client.Stylesheets
                 new StyleRule(new SelectorElement(typeof(RichTextLabel), new[] {StyleClassLabelKeyText}, null, null), new[]
                 {
                     new StyleProperty(Label.StylePropertyFont, notoSansBold12),
-                    new StyleProperty( Control.StylePropertyModulateSelf, NanoGold)
+                    new StyleProperty( Control.StylePropertyModulateSelf, accentTitle) // Eclipsion - faction accent
                 }),
 
                 // alert tooltip
@@ -1103,7 +1149,7 @@ namespace Content.Client.Stylesheets
                 new StyleRule(new SelectorElement(typeof(ItemList), null, null, null), new[]
                 {
                     new StyleProperty(ItemList.StylePropertyBackground,
-                        new StyleBoxFlat {BackgroundColor = new Color(32, 32, 32)}),
+                        new StyleBoxFlat {BackgroundColor = EclipsionPanelDeep}), // Eclipsion - was (32, 32, 32)
                     new StyleProperty(ItemList.StylePropertyItemBackground,
                         itemListItemBackground),
                     new StyleProperty(ItemList.StylePropertyDisabledItemBackground,
@@ -1140,10 +1186,10 @@ namespace Content.Client.Stylesheets
                 new StyleRule(new SelectorElement(typeof(Tree), null, null, null), new[]
                 {
                     new StyleProperty(Tree.StylePropertyBackground,
-                        new StyleBoxFlat {BackgroundColor = new Color(32, 32, 32)}),
+                        new StyleBoxFlat {BackgroundColor = EclipsionPanelDeep}), // Eclipsion - was (32, 32, 32)
                     new StyleProperty(Tree.StylePropertyItemBoxSelected, new StyleBoxFlat
                     {
-                        BackgroundColor = new Color(55, 55, 68),
+                        BackgroundColor = accentSelected, // Eclipsion - was (55, 55, 68)
                         ContentMarginLeftOverride = 4
                     })
                 }),
@@ -1165,7 +1211,7 @@ namespace Content.Client.Stylesheets
                 new StyleRule(new SelectorElement(typeof(Label), new[] {StyleClassLabelHeading}, null, null), new[]
                 {
                     new StyleProperty(Label.StylePropertyFont, notoSansBold16),
-                    new StyleProperty(Label.StylePropertyFontColor, NanoGold),
+                    new StyleProperty(Label.StylePropertyFontColor, accentTitle), // Eclipsion - faction accent
                 }),
 
                 // Bigger Label
@@ -1173,7 +1219,7 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(Label.StylePropertyFont, notoSansBold20),
-                        new StyleProperty(Label.StylePropertyFontColor, NanoGold),
+                        new StyleProperty(Label.StylePropertyFontColor, accentTitle), // Eclipsion - faction accent
                     }),
 
                 // Small Label
@@ -1187,7 +1233,7 @@ namespace Content.Client.Stylesheets
                 new StyleRule(new SelectorElement(typeof(Label), new[] {StyleClassLabelKeyText}, null, null), new[]
                 {
                     new StyleProperty(Label.StylePropertyFont, notoSansBold12),
-                    new StyleProperty(Label.StylePropertyFontColor, NanoGold)
+                    new StyleProperty(Label.StylePropertyFontColor, accentTitle) // Eclipsion - faction accent
                 }),
 
                 new StyleRule(new SelectorElement(typeof(Label), new[] {StyleClassLabelSecondaryColor}, null, null),
@@ -1288,7 +1334,7 @@ namespace Content.Client.Stylesheets
                     new SelectorElement(typeof(MenuButton), null, null, new[] {Button.StylePseudoClassPressed}),
                     new[]
                     {
-                        new StyleProperty(Button.StylePropertyModulateSelf, ButtonColorPressed),
+                        new StyleProperty(Button.StylePropertyModulateSelf, accentPressed), // Eclipsion - faction accent
                     }),
 
                 new StyleRule(
@@ -1402,7 +1448,7 @@ namespace Content.Client.Stylesheets
                 }),
                 new StyleRule(new SelectorElement(typeof(ContainerButton), new[] {StyleClassChatFilterOptionButton}, null, new[] {ContainerButton.StylePseudoClassPressed}), new[]
                 {
-                    new StyleProperty(Control.StylePropertyModulateSelf, ButtonColorPressed),
+                    new StyleProperty(Control.StylePropertyModulateSelf, accentPressed), // Eclipsion - faction accent
                 }),
                 new StyleRule(new SelectorElement(typeof(ContainerButton), new[] {StyleClassChatFilterOptionButton}, null, new[] {ContainerButton.StylePseudoClassDisabled}), new[]
                 {
@@ -1424,7 +1470,7 @@ namespace Content.Client.Stylesheets
                 }),
                 new StyleRule(new SelectorElement(typeof(OptionButton), null, null, new[] {ContainerButton.StylePseudoClassPressed}), new[]
                 {
-                    new StyleProperty(Control.StylePropertyModulateSelf, ButtonColorPressed),
+                    new StyleProperty(Control.StylePropertyModulateSelf, accentPressed), // Eclipsion - faction accent
                 }),
                 new StyleRule(new SelectorElement(typeof(OptionButton), null, null, new[] {ContainerButton.StylePseudoClassDisabled}), new[]
                 {
@@ -1444,8 +1490,19 @@ namespace Content.Client.Stylesheets
 
                 new StyleRule(new SelectorElement(typeof(PanelContainer), new []{ ClassHighDivider}, null, null), new []
                 {
-                    new StyleProperty(PanelContainer.StylePropertyPanel, new StyleBoxFlat { BackgroundColor = NanoGold, ContentMarginBottomOverride = 2, ContentMarginLeftOverride = 2}),
+                    new StyleProperty(PanelContainer.StylePropertyPanel, new StyleBoxFlat { BackgroundColor = accentColor, ContentMarginBottomOverride = 2, ContentMarginLeftOverride = 2}), // Eclipsion - faction accent
                 }),
+
+                // Eclipsion Start - accent rule under the FancyWindow title bar, and the HUD pieces the Eclipsion
+                //   theme leaves white for the accent to tint (see HudAccentTint).
+                new StyleRule(new SelectorElement(typeof(PanelContainer), new []{ StyleClassWindowAccentDivider}, null, null), new []
+                {
+                    new StyleProperty(PanelContainer.StylePropertyPanel, new StyleBoxFlat { BackgroundColor = accentColor, ContentMarginBottomOverride = 2, ContentMarginLeftOverride = 2}),
+                }),
+
+                Element().Class(HudAccentTint.StyleClass)
+                    .Prop(Control.StylePropertyModulateSelf, accentColor),
+                // Eclipsion End
 
                 Element<TextureButton>()
                     .Class(StyleClassButtonHelp)
@@ -1460,33 +1517,35 @@ namespace Content.Client.Stylesheets
                 // ---
 
                 // Different Background shapes ---
+                // Eclipsion - panel shapes below were #252525 / #25252A greys; now gunmetal, pre-divided for
+                //   the bevelled button texture they are drawn with.
                 Element<PanelContainer>().Class(ClassAngleRect)
                     .Prop(PanelContainer.StylePropertyPanel, BaseAngleRect)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#252525")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel)),
 
                 // Lobby translucent panels
                 Element<PanelContainer>().Class("LobbyPanel")
                     .Prop(PanelContainer.StylePropertyPanel, BaseAngleRect)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#252525CC")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel).WithAlpha(0.8f)),
 
                 Element<PanelContainer>().Class("LobbyPanelLight")
                     .Prop(PanelContainer.StylePropertyPanel, BaseAngleRect)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#25252570")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel).WithAlpha(0.44f)),
 
                 Element<PanelContainer>().Class("BackgroundOpenRight")
                     .Prop(PanelContainer.StylePropertyPanel, BaseButtonOpenRight)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#25252A")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel)),
 
                 Element<PanelContainer>().Class("BackgroundOpenLeft")
                     .Prop(PanelContainer.StylePropertyPanel, BaseButtonOpenLeft)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#25252A")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel)),
                 // ---
 
                 // Dividers
                 Element<PanelContainer>().Class(ClassLowDivider)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
-                        BackgroundColor = Color.FromHex("#444"),
+                        BackgroundColor = EclipsionEdge, // Eclipsion - was #444
                         ContentMarginLeftOverride = 2,
                         ContentMarginBottomOverride = 2
                     }),
@@ -1494,11 +1553,11 @@ namespace Content.Client.Stylesheets
                 // Window Headers
                 Element<Label>().Class("FancyWindowTitle")
                     .Prop("font", boxFont13)
-                    .Prop("font-color", NanoGold),
+                    .Prop("font-color", accentTitle), // Eclipsion - faction accent
 
                 Element<PanelContainer>().Class("WindowHeadingBackground")
                     .Prop("panel", new StyleBoxTexture(BaseButtonOpenLeft) { Padding = default })
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#1F1F1F")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanelDeep)), // Eclipsion - was #1F1F1F
 
                 Element<PanelContainer>().Class("WindowHeadingBackgroundLight")
                     .Prop("panel", new StyleBoxTexture(BaseButtonOpenLeft) { Padding = default }),
@@ -1517,11 +1576,11 @@ namespace Content.Client.Stylesheets
                 //The lengths you have to go through to change a background color smh
                 Element<PanelContainer>().Class("PanelBackgroundBaseDark")
                     .Prop("panel", new StyleBoxTexture(BaseButtonOpenBoth) { Padding = default })
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#1F1F23")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanelDeep)), // Eclipsion - was #1F1F23
 
                 Element<PanelContainer>().Class("PanelBackgroundLight")
                     .Prop("panel", new StyleBoxTexture(BaseButtonOpenBoth) { Padding = default })
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#2F2F3B")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanelRaised)), // Eclipsion - was #2F2F3B
 
                 // Window Footer
                 Element<TextureRect>().Class("NTLogoDark")
@@ -1612,7 +1671,7 @@ namespace Content.Client.Stylesheets
                 // ---
 
                 Element<Label>().Class("StatusFieldTitle")
-                    .Prop("font-color", NanoGold),
+                    .Prop("font-color", accentTitle), // Eclipsion - faction accent
 
                 Element<Label>().Class("Good")
                     .Prop("font-color", GoodGreenFore),
@@ -1648,7 +1707,7 @@ namespace Content.Client.Stylesheets
                 //PDA - Backgrounds
                 Element<PanelContainer>().Class("PdaContentBackground")
                     .Prop(PanelContainer.StylePropertyPanel, BaseButtonOpenBoth)
-                    .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#25252a")),
+                    .Prop(Control.StylePropertyModulateSelf, OnButtonTexture(EclipsionPanel)), // Eclipsion - was #25252a
 
                 Element<PanelContainer>().Class("PdaBackground")
                     .Prop(PanelContainer.StylePropertyPanel, BaseButtonOpenBoth)
@@ -1662,7 +1721,7 @@ namespace Content.Client.Stylesheets
                     .Prop(PanelContainer.StylePropertyPanel, AngleBorderRect),
 
                 Element<PanelContainer>().Class("BackgroundDark")
-                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat(Color.FromHex("#252525"))),
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat(EclipsionPanel)), // Eclipsion - was #252525
 
                 //PDA - Buttons
                 Element<PdaSettingsButton>().Pseudo(ContainerButton.StylePseudoClassNormal)

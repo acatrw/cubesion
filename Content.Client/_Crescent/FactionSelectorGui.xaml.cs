@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Client._Crescent.UserInterface;
 using Content.Client.Guidebook;
 using Content.Client.Humanoid;
 using Content.Client.Lobby;
@@ -187,12 +188,12 @@ namespace Content.Client._Crescent
             {
                 try
                 {
-                    var factionPhoto = new TextureRect
+                    // Eclipsion - fills the info column at the banner's aspect ratio. It used to be pinned at
+                    //   1012x189, which is still the ceiling (the banners are 281x53 pixel art, drawn scaled).
+                    var factionPhoto = new AspectTextureRect
                     {
-                        Stretch = TextureRect.StretchMode.Scale,
                         Texture = faction.Icon.Frame0(),
-                        SetHeight = 189f,
-                        SetWidth = 1012f,
+                        MaxDisplayWidth = 1012f,
                     };
                     FactionInfo.AddChild(factionPhoto);
                 }
@@ -210,12 +211,21 @@ namespace Content.Client._Crescent
                 Align = Label.AlignMode.Center,
             });
 
-            FactionInfo.AddChild(new Label
-            {
-                Text = faction.Description,
-                MaxWidth = 1012f,
-                HorizontalAlignment = HAlignment.Center,
-            });
+            // Eclipsion - wraps to the available width. The prototype text is hard-wrapped at ~120 columns,
+            //   so fold those breaks back into paragraphs first or it wraps twice.
+            var description = new FormattedMessage();
+            description.AddText(ReflowParagraphs(faction.Description));
+            var descriptionLabel = new RichTextLabel { HorizontalExpand = true };
+            descriptionLabel.SetMessage(description);
+            FactionInfo.AddChild(descriptionLabel);
+        }
+
+        private static string ReflowParagraphs(string text)
+        {
+            var paragraphs = text.Replace("\r\n", "\n")
+                .Split("\n\n", StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => string.Join(' ', p.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)));
+            return string.Join("\n\n", paragraphs);
         }
 
         public void SaveCharacter()

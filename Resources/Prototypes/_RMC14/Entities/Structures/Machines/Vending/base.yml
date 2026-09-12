@@ -26,15 +26,18 @@
     tags:
     - Structure
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    # Eclipsion: faction racks swap in their own chassis from _Crescent/Structures/Machines/Vendors.
+    # No visualizer drives these, so the lit state is shown statically and the panel stays shut.
+    sprite: _Crescent/Structures/Machines/Vendors/armory_neutral.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
-    - state: "off"
+    - state: normal-unshaded
       map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
       shader: unshaded
     - state: panel
       map: ["enum.WiresVisualLayers.MaintenancePanel"]
+      visible: false
   - type: UserInterface
     interfaces:
       enum.CMAutomatedVendorUI.Key:

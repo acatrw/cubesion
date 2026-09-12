@@ -38,6 +38,7 @@ public sealed partial class ShuttleSystem
     private float _minThrowVelocity;
     private float _massBias;
     private float _inertiaScaling;
+    private float _energyMultiplier;
     // this doesn't update if plating mass is changed but edgecase
     private float _platingMass;
 
@@ -48,6 +49,12 @@ public sealed partial class ShuttleSystem
     private const float _minImpulseVelocity = 0.07f;
     // high-speed collisions tend to be a series of increasingly smaller collisions so don't spam admin logs
     private readonly TimeSpan _adminLogSpacing = TimeSpan.FromSeconds(3);
+    // A grind resolves many contacts a second and every impact sound is a networked entity that each client in
+    // range turns into an OpenAL source. Unbounded, a ram exhausts the client's audio sources mid-collision
+    // ("Error creating audio source" / "AL error: OutOfMemory") and the entity churn stalls it, so space them out.
+    private readonly TimeSpan _impactSoundSpacing = TimeSpan.FromSeconds(0.25);
+    // Sparks are networked entities too, so cap how many one drain is allowed to spawn.
+    private const int _maxSparksPerDrain = 24;
 
     private readonly SoundCollectionSpecifier _shuttleImpactSound = new("ShuttleImpactSound");
     private readonly ProtoId<ContentTileDefinition> _platingId = "Plating";
@@ -60,6 +67,10 @@ public sealed partial class ShuttleSystem
     private HashSet<EntityUid> _intersecting = new();
     // for _adminLogSpacing
     private Dictionary<EntityUid, TimeSpan> _impactedAt = new();
+    // for _impactSoundSpacing
+    private readonly Dictionary<EntityUid, TimeSpan> _impactSoundAt = new();
+    // Spark budget left in the drain currently being processed, see _maxSparksPerDrain.
+    private int _sparkBudget;
 
     /// <summary>
     /// One contact point of a grid-on-grid collision, captured during the physics step and resolved afterwards.
@@ -72,7 +83,11 @@ public sealed partial class ShuttleSystem
         Vector2 OtherLocalPoint,
         Vector2 OurVelocity,
         Vector2 OtherVelocity,
-        float RelativeVelocity,
+        Vector2 OurBodyVelocity,
+        Vector2 OtherBodyVelocity,
+        float OurAngularVelocity,
+        float OtherAngularVelocity,
+        Vector2 WorldNormal,
         float EffectiveInertiaMult,
         float OurFixtureDensity,
         float OtherFixtureDensity);
@@ -85,6 +100,13 @@ public sealed partial class ShuttleSystem
     // the loop dereferences FixtureA/FixtureB on a recycled contact and the server dies. So: look, don't touch.
     private readonly List<PendingImpact> _pendingImpacts = new();
     private readonly List<PendingImpact> _processingImpacts = new();
+
+    /// <summary>
+    /// Per-grid velocity bookkeeping for one <see cref="UpdateImpact"/> drain. Base values are the pre-solve
+    /// velocities from the collision; Delta is the impact slowdown accumulated so far this drain.
+    /// </summary>
+    private record struct ImpactVelocity(Vector2 Linear, float Angular, Vector2 Delta, bool Restore);
+    private readonly Dictionary<EntityUid, ImpactVelocity> _impactVelocities = new();
 
     // Scratch buffers for ProcessImpactZone, see the note there.
     private readonly List<ImpactTileData> _tilesToProcess = new();
@@ -102,7 +124,6 @@ public sealed partial class ShuttleSystem
 
         Subs.CVar(_cfg, CCVars.ImpactEnabled, value => _enabled = value, true);
         Subs.CVar(_cfg, CCVars.MinimumImpactInertia, value => _minimumImpactInertia = value, true);
-        Subs.CVar(_cfg, CCVars.MinimumImpactInertia, value => _minimumImpactInertia = value, true);
         Subs.CVar(_cfg, CCVars.MinimumImpactVelocity, value => _minimumImpactVelocity = value, true);
         Subs.CVar(_cfg, CCVars.TileBreakEnergyMultiplier, value => _tileBreakEnergyMultiplier = value, true);
         Subs.CVar(_cfg, CCVars.ImpactDamageMultiplier, value => _damageMultiplier = value, true);
@@ -113,6 +134,7 @@ public sealed partial class ShuttleSystem
         Subs.CVar(_cfg, CCVars.ImpactMinThrowVelocity, value => _minThrowVelocity = value, true);
         Subs.CVar(_cfg, CCVars.ImpactMassBias, value => _massBias = value, true);
         Subs.CVar(_cfg, CCVars.ImpactInertiaScaling, value => _inertiaScaling = value, true);
+        Subs.CVar(_cfg, CCVars.ImpactEnergyMultiplier, value => _energyMultiplier = value, true);
 
         _platingMass = _protoManager.Index(_platingId).Mass;
     }
@@ -125,7 +147,7 @@ public sealed partial class ShuttleSystem
     {
         if (_pendingImpacts.Count == 0)
         {
-            if (_impactedAt.Count > 0)
+            if (_impactedAt.Count > 0 || _impactSoundAt.Count > 0)
                 PruneImpactLog();
 
             return;
@@ -137,12 +159,47 @@ public sealed partial class ShuttleSystem
         _processingImpacts.AddRange(_pendingImpacts);
         _pendingImpacts.Clear();
 
+        _impactVelocities.Clear();
+        _sparkBudget = _maxSparksPerDrain;
+
         foreach (var impact in _processingImpacts)
         {
+            _impactVelocities.TryAdd(impact.OurEntity, new ImpactVelocity(impact.OurBodyVelocity, impact.OurAngularVelocity, Vector2.Zero, false));
+            _impactVelocities.TryAdd(impact.OtherEntity, new ImpactVelocity(impact.OtherBodyVelocity, impact.OtherAngularVelocity, Vector2.Zero, false));
+
+            // Crescent: before impacts were queued, the engine raising StartCollideEvent for both sides meant every
+            // contact resolved twice, the second pass seeing the first pass's slowdown. Ramming was tuned around
+            // that - a rammer grinds in and stalls on its own - so keep doing it on purpose.
+            ResolveImpact(impact);
             ResolveImpact(impact);
         }
 
+        // The physics solver has already stopped these grids dead against the contact. Where the hull gave way,
+        // the contact is gone, so hand back the pre-collision momentum minus the accumulated impact slowdown.
+        // Grids where nothing broke keep the solver's response.
+        foreach (var (uid, velocity) in _impactVelocities)
+        {
+            if (velocity.Restore)
+                RestoreImpactVelocity(uid, velocity.Linear + velocity.Delta, velocity.Angular);
+        }
+
+        _impactVelocities.Clear();
         _processingImpacts.Clear();
+    }
+
+    private Vector2 GetImpactDelta(EntityUid uid)
+    {
+        return _impactVelocities.TryGetValue(uid, out var velocity) ? velocity.Delta : Vector2.Zero;
+    }
+
+    private void AddImpactDelta(EntityUid uid, Vector2 deltaV, bool restore)
+    {
+        if (!_impactVelocities.TryGetValue(uid, out var velocity))
+            return;
+
+        velocity.Delta += deltaV;
+        velocity.Restore |= restore;
+        _impactVelocities[uid] = velocity;
     }
 
     /// <summary>
@@ -216,7 +273,11 @@ public sealed partial class ShuttleSystem
                 otherPoint.Position,
                 ourVelocity,
                 otherVelocity,
-                jungleDiff,
+                ourBody.LinearVelocity,
+                otherBody.LinearVelocity,
+                ourBody.AngularVelocity,
+                otherBody.AngularVelocity,
+                worldNormal,
                 effectiveInertiaMult,
                 args.OurFixture.Density,
                 args.OtherFixture.Density));
@@ -254,17 +315,33 @@ public sealed partial class ShuttleSystem
         if (ourXform.MapUid != otherXform.MapUid)
             return;
 
-        var jungleDiff = impact.RelativeVelocity;
+        // Velocities as of the collision, minus whatever slowdown earlier passes have already dealt this drain.
+        var ourVelocity = impact.OurVelocity + GetImpactDelta(ourEntity);
+        var otherVelocity = impact.OtherVelocity + GetImpactDelta(otherEntity);
+        var topDiff = ourVelocity - otherVelocity;
+        var jungleDiff = topDiff.Length() * MathF.Abs(Vector2.Dot(topDiff.Normalized(), impact.WorldNormal.Normalized()));
         var effectiveInertiaMult = impact.EffectiveInertiaMult;
+
+        // Earlier passes may have slowed the grids below the impact threshold.
+        if (jungleDiff < _minimumImpactVelocity && jungleDiff * effectiveInertiaMult < _minimumImpactInertia
+            || float.IsNaN(jungleDiff))
+            return;
 
         // Anchored to the grid rather than to the stale map position: the grids have kept moving since the
         // collision, and at ramming speed that is several tiles.
         var coordinates = new EntityCoordinates(ourEntity, impact.OurLocalPoint);
         var worldPoint = _transform.ToMapCoordinates(coordinates).Position;
 
-        var volume = MathF.Min(10f, MathF.Pow(jungleDiff, 0.5f) - 5f);
-        var audioParams = AudioParams.Default.WithVariation(SharedContentAudioSystem.DefaultVariation).WithVolume(volume);
-        _audio.PlayPvs(_shuttleImpactSound, coordinates, audioParams);
+        // Rate-limited because a scrape resolves many contacts per second, see _impactSoundSpacing.
+        if (CheckShouldPlaySound(ourEntity) && CheckShouldPlaySound(otherEntity))
+        {
+            var volume = MathF.Min(10f, MathF.Pow(jungleDiff, 0.5f) - 5f);
+            var audioParams = AudioParams.Default.WithVariation(SharedContentAudioSystem.DefaultVariation).WithVolume(volume);
+            _audio.PlayPvs(_shuttleImpactSound, coordinates, audioParams);
+
+            _impactSoundAt[ourEntity] = _gameTiming.CurTime;
+            _impactSoundAt[otherEntity] = _gameTiming.CurTime;
+        }
 
         // if we're not enabled, stop after playing sound
         if (!_enabled)
@@ -282,7 +359,7 @@ public sealed partial class ShuttleSystem
             return;
 
         // E = MV^2/2
-        var energyMult = MathF.Pow(jungleDiff, 2) / 2;
+        var energyMult = MathF.Pow(jungleDiff, 2) / 2 * _energyMultiplier;
         // mass-based damage reduction to grid with more mass so that plastitanium block rammer doesn't die to lattice
         var ourMassDR = MathF.Max(otherMass / ourMass, 1f);
         var otherMassDR = MathF.Max(ourMass / otherMass, 1f);
@@ -307,25 +384,49 @@ public sealed partial class ShuttleSystem
         _impactedAt[otherEntity] = _gameTiming.CurTime;
 
         // uses local region mass for slowdown calculation so lattice doesn't have same slowdown as wall block
-        var totalInertia = impact.OurVelocity * ourMass + impact.OtherVelocity * otherMass;
+        var totalInertia = ourVelocity * ourMass + otherVelocity * otherMass;
         var inelasticVel = totalInertia / (ourMass + otherMass);
 
-        DoGridImpact((ourEntity, ourGrid, ourXform, ourBody), impact.OurFixtureDensity, inelasticVel, impact.OurVelocity, ourTile, ourTiles, toUsEnergy);
+        var ourDeltaV = DoGridImpact((ourEntity, ourGrid, ourXform, ourBody), impact.OurFixtureDensity, inelasticVel, ourVelocity, ourTile, ourTiles, toUsEnergy, out var ourBroke);
 
         // The first DoGridImpact can destroy the other grid outright, so re-check before touching it.
-        if (TerminatingOrDeleted(otherEntity) || EntityManager.IsQueuedForDeletion(otherEntity))
-            return;
+        var otherAlive = !TerminatingOrDeleted(otherEntity) && !EntityManager.IsQueuedForDeletion(otherEntity);
+        var otherDeltaV = Vector2.Zero;
+        var otherBroke = false;
+        if (otherAlive)
+            otherDeltaV = DoGridImpact((otherEntity, otherGrid, otherXform, otherBody), impact.OtherFixtureDensity, inelasticVel, otherVelocity, otherTile, otherTiles, toOtherEnergy, out otherBroke);
 
-        DoGridImpact((otherEntity, otherGrid, otherXform, otherBody), impact.OtherFixtureDensity, inelasticVel, impact.OtherVelocity, otherTile, otherTiles, toOtherEnergy);
+        // Applied once the whole drain is done, see UpdateImpact.
+        var hullGaveWay = ourBroke || otherBroke;
+        AddImpactDelta(ourEntity, ourDeltaV, hullGaveWay || !otherAlive);
+        if (otherAlive)
+            AddImpactDelta(otherEntity, otherDeltaV, hullGaveWay);
     }
 
-    private void DoGridImpact(Entity<MapGridComponent, TransformComponent, PhysicsComponent> ent,
+    private void RestoreImpactVelocity(EntityUid uid, Vector2 linear, float angular)
+    {
+        if (TerminatingOrDeleted(uid) || !_physicsQuery.TryComp(uid, out var body))
+            return;
+
+        if (!float.IsFinite(linear.X) || !float.IsFinite(linear.Y) || !float.IsFinite(angular))
+            return;
+
+        _physics.SetLinearVelocity(uid, linear, body: body);
+        _physics.SetAngularVelocity(uid, angular, body: body);
+    }
+
+    /// <summary>
+    /// Damages the impact zone and returns the velocity change the impact should cause. The caller applies it,
+    /// because the physics solver has already responded to this contact by the time we get here.
+    /// </summary>
+    private Vector2 DoGridImpact(Entity<MapGridComponent, TransformComponent, PhysicsComponent> ent,
                               float fixtureDensity,
                               Vector2 inelasticVelocity,
                               Vector2 velocity,
                               Vector2i tile,
                               int tiles,
-                              float energy)
+                              float energy,
+                              out bool brokeTiles)
     {
         // for readability to not have .Comp1 .Comp2 for everything
         var (_, grid, xform, body) = ent;
@@ -337,16 +438,17 @@ public sealed partial class ShuttleSystem
         // without this impacts which destroy tiles just make grids slice straight through each other
         var postImpactVelocity = Vector2.Lerp(velocity, inelasticVelocity, MathF.Min(1f, _impactSlowdown * tiles * fixtureDensity / body.FixturesMass));
         var deltaV = -velocity + postImpactVelocity;
-        _physics.ApplyLinearImpulse(ent, deltaV * body.FixturesMass, body: body);
 
         // process tile and entity damage
-        ProcessImpactZone(ent, grid, tile, energy, deltaV.Normalized(), radius);
+        brokeTiles = ProcessImpactZone(ent, grid, tile, energy, deltaV.Normalized(), radius);
 
         // Rat-start
 		//// throw every entity on grid if the impulse is not negligible
         //if (deltaV.Length() > _minImpulseVelocity)
         //    ThrowEntitiesOnGrid(ent, xform, -deltaV);
 		// Rat-end
+
+        return deltaV;
     }
 
     /// <summary>
@@ -422,9 +524,9 @@ public sealed partial class ShuttleSystem
     }
 
     /// <summary>
-    /// Processes a zone of tiles around the impact point
+    /// Processes a zone of tiles around the impact point. Returns whether any tile broke.
     /// </summary>
-    private void ProcessImpactZone(EntityUid uid, MapGridComponent grid, Vector2i centerTile, float energy, Vector2 dir, float radius)
+    private bool ProcessImpactZone(EntityUid uid, MapGridComponent grid, Vector2i centerTile, float energy, Vector2 dir, float radius)
     {
         // Reused across impacts - a scrape resolves many of these per tick and this is a hotspot.
         // Safe because impacts are drained one at a time from Update(), never nested.
@@ -455,6 +557,8 @@ public sealed partial class ShuttleSystem
         {
             ProcessBrokenTilesAndSparks(uid, grid, brokenTiles, sparkTiles);
         }
+
+        return brokenTiles.Count > 0;
     }
 
     /// <summary>
@@ -564,9 +668,13 @@ public sealed partial class ShuttleSystem
         if (TerminatingOrDeleted(uid))
             return;
 
-        // Spawn spark effects
+        // Spawn spark effects, up to the drain's budget
         foreach (var tile in sparkTiles)
         {
+            if (_sparkBudget <= 0)
+                break;
+
+            _sparkBudget--;
             var coords = _mapSystem.GridTileToLocal(uid, grid, tile);
             Spawn(_sparkEffect, coords);
         }
@@ -579,6 +687,15 @@ public sealed partial class ShuttleSystem
     private bool CheckShouldLog(EntityUid uid)
     {
         return !(_impactedAt.TryGetValue(uid, out var last) && _gameTiming.CurTime < last + _adminLogSpacing);
+    }
+
+    /// <summary>
+    /// Check whether this grid is allowed another impact sound yet. Used to keep a ram from spawning more audio
+    /// entities than a client can hold sources for.
+    /// </summary>
+    private bool CheckShouldPlaySound(EntityUid uid)
+    {
+        return !(_impactSoundAt.TryGetValue(uid, out var last) && _gameTiming.CurTime < last + _impactSoundSpacing);
     }
 
     /// <summary>
@@ -599,6 +716,20 @@ public sealed partial class ShuttleSystem
         foreach (var uid in _staleImpacts)
         {
             _impactedAt.Remove(uid);
+        }
+
+        _staleImpacts.Clear();
+
+        var soundCutoff = _gameTiming.CurTime - _impactSoundSpacing;
+        foreach (var (uid, time) in _impactSoundAt)
+        {
+            if (time < soundCutoff || TerminatingOrDeleted(uid))
+                _staleImpacts.Add(uid);
+        }
+
+        foreach (var uid in _staleImpacts)
+        {
+            _impactSoundAt.Remove(uid);
         }
 
         _staleImpacts.Clear();

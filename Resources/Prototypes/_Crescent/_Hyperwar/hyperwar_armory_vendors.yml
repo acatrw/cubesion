@@ -15,7 +15,7 @@
     access:
     - [ "NCWLGeneral" ]
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_ncwl.rsi
   - type: CMAutomatedVendor
     jobs:
     - PartisanNCWL
@@ -224,7 +224,7 @@
     access:
     - [ "Empire" ]
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_dsm.rsi
   - type: CMAutomatedVendor
     jobs:
     - LevymanDSM
@@ -429,7 +429,7 @@
     access:
     - [ "Shinohara" ]
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_shi.rsi
   - type: CMAutomatedVendor
     jobs:
     - CorpsecSHI
@@ -703,7 +703,7 @@
     access:
     - [ "SyndicateBasic" ]
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_tfsc.rsi
   - type: CMAutomatedVendor
     jobs:
     - InfanteerTFSC
@@ -1008,7 +1008,7 @@
   description: An automated depot wired into the fleet magazines. All ship-gun ordnance, free to restock.
   components:
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/armory_neutral.rsi
   - type: CMAutomatedVendor
     sections:
     - name: Autocannon Drums
@@ -1150,7 +1150,7 @@
     access:
     - [ "NCWLGeneral" ]
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_ncwl.rsi
   - type: CMAutomatedVendor
     jobs:
     - PartisanNCWL
@@ -1183,7 +1183,7 @@
     access:
     - [ "Empire" ]
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_dsm.rsi
   - type: CMAutomatedVendor
     jobs:
     - LevymanDSM
@@ -1222,7 +1222,7 @@
     access:
     - [ "Shinohara" ]
   - type: Sprite
-    sprite: _Crescent/Structures/armory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_shi.rsi
   - type: CMAutomatedVendor
     jobs:
     - CorpsecSHI
@@ -1250,7 +1250,7 @@
     access:
     - [ "SyndicateBasic" ]
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_tfsc.rsi
   - type: CMAutomatedVendor
     jobs:
     - InfanteerTFSC

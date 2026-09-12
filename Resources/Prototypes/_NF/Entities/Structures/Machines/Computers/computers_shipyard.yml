@@ -27,7 +27,8 @@
     - map: ["computerLayerKeyboard"]
       state: generic_keyboard
     - map: ["computerLayerScreen"]
-      state: shipyard
+      sprite: _Crescent/Structures/Machines/shipyard_console.rsi
+      state: screen
     - map: ["computerLayerKeys"]
       state: telesci_key
   - type: Appearance

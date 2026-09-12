@@ -1095,8 +1095,8 @@
 - type: entity
   parent: VendingMachineSnack
   id: VendingMachineSustenance
-  name: Sustenance Vendor
-  description: A vending machine which vends food, as required by section 47-C of the NT's Prisoner Ethical Treatment Agreement.
+  name: SHI compact ration vendor
+  description: A Shinohara Heavy Industries vending machine supplying compact military rations throughout the sector. Shelf-stable nutrition for soldiers, spacers, and anyone else with credits, regardless of allegiance.
   components:
   - type: VendingMachine
     pack: SustenanceInventory
@@ -1108,8 +1108,12 @@
     ejectState: eject-unshaded
     initialStockQuality: 1
     denyState: deny-unshaded
+  - type: Advertise
+    pack: ShinoharaSustenanceAds
+  - type: SpeakOnUIClosed
+    pack: ShinoharaSustenanceGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/sustenance.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/sustenance_shi.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]

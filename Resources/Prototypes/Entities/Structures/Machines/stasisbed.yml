@@ -16,8 +16,7 @@
     noRot: true
     layers:
     - state: icon
-    - state: unlit
-      shader: unshaded
+    - state: unlit # Eclipsion - not unshaded; the unlit state covers the whole mattress, so an emissive layer made the bed glow through darkness.
       map: ["enum.StasisBedVisualLayers.IsOn"]
   - type: StasisBedVisuals
   - type: Appearance

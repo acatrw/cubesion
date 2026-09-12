@@ -17,6 +17,7 @@
     to Domain, not a second commander. Noble, burgher, Saintsworn, Freeholder and Oathbound interests compete inside the
     same charter, making Imperial politics a struggle over privilege, precedent, service and obligation.
   color: "#9FED58"
+  uiAccent: "#9D7BE6"
   weight: 8
   enabled: true
   # Held level against NCWL: the war is between these two, so they only ever measure each other.
@@ -45,6 +46,7 @@
     during the first uprising. If the revolution succeeds, League territory is expected to become recognized Workers'
     Union territory rather than a permanent NCWL state.
   color: "#9FED58"
+  uiAccent: "#D9962B"
   weight: 7
   enabled: true
   balanceMode: parity
@@ -71,6 +73,7 @@
     prevention has failed. Shinohara does not need to conquer Crescent: it wants large-scale trade, war and extraction to
     become economically painful without its credit, parts and infrastructure somewhere in the transaction.
   color: "#9FED58"
+  uiAccent: "#6FB0A6"
   weight: 6
   enabled: true
   # Capped at a quarter of everyone playing, but never constrains DSM/NCWL: an empty support faction
@@ -100,6 +103,7 @@
     Members may compete, bargain hard and keep proprietary information. They may not betray accepted joint operations or
     ignore a valid Administrator order while claiming the benefits of the Federation charter.
   color: "#9FED58"
+  uiAccent: "#D0463F"
   weight: 5
   enabled: true
   balanceMode: share
@@ -125,6 +129,7 @@
     one of their best-known common markets and meeting places, but the Pact has no fixed territorial capital. Smaller
     caravans, hidden docks, workshops and pilgrim ships carry the same society wherever the routes lead.
   color: "#9FED58"
+  uiAccent: "#5DBB5A"
   weight: 4
   enabled: true
   icon:
@@ -148,6 +153,7 @@
     it at war with the Mandate itself: Imperial authorities license useful psions and may protect Oathbound subjects whom
     Militia hunters consider legitimate targets. Local tolerance never gives the movement universal Imperial authority.
   color: "#9FED58"
+  uiAccent: "#B8A97A"
   weight: 3
   enabled: false
   icon:
@@ -172,6 +178,7 @@
     functioning local ruler is cheaper and more effective than direct administration. A Crown contingent therefore
     carries enormous political weight without replacing the Lord Admiral's routine frontier command.
   color: "#ffffed"
+  uiAccent: "#E0CF8A"
   weight: 2
   enabled: false
   icon:
@@ -190,6 +197,7 @@
     forces later destroyed Analiesse, its mobile headquarters and fleet base. Survivors carried Minutemen law to Gliess
     Santo, where the modern Sheriff and Deputies inherit its local jurisdiction and civilian-protection ideals.
   color: "#9FED58"
+  uiAccent: "#4E8FD6"
   weight: 1
   enabled: false
   icon:

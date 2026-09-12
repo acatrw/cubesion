@@ -91,6 +91,11 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     private float _accumulatedFrameTime;
     private float _uiTps;
 
+    /// <summary>
+    ///     Crescent: set by <see cref="RefreshShuttleConsoles()"/>, consumed once at the start of Update.
+    /// </summary>
+    private bool _consolesDirty;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -257,14 +262,20 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     /// </summary>
     public void RefreshShuttleConsoles(EntityUid gridUid)
     {
-        var exclusions = new List<ShuttleExclusionObject>();
-        GetExclusions(ref exclusions);
         _consoles.Clear();
         _lookup.GetChildEntities(gridUid, _consoles);
 
+        // Crescent: the dock list is the same for every console in this sweep, so build it once - and only
+        // once we know some console on this grid is actually open to receive it.
+        Dictionary<NetEntity, List<DockingPortState>>? docks = null;
+
         foreach (var entity in _consoles)
         {
-            UpdateState(entity, entity.Comp);
+            if (!_ui.IsUiOpen(entity.Owner, ShuttleConsoleUiKey.Key))
+                continue;
+
+            docks ??= GetAllDocks();
+            UpdateState(entity, entity.Comp, docks);
         }
 
         _dockingConsole.UpdateConsolesUsing(gridUid); // Lavaland Change: FTL
@@ -418,14 +429,34 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     /// <summary>
     /// Refreshes all of the data for shuttle consoles.
     /// </summary>
+    /// <remarks>
+    /// Crescent: coalesced into one sweep per tick. Undocking a hull calls this once per docking port, and
+    /// each of those calls it a second time through <see cref="UndockEvent"/>; the sweep is world-wide, so
+    /// a four-port ship cast off ran eight identical rebuilds in the same tick. Consoles that need state
+    /// right now (a UI opening, a targeting mode change) call <see cref="UpdateState"/> directly and are
+    /// unaffected.
+    /// </remarks>
     public void RefreshShuttleConsoles()
     {
-        //var exclusions = new List<ShuttleExclusionObject>();
-        //GetExclusions(ref exclusions);
+        _consolesDirty = true;
+    }
+
+    private void DoRefreshShuttleConsoles()
+    {
+        _consolesDirty = false;
+
+        // Every console in the sweep gets the same dock list, so build it at most once - and not at all if
+        // nobody has a console open.
+        Dictionary<NetEntity, List<DockingPortState>>? docks = null;
+
         var query = AllEntityQuery<ShuttleConsoleComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
-            UpdateState(uid, comp);
+            if (!_ui.IsUiOpen(uid, ShuttleConsoleUiKey.Key))
+                continue;
+
+            docks ??= GetAllDocks();
+            UpdateState(uid, comp, docks);
         }
     }
 
@@ -797,8 +828,19 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
         return turrets;
     }
 
-    public void UpdateState(EntityUid consoleUid, ShuttleConsoleComponent console)
+    /// <param name="docks">
+    ///     Crescent: a dock list already built by the caller. <see cref="GetAllDocks"/> walks every docking
+    ///     port on the server, and the result is identical for every console, so a sweep builds it once and
+    ///     hands it down instead of rebuilding it per console.
+    /// </param>
+    public void UpdateState(EntityUid consoleUid, ShuttleConsoleComponent console, Dictionary<NetEntity, List<DockingPortState>>? docks = null)
     {
+        // Crescent: a closed console rebuilds its whole state from BoundUIOpenedEvent, so building one here
+        // only burns a world-wide dock scan, a world-wide projectile scan and a turret scan on a UI nobody
+        // is looking at. Docking alone used to fire this for every console on the server, once per port.
+        if (!_ui.IsUiOpen(consoleUid, ShuttleConsoleUiKey.Key))
+            return;
+
         EntityUid? entity = consoleUid;
 
         var getShuttleEv = new ConsoleShuttleEvent
@@ -814,7 +856,7 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
 
         NavInterfaceState navState;
         ShuttleMapInterfaceState mapState;
-        var dockState = GetDockState();
+        var dockState = new DockingInterfaceState(docks ?? GetAllDocks()); // Crescent: reuse the sweep's list.
         var iffState = GetIFFState(consoleUid, null);
         var crewState = GetCrewState(consoleUid, console);
 
@@ -878,6 +920,9 @@ public sealed partial class ShuttleConsoleSystem : SharedShuttleConsoleSystem
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
+
+        if (_consolesDirty) // Crescent: one coalesced sweep for everything that dirtied consoles this tick.
+            DoRefreshShuttleConsoles();
 
         var toRemove = new ValueList<(EntityUid, PilotComponent)>();
         var query = EntityQueryEnumerator<PilotComponent>();

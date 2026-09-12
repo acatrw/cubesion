@@ -3151,7 +3151,7 @@ entities:
       parent: 1
     - type: PointLight
       energy: 1
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 395
     components:

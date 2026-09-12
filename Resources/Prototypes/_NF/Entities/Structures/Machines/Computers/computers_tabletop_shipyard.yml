@@ -12,8 +12,8 @@
       sprite: _NF/Structures/Machines/computer_tabletop.rsi
       state: generic_keyboard_tabletop
     - map: ["computerLayerScreen"]
-      sprite: _NF/Structures/Machines/computers.rsi
-      state: shipyard
+      sprite: _Crescent/Structures/Machines/shipyard_console.rsi
+      state: screen
     - map: ["computerLayerKeys"]
       sprite: _NF/Structures/Machines/computers.rsi
       state: telesci_key
@@ -33,8 +33,8 @@
       sprite: _NF/Structures/Machines/computer_tabletop.rsi
       state: generic_keyboard_tabletop
     - map: ["computerLayerScreen"]
-      sprite: _NF/Structures/Machines/computers.rsi
-      state: shipyard
+      sprite: _Crescent/Structures/Machines/shipyard_console.rsi
+      state: screen
     - map: ["computerLayerKeys"]
       sprite: _NF/Structures/Machines/computers.rsi
       state: telesci_key

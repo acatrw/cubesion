@@ -2072,7 +2072,7 @@ entities:
     - type: Transform
       pos: 8.481326,8.370146
       parent: 2
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 304
     components:

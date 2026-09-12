@@ -1,5 +1,6 @@
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
+using Content.Server.Gatherable.Components;
 using Content.Shared._Crescent;
 using Content.Shared.Physics;
 using Content.Shared.PointCannons;
@@ -65,6 +66,16 @@ public sealed class ShipWeaponTargetingSystem : EntitySystem
         {
             if (!HasComp<ProjectileComponent>(projectile))
                 continue;
+
+            // Mining projectiles such as the Exhumer must never target plating. Besides being outside
+            // their intended role, enabling tile sweeps makes a round fired over its own hull hit that hull.
+            if (HasComp<GatheringProjectileComponent>(projectile))
+            {
+                if (TryComp<ProjectilePhasePreventComponent>(projectile, out var miningPhase))
+                    miningPhase.TargetTiles = false;
+
+                continue;
+            }
 
             // Snapshot at launch: changing the console must not retarget rounds already in flight.
             if (mode != ShipWeaponTargetingMode.TilesAndWalls)

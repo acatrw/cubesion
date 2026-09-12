@@ -1,0 +1,18 @@
+- type: entity
+  parent: DrinkHotCoffee
+  id: DrinkShinoharaCoffee
+  name: Shinohara corporate blend
+  description: A smooth, dark roast issued to Shinohara personnel who have deadlines to conquer. Drinking it grants a short-lived adrenaline rush and a slight speed boost. The cup insists the cat mascot is a productivity feature.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        reagents:
+        - ReagentId: Coffee
+          Quantity: 14
+        - ReagentId: Cream
+          Quantity: 2
+        - ReagentId: Sugar
+          Quantity: 2
+        - ReagentId: Epinephrine
+          Quantity: 2

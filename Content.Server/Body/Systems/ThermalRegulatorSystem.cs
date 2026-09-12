@@ -12,12 +12,6 @@ public sealed class ThermalRegulatorSystem : EntitySystem
     [Dependency] private readonly TemperatureSystem _tempSys = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlockerSys = default!;
 
-    /// <summary>
-    /// How much of the gap between normal body temperature and the temperature that starts burning the
-    /// body the comfortable range is allowed to cover.
-    /// </summary>
-    private const float SafeOverheatFraction = 0.25f;
-
     public override void Initialize()
     {
         base.Initialize();
@@ -78,13 +72,12 @@ public sealed class ThermalRegulatorSystem : EntitySystem
         tempDiff = Math.Abs(ent.Comp2.CurrentTemperature - ent.Comp1.NormalBodyTemperature);
         targetHeat = tempDiff * heatCapacity;
 
-        var overheating = ent.Comp2.CurrentTemperature > ent.Comp1.NormalBodyTemperature;
-
-        // Active regulation starts once the body temperature leaves the comfortable range.
-        if (tempDiff < GetRegulationThreshold(ent.Comp1, ent.Comp2, overheating))
-            return;
-
-        if (overheating)
+        // Sweating and shivering always pull the body back towards normal - they are capped by targetHeat, so
+        // a small drift gets a small correction. Do not gate this on ThermalRegulationTemperatureThreshold:
+        // upstream only regulated INSIDE that range (a body 25K+ off normal gave up and ran away), and flipping
+        // it to only regulate OUTSIDE the range parked everyone 25K off normal - sealed suits cooked their
+        // wearer at 335K and in plain station air bodies sat at ~301K, right on the Unathi cold slowdown.
+        if (ent.Comp2.CurrentTemperature > ent.Comp1.NormalBodyTemperature)
         {
             if (!_actionBlockerSys.CanSweat(ent))
                 return;
@@ -98,27 +91,5 @@ public sealed class ThermalRegulatorSystem : EntitySystem
 
             _tempSys.ChangeHeat(ent, Math.Min(targetHeat, ent.Comp1.ShiveringHeatRegulation), ignoreHeatResistance: true, ent);
         }
-    }
-
-    /// <summary>
-    /// How far the body is allowed to drift from its normal temperature before sweating or shivering starts.
-    /// </summary>
-    /// <remarks>
-    /// Metabolism always outpaces implicit regulation (a human nets +200 J/s above normal), so the only thing
-    /// dumping that heat is the surrounding air. Anything that stops the air taking it - a hardsuit's
-    /// TemperatureProtection multiplies atmospheric exchange by as little as 0.001, while metabolism ignores heat
-    /// resistance entirely - parks the body at normalBodyTemperature + the configured threshold. For a human that
-    /// is 335K, above the 325K where burn damage starts, so a sealed suit slowly cooked its wearer. Clamp the hot
-    /// side of the range so the parking spot always stays under the burn threshold. The cold side is untouched.
-    /// </remarks>
-    private float GetRegulationThreshold(ThermalRegulatorComponent regulator, TemperatureComponent temperature, bool overheating)
-    {
-        if (!overheating)
-            return regulator.ThermalRegulationTemperatureThreshold;
-
-        var heatDamageThreshold = temperature.ParentHeatDamageThreshold ?? temperature.HeatDamageThreshold;
-        var headroom = heatDamageThreshold - regulator.NormalBodyTemperature;
-
-        return Math.Min(regulator.ThermalRegulationTemperatureThreshold, Math.Max(0f, headroom * SafeOverheatFraction));
     }
 }

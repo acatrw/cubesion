@@ -2467,7 +2467,7 @@ entities:
       parent: 217
     - type: Physics
       canCollide: False
-- proto: PoweredlightLED
+- proto: Poweredlight
   entities:
   - uid: 219
     components:

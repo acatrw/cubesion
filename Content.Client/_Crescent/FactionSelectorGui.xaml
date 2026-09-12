@@ -1,8 +1,13 @@
 <BoxContainer xmlns="https://spacestation14.io"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               HorizontalExpand="True">
-    <BoxContainer>
-        <BoxContainer Name="CFactionList" Orientation="Vertical" />
-        <BoxContainer Name="FactionInfo" Orientation="Vertical" />
+    <!-- Eclipsion - the info side takes the width that is left instead of a fixed 1012px, so the lobby's
+         right-hand panel (and its chat) is no longer pushed off screen. -->
+    <BoxContainer HorizontalExpand="True" VerticalExpand="True" SeparationOverride="8">
+        <BoxContainer Name="CFactionList" Orientation="Vertical" MinWidth="300" Margin="4 4 0 4" />
+        <ScrollContainer HorizontalExpand="True" VerticalExpand="True" HScrollEnabled="False">
+            <BoxContainer Name="FactionInfo" Orientation="Vertical" HorizontalExpand="True"
+                          SeparationOverride="6" Margin="0 4 8 8" />
+        </ScrollContainer>
     </BoxContainer>
 </BoxContainer>

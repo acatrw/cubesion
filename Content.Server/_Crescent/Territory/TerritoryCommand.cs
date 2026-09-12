@@ -1,6 +1,7 @@
 using System.Linq;
 using Content.Server.Administration;
 using Content.Shared.Administration;
+using Content.Shared._Crescent.Factions;
 using Content.Shared._Crescent.Territory;
 using Robust.Shared.Console;
 
@@ -21,13 +22,14 @@ public sealed class TerritoryCommand : IConsoleCommand
     public string Help =>
         "Usage: territory <list|set|clear|forget>\n" +
         "  list                     - every region in the save or on the current map\n" +
-        "  set <regionId> <faction> - hand a region to DSM, NCWL, TFSC or SHI\n" +
+        "  set <regionId> <faction> - hand a region to DSM, NCWL, TFCF or SHI\n" +
         "  clear <regionId>         - return a region to nobody\n" +
         "  forget <regionId>        - drop the save row, so the map's own owner applies next load";
 
     [Dependency] private readonly IEntitySystemManager _systems = default!;
 
-    private static IReadOnlyList<string> Factions => PersistentTerritoryFactions.Supported;
+    private static IEnumerable<string> Factions =>
+        PersistentTerritoryFactions.Supported.Select(FactionDisplay.Abbreviation);
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -48,7 +50,7 @@ public sealed class TerritoryCommand : IConsoleCommand
             case "set":
                 if (args.Length < 3)
                 {
-                    shell.WriteError("Usage: territory set <regionId> <DSM|NCWL|TFSC|SHI>");
+                    shell.WriteError("Usage: territory set <regionId> <DSM|NCWL|TFCF|SHI>");
                     return;
                 }
 
@@ -58,7 +60,7 @@ public sealed class TerritoryCommand : IConsoleCommand
                     return;
                 }
 
-                shell.WriteLine($"Region '{args[1]}' is now held by {args[2].Trim().ToUpperInvariant()}.");
+                shell.WriteLine($"Region '{args[1]}' is now held by {FactionDisplay.Abbreviation(FactionDisplay.ResolveId(args[2].Trim())).ToUpperInvariant()}.");
                 return;
 
             case "clear":
@@ -101,8 +103,12 @@ public sealed class TerritoryCommand : IConsoleCommand
 
         foreach (var region in regions)
         {
+            var owner = FactionDisplay.Abbreviation(region.Owner);
+            if (owner.Length == 0)
+                owner = "-";
+
             shell.WriteLine(
-                $"{region.RegionId,-28} {region.Owner ?? "-",-6} " +
+                $"{region.RegionId,-28} {owner,-6} " +
                 $"{(region.Loaded ? "loaded" : "saved "),-7} {region.Name}");
         }
     }

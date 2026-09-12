@@ -4,9 +4,11 @@
 # GAMERULES ARE WHAT DECIDES WHAT SPAWNS IN, BY EVERYTHING IN THE ADVENTURERULE COMPONENT
 #
 # gameMapsByID is a DICTIONARY that describes all spawned grids defined by a gameMap.
-# this is stuff like Port Balreska, which has nova_balreska.yml (MAP) and novabalreska.yml (PROTOTYPE)
+# this is stuff like Port Zarya, which has zarya.yml as both its map and gameMap prototype
 # you can give the dictionary key whatever name you want
 # gameMapID must equal the ID of the gameMap prototype's YML.
+# FreeplayBalreska inherits the DSM/NCWL layout and overrides NCWLHomeStation with Nova Balreska.
+# Existing presets keep Port Zarya; select the freeplaybalreska preset for Nova Balreska.
 # posX & posY define the position it will be spawned at
 # randomOffsetX & randomOffsetY describe an offset that will be applied to the position. leave undefined or at 0 to spawn as is. This offset is ALWAYS POSITIVE.
 # IFFColor changes what color the IFF in the shuttle and map screen will have. Use colors from the Color type, like White, Aqua, Blue, etc.
@@ -22,7 +24,7 @@
 # (1 chunk = 128 units, bounds are inclusive chunk coords).
 #
 #   origin        Gliess Santo            0,     0
-#   axes          Aurora Imperialis (DSM) 0,  5000    Port Balreska (NCWL)   0, -5000
+#   axes          Aurora Imperialis (DSM) 0,  5000    Port Zarya (NCWL)      0, -5000
 #                 Freeport (TFCF)      5000,     0    Tatsumoto (SHI)    -5000,     0
 #   diagonals     Abandoned Station    2000,  2000    Taypan-1 belt      -2000,  2000
 #                 Taypan-2 belt        2000, -2000    Ship Graveyard     -2000, -2000
@@ -111,7 +113,7 @@
     respawnTimeMinutes: 5
   - type: AdventureRule
     gameMapsByID:
-      PortZarya:
+      NCWLHomeStation:
         gameMapID: PortZarya
         posX: 0
         posY: -5000
@@ -257,7 +259,7 @@
     respawnTimeMinutes: 5
   - type: AdventureRule
     gameMapsByID:
-      PortZarya:
+      NCWLHomeStation:
         gameMapID: PortZarya
         posX: 0
         posY: -5000
@@ -665,8 +667,8 @@
   - type: AdventureRule
     worldgenConfig: RatWorld
     gameMapsByID:
-      PortZaryaHyperwar:
-        gameMapID: PortZaryaHyperwar
+      NCWLHomeStation:
+        gameMapID: PortZarya
         posX: 0
         posY: -5000
         IFFColor: Orange

@@ -7313,20 +7313,20 @@ entities:
     - type: Transform
       pos: -5.5,28.5
       parent: 1
-- proto: ImperialFlag
+- proto: DSMBattlewornFlagSpawner
   entities:
   - uid: 1549
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 2.5,-0.5
       parent: 1
   - uid: 1550
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -1.5,-0.5
       parent: 1
+    - type: RandomSpawner
+      chance: 0.5
 - proto: KitchenReagentGrinder
   entities:
   - uid: 1551

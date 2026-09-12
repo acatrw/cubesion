@@ -58,6 +58,18 @@ public sealed partial class ShipRepairScopePrototype : IPrototype
     public EntityWhitelist? Debris;
 
     /// <summary>
+    /// Valuable parts which may only be reinstated after the exact entity recorded in the snapshot
+    /// has been deleted. Moving one off the ship must not make the slip manufacture another copy.
+    /// </summary>
+    /// <remarks>
+    /// This is deliberately narrower than <see cref="Whitelist"/>. Ordinary hull fittings can keep
+    /// the existing repair behaviour, while shields, control consoles and weapons retain their
+    /// identity wherever a player carries them.
+    /// </remarks>
+    [DataField]
+    public EntityWhitelist? ReplacementRequiresDestruction;
+
+    /// <summary>
     /// What the yard charges over the plain material value of a part, for the kinds of part that take
     /// a specialist and a crane rather than a welder - shield emitters, engines, and the guns, the
     /// heavier the worse. It multiplies both the price of putting one back and the price of beating

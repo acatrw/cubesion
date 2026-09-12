@@ -1,5 +1,5 @@
 # Faction equipment vendors: free "basic wardrobe" racks. Built on the ColMarTech automated-vendor
-# (CMAutomatedVendor) so they share the exact look/behaviour of every other autovendor. Each section uses
+# (CMAutomatedVendor) so they behave like every other autovendor, on the faction supply chassis. Each section uses
 # "takeAll", which lets a member draw one of each listed item (tracked per player, so it survives death/regear).
 # Hardsuits and voidsuits are intentionally excluded here -- draw those from an armory.
 #
@@ -18,7 +18,7 @@
   - type: ActivatableUIRequiresAccess
     popupMessage: faction-vendor-access-denied
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_dsm.rsi
   - type: CMAutomatedVendor
     sections:
     - name: Radio
@@ -79,7 +79,7 @@
   - type: ActivatableUIRequiresAccess
     popupMessage: faction-vendor-access-denied
   - type: Sprite
-    sprite: _Crescent/Structures/syndicatearmory.rsi
+    sprite: _Crescent/Structures/Machines/Vendors/supply_ncwl.rsi
   - type: CMAutomatedVendor
     sections:
     - name: Radio
