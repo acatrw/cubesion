@@ -764,6 +764,16 @@
   suffix: Tabletop, NCWL
 
 - type: entity
+  parent: [BaseComputerTabletopHullrotDroneControl, ComputerDroneControlCDTt2]
+  id: ComputerTabletopDroneControlCDT2
+  suffix: Tabletop, CDT
+
+- type: entity
+  parent: [BaseComputerTabletopHullrotDroneControl, ComputerDroneControlCDTt3]
+  id: ComputerTabletopDroneControlCDT3
+  suffix: Tabletop, CDT
+
+- type: entity
   parent: [ComputerTabletopTargeting, ComputerTargetingCapturable]
   id: ComputerTabletopTargetingCapturable
   suffix: Tabletop, Capturable territory
