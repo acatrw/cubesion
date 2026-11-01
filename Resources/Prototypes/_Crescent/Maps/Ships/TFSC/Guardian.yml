@@ -1,0 +1,34 @@
+# Author Info
+# Discord: @ninruB
+#
+- type: vessel
+  id: Guardian
+  name: CDT Guardian
+  description: |
+
+    SHIELD: Bulwark
+    SPEED: 20 m/s
+  price: 100000
+  category: Medium
+  group: None
+  path: /Maps/_Crescent/Shuttles/TFSC/Guardian.yml
+
+- type: gameMap
+  id: Guardian
+  mapName: 'CDT Guardian'
+  mapPath: /Maps/_Crescent/Shuttles/TFSC/Guardian.yml
+  minPlayers: 0
+  stations:
+    Guardian:
+      stationProto: StandardCrescentCivilianVessel
+      components:
+        - type: VesselIcon
+          iffIcon:
+            sprite: _Crescent/ShipIcons/ifficons.rsi
+            state: carrier
+        - type: StationNameSetup
+          mapNameTemplate: 'GSC Guardian {1}'
+          nameGenerator:
+            !type:NanotrasenNameGenerator
+            prefixCreator: '14'
+        - type: VesselDesignation
